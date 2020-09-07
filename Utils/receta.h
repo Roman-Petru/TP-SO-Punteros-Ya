@@ -1,3 +1,5 @@
+#include <commons/collections/dictionary.h>
+
 extern t_dictionary* diccionario_recetas;
 
 typedef enum {
