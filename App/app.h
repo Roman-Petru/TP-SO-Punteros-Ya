@@ -2,8 +2,8 @@
 #include <commons/collections/list.h>
 #include "../Utils/configs.h"
 #include "stddef.h"
-#include<stdlib.h>
-
+#include <stdlib.h>
+#include <string.h>
 
 typedef struct{
 	int posicion_x;
