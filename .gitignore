@@ -43,11 +43,6 @@
 *.i*86
 *.x86_64
 *.hex
-app
-cliente
-comanda
-restaurante
-sindicato
 
 # Debug files
 *.dSYM/
