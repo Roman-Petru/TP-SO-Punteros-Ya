@@ -28,6 +28,14 @@
 *.so.*
 *.dylib
 
+# Eclipse
+.settings
+.cproject
+.project
+
+# Log
+*.log
+
 # Executables
 *.exe
 *.out
