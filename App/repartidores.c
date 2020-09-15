@@ -55,7 +55,10 @@ t_repartidor* encontrar_repartidor_mas_cercano(t_list* lista_repartidores_libres
 		repartidor_a_probar = list_get(lista_repartidores_libres, i);
 		int distancia_minima_para_comparar = calcular_distancia(repartidor_a_probar->posicion->x,repartidor_a_probar->posicion->y, posicion_buscada->x, posicion_buscada->y);
 		if (distancia_minima_para_comparar < distancia_minima)
+		{
 			j = i;
+			distancia_minima = distancia_minima_para_comparar;
+		}
 
 	}
 
