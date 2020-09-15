@@ -2,62 +2,89 @@
 
 
 
-
-t_list* inicializar_repartidores()
-{
-	t_list* lista_repartidores_libres = list_create();
-	t_config* config = leer_config("app.config");
-	char** repartidores = config_get_array_value(config, "REPARTIDORES");
-	char** tiempos_de_descanso = config_get_array_value(config, "TIEMPO_DE_DESCANSO");
-	char** frecuencias_de_descanso = config_get_array_value(config, "FRECUENCIA_DE_DESCANSO");
-
-	int i = 0;
-
-			while (repartidores[i] != NULL)
-			{
-				t_repartidor* repartidor = malloc(sizeof(t_repartidor));
-
-				//SEPARO POSICIONES X E Y DE REPARTIDOR
-				char* token;
-				token = strtok(repartidores[i], "|");
-				repartidor->posicion_x = atoi (token);
-				token = strtok(NULL, "|");
-				repartidor->posicion_y = atoi (token);
-
-
-
-				repartidor->frecuencia_descanso = atoi (frecuencias_de_descanso[i]);
-				repartidor->tiempo_descanso = atoi (tiempos_de_descanso[i]);
-
-				list_add(lista_repartidores_libres, repartidor);
-				free(repartidor);
-
-				i = i+1;
-
-			}
-	return lista_repartidores_libres;
-}
-
-
-
-t_repartidor* mover_repartidor_hacia(t_repartidor* repartidor, int hacia_posicion_x, int hacia_posicion_y)
-{
-	if (repartidor->posicion_x > hacia_posicion_x){
-		repartidor->posicion_x = repartidor->posicion_x - 1;
-	}else if (repartidor->posicion_x < hacia_posicion_x){
-		repartidor->posicion_x = repartidor->posicion_x + 1;
-	}else if (repartidor->posicion_y < hacia_posicion_y){
-		repartidor->posicion_y = repartidor->posicion_y + 1;
-	}else if (repartidor->posicion_y > hacia_posicion_y){
-		repartidor->posicion_y = repartidor->posicion_y - 1;
-	}
-	return repartidor;
-}
-
 int calcular_distancia (int posicion_x, int posicion_y, int hacia_posicion_x, int hacia_posicion_y)
 {
 	int distancia = sqrt((hacia_posicion_x - posicion_x) * (hacia_posicion_x - posicion_x) + (hacia_posicion_y - posicion_y) * (hacia_posicion_y - posicion_y));
 	return distancia;
 }
+
+
+t_list* agregar_repartidores_a_lista_libre(t_list* lista_repartidores_libres, char** repartidores, char** tiempos_de_descanso, char** frecuencias_de_descanso)
+{
+	int i;
+	for (i=0; repartidores[i] != NULL; i++)
+	{
+		t_repartidor* repartidor = malloc(sizeof(t_repartidor));
+
+			//SEPARO POSICIONES X E Y DE REPARTIDOR
+
+		char** token = malloc(30);
+
+		token = string_n_split(repartidores[i], 2, "|");
+
+		repartidor->posicion = malloc(sizeof(t_posicion));
+
+		repartidor->posicion->x = (int)strtol (token[0], NULL, 10);
+		repartidor->posicion->y = (int)strtol (token[1], NULL, 10);
+
+		free(token);
+
+		repartidor->frecuencia_descanso = (int)strtol (frecuencias_de_descanso[i], NULL, 10);
+		repartidor->tiempo_descanso = (int)strtol (tiempos_de_descanso[i], NULL, 10);
+
+		list_add(lista_repartidores_libres, repartidor);
+
+	}
+
+
+	return lista_repartidores_libres;
+}
+
+t_repartidor* encontrar_repartidor_mas_cercano(t_list* lista_repartidores_libres, t_posicion* posicion_buscada)
+{
+	int tamanio_lista = list_size(lista_repartidores_libres);
+	int i = 0;
+	int j = 0;
+
+	t_repartidor* repartidor_a_probar;
+	repartidor_a_probar = list_get(lista_repartidores_libres, i);
+	int distancia_minima = calcular_distancia(repartidor_a_probar->posicion->x,repartidor_a_probar->posicion->y, posicion_buscada->x, posicion_buscada->y);
+
+	for (i=1; i < tamanio_lista; i++)
+	{
+		repartidor_a_probar = list_get(lista_repartidores_libres, i);
+		int distancia_minima_para_comparar = calcular_distancia(repartidor_a_probar->posicion->x,repartidor_a_probar->posicion->y, posicion_buscada->x, posicion_buscada->y);
+		if (distancia_minima_para_comparar < distancia_minima)
+			j = i;
+
+	}
+
+	repartidor_a_probar = list_get(lista_repartidores_libres, j);
+
+	return repartidor_a_probar;
+}
+
+
+
+
+
+
+
+
+
+t_repartidor* mover_repartidor_hacia(t_repartidor* repartidor, int hacia_posicion_x, int hacia_posicion_y)
+{
+	if (repartidor->posicion->x > hacia_posicion_x){
+		repartidor->posicion->x = repartidor->posicion->x - 1;
+	}else if (repartidor->posicion->x < hacia_posicion_x){
+		repartidor->posicion->x = repartidor->posicion->x + 1;
+	}else if (repartidor->posicion->y < hacia_posicion_y){
+		repartidor->posicion->y = repartidor->posicion->y + 1;
+	}else if (repartidor->posicion->y > hacia_posicion_y){
+		repartidor->posicion->y = repartidor->posicion->y - 1;
+	}
+	return repartidor;
+}
+
 
 
