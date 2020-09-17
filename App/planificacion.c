@@ -19,6 +19,9 @@ void planificador_largo_plazo()
 		if (list_size(lista_repartidores_libres) != 0)
 			{
 			t_repartidor* repartidor_cercano = encontrar_repartidor_mas_cercano(lista_repartidores_libres, pedido->posicion_de_restaurante);
+			
+			//falta sacar repartidor de lista
+			
 			pedido->repartidor = repartidor_cercano;
 			pedido->estado_pcb = READY;
 			list_remove(cola_NEW, 0);
