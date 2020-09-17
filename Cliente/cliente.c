@@ -1,27 +1,39 @@
 #include "cliente.h"
-#include <commons/log.h>
-#include <readline/readline.h>
+#include "../Consola/consola.h"
+#include "../Red/cliente_red.h"
 
-void leer_consola(t_log* logger);
+t_cliente_red* cliente;
+t_consola* consola;
+bool hay_que_leer;
 
-int main(void)
+//========== COMANDOS ==========//
+//Definir comandos
+
+//========== CLIENTE ==========//
+static void inicializar()
 {
-	t_log* logger = log_create("cliente.log", "Cliente", true, LOG_LEVEL_INFO);
+	diccionario_serializaciones_inicializar();
+	hay_que_leer = true;
+	cliente = cliente_crear("127.0.0.1", "4444");
 
-	leer_consola(logger);
+	//=== CONSOLA ===//
+	consola = consola_crear("cliente.log", "Cliente");
 
-	log_destroy(logger);
+	//Agregar comandos a consola
 }
 
-void leer_consola(t_log* logger)
+static void terminar_programa()
 {
-	char* leido;
+	consola_destruir(consola);
+	cliente_destruir(cliente);
+	diccionario_serializaciones_destruir();
+}
 
-	leido = readline(">");
 
-	while(*leido != '\0') {
-		log_info(logger, leido);
-
-		leido = readline(">");
-	}
+int main()
+{
+	inicializar();
+	while(hay_que_leer)
+		consola_leer_comando(consola, "Cliente: ");
+	terminar_programa();
 }

@@ -1,5 +1,5 @@
 TARGET = cliente
-LIBS = -L./../Utils -lutils -lcommons -lreadline
+LIBS = -L./../Utils -lutils  -L./../Red -lred -L./../Consola -lconsola -lcommons -lreadline
 CC = gcc
 CFLAGS = -g -Wall
 
