@@ -1,0 +1,102 @@
+[33mcommit ddcbe24a373b860d8cefefcfde366bdb9377459e[m
+Merge: abd5bd8 1901d82
+Author: SebasCabral <sebastiancabral@est.frba.utn.edu.ar>
+Date:   Thu Sep 17 11:33:50 2020 -0300
+
+    Merge branch 'master' of https://github.com/sisoputnfrba/tp-2020-2c-PunterosYa
+
+[33mcommit abd5bd88a813dfe0b25ec4d751fcc9dc80d4719b[m
+Author: SebasCabral <sebastiancabral@est.frba.utn.edu.ar>
+Date:   Thu Sep 17 11:26:52 2020 -0300
+
+    Red y Consola
+
+[33mcommit 1901d82968560347ebe02c2753cb48b01b1a48de[m
+Author: Roman-Petru <67461135+Roman-Petru@users.noreply.github.com>
+Date:   Thu Sep 17 01:01:41 2020 -0300
+
+    Update planificacion.c
+
+[33mcommit d5ab2b770abba6a758a51d337d6b63a0b722d6be[m
+Author: Roman-Petru <ropetru@hotmail.com>
+Date:   Thu Sep 17 00:58:12 2020 -0300
+
+    plani a largo
+
+[33mcommit 0b3b8998599edd532fd270f4a191e4f70791f976[m
+Author: Roman-Petru <ropetru@hotmail.com>
+Date:   Tue Sep 15 10:58:24 2020 -0300
+
+    arreglo
+
+[33mcommit 3bc94c5cd600c195e67f75b2e34fdece1975e42c[m
+Author: Roman-Petru <ropetru@hotmail.com>
+Date:   Tue Sep 15 02:23:36 2020 -0300
+
+    mejora app
+
+[33mcommit a8f6950eeda032f88c4fbcc27741154302780ca8[m
+Author: Roman-Petru <ropetru@hotmail.com>
+Date:   Wed Sep 9 05:37:49 2020 -0300
+
+    2 nuevas funciones
+
+[33mcommit 7971f9c994ec728333a6a34b2abd8deb28c9195f[m
+Author: SebasCabral <sebastiancabral@est.frba.utn.edu.ar>
+Date:   Mon Sep 7 23:46:56 2020 -0300
+
+    Arreglos .gitignore
+
+[33mcommit c6477382fba116bbc5fd452a48771d34dcae4735[m
+Author: SebasCabral <sebastiancabral@est.frba.utn.edu.ar>
+Date:   Mon Sep 7 23:35:15 2020 -0300
+
+    Arreglos .gitignore
+
+[33mcommit 15f1b5cc260028198a6cb3fa0dfd01de1760f52c[m
+Author: SebasCabral <sebastiancabral@est.frba.utn.edu.ar>
+Date:   Mon Sep 7 23:26:35 2020 -0300
+
+    Arreglos .gitignore
+
+[33mcommit 5585e52335f10d9c26691f92009dd3ed08c12b4d[m
+Author: Roman-Petru <ropetru@hotmail.com>
+Date:   Mon Sep 7 06:49:48 2020 -0300
+
+    falto un lib
+
+[33mcommit a2c338de1e59c347047013f24738f7bdca88d306[m
+Author: Roman-Petru <ropetru@hotmail.com>
+Date:   Mon Sep 7 06:43:49 2020 -0300
+
+    faltaba el stdlib
+
+[33mcommit df7ac9655f5fcd22c3a6b73b124b9109e05b7f95[m
+Author: Roman-Petru <ropetru@hotmail.com>
+Date:   Mon Sep 7 06:33:17 2020 -0300
+
+    agregado configs en utils y inicializar repartidores en app.c
+
+[33mcommit 681e34d206bd31737fc219ffd9d871f9542d339e[m
+Author: SebasCabral <sebastiancabral@est.frba.utn.edu.ar>
+Date:   Sun Sep 6 21:58:38 2020 -0300
+
+    Makefiles Arreglados + Truco Deploy
+
+[33mcommit ef5891b9e30ea62e66b1f1da71660a2c801c848f[m
+Author: SebasCabral <sebastiancabral@est.frba.utn.edu.ar>
+Date:   Sun Sep 6 18:08:21 2020 -0300
+
+    Sindicato: obtener_receta + Receta
+
+[33mcommit 351ae4edea95520ae3ac8e1398bcffbf8c0f2959[m
+Author: SebasCabral <sebastiancabral@est.frba.utn.edu.ar>
+Date:   Sun Sep 6 16:53:04 2020 -0300
+
+    Modulos y Makefiles
+
+[33mcommit 4e7b592a242b4963dc0b5ac9a2be1d211319efbd[m
+Author: Sistemas Operativos - UTN.BA <inscripciones.utnso@gmail.com>
+Date:   Sat Sep 5 18:21:53 2020 -0300
+
+    Initial commit

@@ -40,7 +40,7 @@ t_list* agregar_repartidores_a_lista_libre(t_list* lista_repartidores_libres, ch
 	return lista_repartidores_libres;
 }
 
-t_repartidor* encontrar_repartidor_mas_cercano(t_list* lista_repartidores_libres, t_posicion* posicion_buscada)
+t_repartidor* sacar_repartidor_mas_cercano(t_list* lista_repartidores_libres, t_posicion* posicion_buscada)
 {
 	int tamanio_lista = list_size(lista_repartidores_libres);
 	int i = 0;
@@ -62,7 +62,7 @@ t_repartidor* encontrar_repartidor_mas_cercano(t_list* lista_repartidores_libres
 
 	}
 
-	repartidor_a_probar = list_get(lista_repartidores_libres, j);
+	repartidor_a_probar = list_remove(lista_repartidores_libres, j);
 
 	return repartidor_a_probar;
 }
