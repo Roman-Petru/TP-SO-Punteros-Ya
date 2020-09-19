@@ -7,12 +7,15 @@ int grado_multiprogramacion;
 int grado_multiprocesamiento;
 ALGORITMO_PLANI algoritmo_planificacion;
 
+sem_t* semaforo_app;
 
 t_list* cola_NEW;
 t_list* cola_EXE;
 t_list* cola_READY;
 t_list* cola_BLOCKED;
 t_list* cola_EXIT;
+
+t_log* logger_app;
 
 void inicializar_repartidores()
 {
@@ -30,8 +33,12 @@ void inicializar_repartidores()
 	grado_multiprogramacion = list_size(lista_repartidores_libres);
 	grado_multiprocesamiento = config_get_int_value(config, "GRADO_DE_MULTIPROCESAMIENTO");
 
+	sem_init (semaforo_app, 0, 0);
 
+	inicializar_diccionario_acciones();
+	inicializar_diccionario_colas();
 
+	logger_app = log_create("app.log", "APP", true, LOG_LEVEL_INFO);
 }
 
 /*
@@ -75,13 +82,13 @@ int main()
 	}*/
 
 	inicializar_repartidores();
-
 	while(true)
 	{
+		planificar_largo_plazo();
+		planificar_corto_plazo();
+		ejecutar_ciclo();
+
 		//ejecutar_interrupciones();
-		planificador_largo_plazo();
-		//planificador_corto_plazo();
-	//	esperar_fin_de_ciclo();
 	}
 
 }

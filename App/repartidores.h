@@ -27,7 +27,7 @@ typedef struct{
 int calcular_distancia (int posicion_x, int posicion_y, int hacia_posicion_x, int hacia_posicion_y);
 t_list* agregar_repartidores_a_lista_libre(t_list* lista_repartidores_libres, char** repartidores, char** tiempos_de_descanso, char** frecuencias_de_descanso);
 t_repartidor* sacar_repartidor_mas_cercano(t_list* lista_repartidores_libres, t_posicion* posicion_buscada);
-t_repartidor* mover_repartidor_hacia(t_repartidor* repartidor, int hacia_posicion_x, int hacia_posicion_y);
+t_repartidor* mover_repartidor_hacia(t_repartidor* repartidor, t_posicion* hacia_posicion);
 
 
 #endif //REPAR_APP

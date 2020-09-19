@@ -75,8 +75,11 @@ t_repartidor* sacar_repartidor_mas_cercano(t_list* lista_repartidores_libres, t_
 
 
 
-t_repartidor* mover_repartidor_hacia(t_repartidor* repartidor, int hacia_posicion_x, int hacia_posicion_y)
+t_repartidor* mover_repartidor_hacia(t_repartidor* repartidor, t_posicion* hacia_posicion)
 {
+	int hacia_posicion_x = hacia_posicion->x;
+	int hacia_posicion_y = hacia_posicion->y;
+
 	if (repartidor->posicion->x > hacia_posicion_x){
 		repartidor->posicion->x = repartidor->posicion->x - 1;
 	}else if (repartidor->posicion->x < hacia_posicion_x){
