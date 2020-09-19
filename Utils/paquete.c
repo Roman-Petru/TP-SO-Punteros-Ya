@@ -1,6 +1,7 @@
 #include "paquete.h"
 #include <stdlib.h>
 #include <string.h>
+#include "../Utils/dictionary_int.h"
 
 // ===== Paquete =====
 t_paquete* paquete_crear(t_codigo_de_operacion codigo_operacion, t_buffer* buffer)

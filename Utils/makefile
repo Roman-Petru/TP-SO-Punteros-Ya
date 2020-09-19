@@ -1,5 +1,5 @@
 TARGET_LIB = libutils.a
-LIBS = -lcommons -lpthread 
+LIBS = -L./../Red -lred -lcommons -lpthread 
 CC = gcc
 CFLAGS = -Wall -g
 

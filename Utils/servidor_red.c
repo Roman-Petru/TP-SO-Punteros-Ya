@@ -2,7 +2,6 @@
 #include "cliente_red.h"
 #include "socket.h"
 #include "paquete.h"
-#include "protocolo.h"
 #include <string.h>
 #include <stdlib.h>
 #include <commons/log.h>

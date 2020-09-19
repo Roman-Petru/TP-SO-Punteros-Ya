@@ -1,5 +1,5 @@
 #include "consola.h"
-#include "../Red/protocolo.h"
+#include "protocolo.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <readline/readline.h>
