@@ -1,6 +1,8 @@
 #include "cliente.h"
-#include "../Consola/consola.h"
-#include "../Red/cliente_red.h"
+#include "../Utils/consola.h"
+#include "../Utils/cliente_red.h"
+//#include "../Utils/consola.h"
+
 
 t_cliente_red* cliente;
 t_consola* consola;
@@ -8,6 +10,10 @@ bool hay_que_leer;
 
 //========== COMANDOS ==========//
 //Definir comandos
+static void cliente_hola()
+{
+	cliente_enviar_mensaje(cliente, CONSOLA, "hola");
+}
 
 //========== CLIENTE ==========//
 static void inicializar()
@@ -20,6 +26,7 @@ static void inicializar()
 	consola = consola_crear("cliente.log", "Cliente");
 
 	//Agregar comandos a consola
+	consola_agregar_comando(consola, "hola", &cliente_hola);
 }
 
 static void terminar_programa()

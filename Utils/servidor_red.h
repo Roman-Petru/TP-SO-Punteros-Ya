@@ -1,4 +1,3 @@
-#include "dictionary_int.h"
 #include "protocolo.h"
 #include <pthread.h>
 #include <stdbool.h>
