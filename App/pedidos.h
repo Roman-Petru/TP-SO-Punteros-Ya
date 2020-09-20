@@ -41,13 +41,15 @@ typedef struct{
 	INSTRUCCION_A_REALIZAR instruccion_a_realizar;
 
 	pthread_t hilo;
-	sem_t* mutex;
+	sem_t mutex;
 
 }t_pedido;
 
+t_pedido* crear_pedido(int id, t_posicion* posicion_de_restaurante, t_posicion* posicion_cliente, bool resto_default);
 void ciclo_pedido(t_pedido* pedido);
 typedef void (*t_accion)(t_pedido* pedido);
 void inicializar_diccionario_acciones();
 void descansar_repartidor(t_pedido* pedido);
+bool  misma_posicion (t_posicion* posicion1, t_posicion* posicion2);
 
 #endif //PEDIDOS_APP

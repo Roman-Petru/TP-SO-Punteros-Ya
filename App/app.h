@@ -5,6 +5,7 @@
 #include "planificacion.h"
 #include <commons/config.h>
 #include <commons/log.h>
+#include <semaphore.h>
 
 extern t_log* logger_app;
 
@@ -18,7 +19,7 @@ typedef enum{
 
 extern t_config* config;
 extern int grado_multiprocesamiento;
-extern sem_t* semaforo_app;
+extern sem_t semaforo_app;
 
 
 void inicializar_repartidores();
