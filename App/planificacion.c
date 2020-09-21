@@ -16,12 +16,24 @@ t_config* config;
 
 void planificar_corto_plazo()
 {
+	if (strcmp(config_get_string_value(config, "ALGORITMO_DE_PLANIFICACION"), "HRRN") == 0)
+		list_sort(cola_READY, &highest_ratio_response);
+
 	while (grado_multiprocesamiento > list_size(cola_EXEC)&&(!list_is_empty(cola_READY)))
 		cambiar_estado_a(list_remove(cola_READY, 0), EXEC);  //meter en cola EXEC (todavia no ejecuta)
 
-
 }
 
+
+static void actualizar_estado_listos()
+{
+	for (int i=0; i < list_size(cola_READY); i++)
+	{
+		t_pedido* pedido = list_get(cola_READY, i);
+		pedido->ciclos_en_ready = pedido->ciclos_en_ready + 1;
+	}
+
+}
 
 static void actualizar_estado_bloqueados()
 {
@@ -91,10 +103,11 @@ void ejecutar_ciclo()
 	for (int i=0; i < list_size(cola_EXEC); i++)
 		sem_wait (&semaforo_app);
 
-	sleep(1);
-
+	actualizar_estado_listos();
 	actualizar_estado_bloqueados();
 	actualizar_estado_ejecutados();
+
+	sleep(1);
 
 }
 
@@ -160,6 +173,9 @@ void meter_en_cola_READY(t_pedido* pedido)
 
 	if (strcmp(config_get_string_value(config, "ALGORITMO_DE_PLANIFICACION"), "SJF-SD") == 0)
 		meter_con_SJF_SD(pedido);
+
+	if (strcmp(config_get_string_value(config, "ALGORITMO_DE_PLANIFICACION"), "HRRN") == 0)
+		meter_con_FIFO(pedido);
 }
 
 
@@ -198,6 +214,15 @@ static int estimacion_proxima_rafaga(t_pedido* pedido)
 	return pedido->estimacion;
 }
 */
+
+bool highest_ratio_response(t_pedido* pedido1, t_pedido* pedido2)
+{
+	if ((pedido1->ciclos_en_ready / pedido1->estimacion + 1) > (pedido2->ciclos_en_ready / pedido2->estimacion + 1))
+		return true;
+		else return false;
+
+}
+
 
 float convertir_string_en_float (char* token)
 {

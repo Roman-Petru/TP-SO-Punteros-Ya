@@ -28,6 +28,7 @@ void meter_en_cola(t_pedido* pedido, t_list* cola_nueva);
 void meter_en_cola_READY(t_pedido* pedido);
 void meter_con_FIFO(t_pedido* pedido);
 void meter_con_SJF_SD(t_pedido* pedido);
+bool highest_ratio_response(t_pedido* pedido1, t_pedido* pedido2);
 void ejecutar_ciclo();
 void logear_cambio_cola(t_pedido* pedido, t_list* cola_nueva);
 void inicializar_diccionario_colas();

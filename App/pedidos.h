@@ -34,7 +34,7 @@ typedef struct{
 
 	int ciclos_ejecutandose;
 	int ciclos_descansados;
-	int ciclos_anterior_rafaga;
+	int ciclos_en_ready;
 	float estimacion;
 	bool esta_listo;
 
