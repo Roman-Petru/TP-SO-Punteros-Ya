@@ -11,6 +11,8 @@ t_dictionary_int* diccionario_colas;
 
 t_config* config;
 
+//static int estimacion_proxima_rafaga(t_pedido* pedido);
+
 
 void planificar_corto_plazo()
 {
@@ -19,7 +21,6 @@ void planificar_corto_plazo()
 
 
 }
-
 
 
 static void actualizar_estado_bloqueados()
@@ -64,12 +65,14 @@ static void actualizar_estado_ejecutados()
 				if (pedido->esta_listo)
 					pedido->instruccion_a_realizar = IR_A_CLIENTE;
 				else {
+					pedido->estimacion = (valor_alpha * pedido->ciclos_ejecutandose + (1 - valor_alpha) * pedido->estimacion);
 					pedido->ciclos_ejecutandose = 0;
 					cambiar_estado_a(pedido, BLOCKED);
 					pedido->instruccion_a_realizar = ESPERAR_EN_RESTAURANTE;
 				}
 				}
 			if (pedido->ciclos_ejecutandose == pedido->repartidor->frecuencia_descanso)	{
+				pedido->estimacion = (valor_alpha * pedido->ciclos_ejecutandose + (1 - valor_alpha) * pedido->estimacion);
 				pedido->ciclos_ejecutandose = 0;
 				cambiar_estado_a(pedido, BLOCKED);
 			}
@@ -155,11 +158,25 @@ void meter_en_cola_READY(t_pedido* pedido)
 	if (strcmp(config_get_string_value(config, "ALGORITMO_DE_PLANIFICACION"), "FIFO") == 0)
 		meter_con_FIFO(pedido);
 
+	if (strcmp(config_get_string_value(config, "ALGORITMO_DE_PLANIFICACION"), "SJF-SD") == 0)
+		meter_con_SJF_SD(pedido);
 }
 
 
 void meter_con_FIFO(t_pedido* pedido)  {list_add(cola_READY, pedido); }
 
+void meter_con_SJF_SD(t_pedido* pedido)
+{
+	int i = 0;
+	t_pedido* pivot = list_get(cola_READY, i);
+	while(pivot != NULL && (pivot->estimacion <=pedido->estimacion))
+	{
+		i++;
+		pivot = list_get(cola_READY, i);
+	}
+	list_add_in_index(cola_READY, i, pedido);
+
+}
 
 void logear_cambio_cola(t_pedido* pedido, t_list* cola_nueva)
 {
@@ -174,6 +191,26 @@ void logear_cambio_cola(t_pedido* pedido, t_list* cola_nueva)
 
 }
 
+/*
+static int estimacion_proxima_rafaga(t_pedido* pedido)
+{
+	pedido->estimacion = (valor_alpha * pedido->ciclos_anterior_rafaga + (1 - valor_alpha) * pedido->estimacion);
+	return pedido->estimacion;
+}
+*/
+
+float convertir_string_en_float (char* token)
+{
+
+	for (int i=0; i < strlen(token); i++)
+	{
+		if (token[i] == ','){
+			token[i]='.';
+			break;
+		}
+	}
+	return strtof(token, NULL);
+}
 
 //-----------DICCIONARIO DE COLAS-----------//
 void inicializar_diccionario_colas()

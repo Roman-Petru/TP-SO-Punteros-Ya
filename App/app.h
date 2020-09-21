@@ -8,7 +8,7 @@
 #include <semaphore.h>
 
 extern t_log* logger_app;
-
+extern float valor_alpha;
 
 typedef enum{
 	FIFO = 0,
@@ -22,6 +22,6 @@ extern int grado_multiprocesamiento;
 extern sem_t semaforo_app;
 
 
-void inicializar_repartidores();
+void inicializar_app();
 
 #endif //APP_APP

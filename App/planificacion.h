@@ -27,10 +27,11 @@ int sacar_de_cola_actual(t_pedido* pedido);
 void meter_en_cola(t_pedido* pedido, t_list* cola_nueva);
 void meter_en_cola_READY(t_pedido* pedido);
 void meter_con_FIFO(t_pedido* pedido);
+void meter_con_SJF_SD(t_pedido* pedido);
 void ejecutar_ciclo();
 void logear_cambio_cola(t_pedido* pedido, t_list* cola_nueva);
 void inicializar_diccionario_colas();
-
+float convertir_string_en_float (char* token);
 
 #endif //PLANI_APP
 

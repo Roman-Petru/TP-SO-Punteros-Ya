@@ -19,6 +19,8 @@ t_pedido* crear_pedido(int id, t_posicion* posicion_de_restaurante, t_posicion* 
 
 	nuevo_pedido->ciclos_ejecutandose = 0;
 	nuevo_pedido->ciclos_descansados = 0;
+	nuevo_pedido->ciclos_anterior_rafaga = 0;
+	nuevo_pedido->estimacion = config_get_int_value(config, "ESTIMACION_INICIAL");
 
 	nuevo_pedido->esta_listo = resto_default ? true: false;
 

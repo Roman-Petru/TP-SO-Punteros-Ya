@@ -5,13 +5,13 @@ t_config* config;
 t_list* lista_repartidores_libres;
 int grado_multiprogramacion;
 int grado_multiprocesamiento;
-ALGORITMO_PLANI algoritmo_planificacion;
+float valor_alpha;
 
 sem_t semaforo_app;
 
 t_log* logger_app;
 
-void inicializar_repartidores()
+void inicializar_app()
 {
 	config = config_create("app.config");
 
@@ -26,11 +26,11 @@ void inicializar_repartidores()
 
 	grado_multiprogramacion = list_size(lista_repartidores_libres);
 	grado_multiprocesamiento = config_get_int_value(config, "GRADO_DE_MULTIPROCESAMIENTO");
+	char* token = config_get_string_value(config, "ALPHA");
+	valor_alpha = convertir_string_en_float(token);
 
 	sem_init (&(semaforo_app), 0, 0);
 
-	inicializar_diccionario_acciones();
-	inicializar_diccionario_colas();
 
 	logger_app = log_create("app.log", "APP", true, LOG_LEVEL_INFO);
 
@@ -41,6 +41,7 @@ void inicializar_repartidores()
 	cola_EXEC = list_create();
 	cola_EXIT = list_create();
 
+	//inicializar_diccionario_acciones();
 	inicializar_diccionario_colas();
 }
 
@@ -63,7 +64,7 @@ t_pedido* crear_pedido_con_resto_default(int id)
 int main()
 {
 
-	inicializar_repartidores();
+	inicializar_app();
 	list_add(cola_NEW, crear_pedido_con_resto_default(343));
 	list_add(cola_NEW, crear_pedido_con_resto_default(827));
 	list_add(cola_NEW, crear_pedido_con_resto_default(7777));
