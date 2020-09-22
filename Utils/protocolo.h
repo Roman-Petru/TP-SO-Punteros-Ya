@@ -1,10 +1,4 @@
 #pragma once
-#include <stdbool.h>
-#include "buffer.h"
-#include "dictionary_int.h"
-
-extern t_dictionary_int* diccionario_serializaciones;
-extern t_dictionary_int* diccionario_deserializaciones;
 
 typedef enum
 {
@@ -13,18 +7,25 @@ typedef enum
 	OPERACION_OK,
 	TERMINAR,
 	CONSOLA,
+	LOGGUEAR,
+	CONSULTAR_ARMAS,
 	//=== ERROR ===//
 	ERROR = -1,
 	ERROR_DESERIALIZAR_BUFFER = -2
 } t_codigo_de_operacion;
 
-typedef t_codigo_de_operacion (*t_operacion)(void* datos);
+typedef struct
+{
+	t_codigo_de_operacion codigo_operacion;
+	void* datos;
+} t_respuesta;
 
-typedef t_buffer* (*t_serializador)(void* datos);
-typedef void* (*t_deserializador)(t_buffer* buffer);
-void diccionario_serializaciones_inicializar();
-void diccionario_deserializaciones_inicializar();
-void diccionario_serializaciones_destruir();
-void diccionario_deserializaciones_destruir();
+typedef t_respuesta* (*t_operacion_servidor)(void* datos);
+typedef t_respuesta* (*t_operacion_servidor_simple)();
+typedef void (*t_operacion_cliente)(void* datos);
+typedef void (*t_operacion_cliente_simple)();
+
+extern t_respuesta* respuesta_crear(t_codigo_de_operacion codigo_operacion, void* datos);
+extern void respuesta_destruir(t_respuesta* respuesta);
 
 void operacion_ok();

@@ -1,18 +1,24 @@
 #include "buffer.h"
-#include "protocolo.h"
+#include "serializacion.h"
 #include <stdlib.h>
 #include <string.h>
-
 
 // ===== Buffer =====
 t_buffer* buffer_crear(size_t tamanio)
 {
 	t_buffer* buffer = malloc(sizeof(t_buffer));
-	buffer->stream = malloc(tamanio);
+	buffer->stream = calloc(1, tamanio);
 	buffer->desplazamiento = 0;
 	buffer->tamanio = tamanio;
 
 	return buffer;
+}
+
+t_buffer* buffer_crear_con_datos(t_codigo_de_operacion codigo_operacion, void* datos)
+{
+	if(datos == NULL)
+		return buffer_crear(0);
+	return ((t_serializador) dictionary_int_get(diccionario_serializaciones, codigo_operacion))(datos);
 }
 
 void buffer_destruir(t_buffer* buffer)
@@ -56,7 +62,10 @@ char* buffer_deserializar_string(t_buffer* buffer)
 {
 	size_t* tamanio = buffer_deserializar(buffer, sizeof(uint32_t));
 	char* string = malloc(*tamanio+1);
+	if(buffer->tamanio < buffer->desplazamiento + *tamanio)
+		exit(ERROR_DESERIALIZAR_BUFFER);
 	memcpy(string, buffer->stream + buffer->desplazamiento, *tamanio);
+	buffer->desplazamiento += *tamanio;
 	string[*tamanio] = '\0';
 	free(tamanio);
 

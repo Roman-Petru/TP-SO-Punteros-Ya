@@ -1,10 +1,8 @@
 #include "protocolo.h"
 #include "buffer.h"
 #include <string.h>
+#include <stdlib.h>
 #include <commons/log.h>
-
-t_dictionary_int* diccionario_serializaciones;
-t_dictionary_int* diccionario_deserializaciones;
 
 // ===== Operaciones =====
 
@@ -23,43 +21,17 @@ void operacion_ok()
 	log_destroy(logger);
 }
 
-// ===== Serializaciones =====
-static t_buffer* serializar_string(void* datos)
+// ===== Respuesta =====
+t_respuesta* respuesta_crear(t_codigo_de_operacion codigo_operacion, void* datos)
 {
-	t_buffer* buffer = buffer_crear(sizeof(size_t) + strlen(datos));
-	buffer_serializar_string(buffer, datos);
-
-	return buffer;
+	t_respuesta* respuesta = malloc(sizeof(t_respuesta));
+	respuesta->codigo_operacion = codigo_operacion;
+	respuesta->datos = datos;
+	return respuesta;
 }
 
-// ===== Deserializaciones =====
-static void* deserializar_string(t_buffer* buffer)
+void respuesta_destruir(t_respuesta* respuesta)
 {
-	return buffer_deserializar_string(buffer);
-}
-
-// ===== Diccionario de Serializaciones =====
-void diccionario_serializaciones_inicializar()
-{
-	diccionario_serializaciones = dictionary_int_create();
-
-	dictionary_int_put(diccionario_serializaciones, CONSOLA, &serializar_string);
-}
-
-void diccionario_serializaciones_destruir()
-{
-	dictionary_int_destroy(diccionario_serializaciones);
-}
-
-// ===== Diccionario de Deserializaciones =====
-void diccionario_deserializaciones_inicializar()
-{
-	diccionario_deserializaciones = dictionary_int_create();
-
-	dictionary_int_put(diccionario_deserializaciones, CONSOLA, &deserializar_string);
-}
-
-void diccionario_deserializaciones_destruir()
-{
-	dictionary_int_destroy(diccionario_deserializaciones);
+	free(respuesta->datos); // NO SIEMPRE FREE NADA MAS
+	free(respuesta);
 }

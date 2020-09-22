@@ -1,4 +1,4 @@
-//#pragma once
+#pragma once
 
 int socket_crear(char* ip, char* puerto);
 int socket_escucha_crear(char* ip, char* puerto);
