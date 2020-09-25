@@ -18,7 +18,7 @@ t_list* agregar_repartidores_a_lista_libre(t_list* lista_repartidores_libres, ch
 
 			//SEPARO POSICIONES X E Y DE REPARTIDOR
 
-		char** token = malloc(30);
+		char** token;
 
 		token = string_n_split(repartidores[i], 2, "|");
 
@@ -27,7 +27,6 @@ t_list* agregar_repartidores_a_lista_libre(t_list* lista_repartidores_libres, ch
 		repartidor->posicion->x = (int)strtol (token[0], NULL, 10);
 		repartidor->posicion->y = (int)strtol (token[1], NULL, 10);
 
-		free(token);
 
 		repartidor->frecuencia_descanso = (int)strtol (frecuencias_de_descanso[i], NULL, 10);
 		repartidor->tiempo_descanso = (int)strtol (tiempos_de_descanso[i], NULL, 10);

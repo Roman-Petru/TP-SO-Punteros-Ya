@@ -69,6 +69,7 @@ static void actualizar_estado_ejecutados()
 			log_info(logger_app, "el pedido %d entrego el pedido al cliente", pedido->id_pedido);
 			cambiar_estado_a(pedido, EXIT);
 			list_add(lista_repartidores_libres, pedido->repartidor);
+			pthread_cancel(&(pedido->hilo));
 			pedido->repartidor = NULL;
 
 		}
