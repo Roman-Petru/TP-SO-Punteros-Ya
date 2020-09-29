@@ -1,5 +1,6 @@
 #include "protocolo.h"
 #include "buffer.h"
+#include "serializacion.h"
 #include <string.h>
 #include <stdlib.h>
 #include <commons/log.h>
@@ -32,6 +33,7 @@ t_respuesta* respuesta_crear(t_codigo_de_operacion codigo_operacion, void* datos
 
 void respuesta_destruir(t_respuesta* respuesta)
 {
-	free(respuesta->datos); // NO SIEMPRE FREE NADA MAS
+	if(respuesta->datos!=NULL)
+		((t_destructor) dictionary_int_get(diccionario_destrucciones, respuesta->codigo_operacion))(respuesta->datos);
 	free(respuesta);
 }

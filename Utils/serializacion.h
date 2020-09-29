@@ -3,9 +3,11 @@
 
 extern t_dictionary_int* diccionario_serializaciones;
 extern t_dictionary_int* diccionario_deserializaciones;
+extern t_dictionary_int* diccionario_destrucciones;
 
 typedef t_buffer* (*t_serializador)(void* datos);
 typedef void* (*t_deserializador)(t_buffer* buffer);
+typedef void (*t_destructor)(void* datos);
 
 void diccionario_serializaciones_inicializar();
 void diccionario_deserializaciones_inicializar();

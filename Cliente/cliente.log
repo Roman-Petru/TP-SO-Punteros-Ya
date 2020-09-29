@@ -2,3 +2,10 @@
 [INFO] 19:40:10:31 Cliente/(10544:10544): si
 [INFO] 11:21:14:149 Cliente/(21161:21161): OPERACION OK.
 [INFO] 11:21:20:421 Cliente/(21161:21161): OPERACION OK.
+[ERROR] 17:05:00:71 Cliente/(14623:14623): Cliente no entiende el mensaje enviar.
+[ERROR] 17:05:24:559 Cliente/(14623:14623): Cliente no entiende el mensaje enviar.
+[ERROR] 17:06:46:198 Cliente/(14623:14623): Cliente no entiende el mensaje desconectar.
+[ERROR] 17:07:15:279 Cliente/(14709:14709): Cliente no entiende el mensaje hol.
+[ERROR] 17:07:17:215 Cliente/(14709:14709): Cliente no entiende el mensaje enviar.
+[ERROR] 17:07:55:759 Cliente/(14709:14709): Cliente no entiende el mensaje enviar.
+[ERROR] 17:07:59:623 Cliente/(14709:14709): Cliente no entiende el mensaje terminar.
