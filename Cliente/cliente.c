@@ -88,9 +88,7 @@ static void operacion_terminar_servidor() { consola_log(consola, "El servidor se
 static void inicializar()
 {
 	config = config_create("cliente.config");
-	diccionario_serializaciones_inicializar();
-	diccionario_deserializaciones_inicializar();
-	diccionario_destrucciones_inicializar();
+	serializacion_inicializar();
 	hay_que_leer = true;
 
 	//=== DATOS TEMPORALES ===//
@@ -118,9 +116,7 @@ static void terminar_programa()
 	config_destroy(config);
 	consola_destruir(consola);
 	cliente_destruir(cliente);
-	diccionario_serializaciones_destruir();
-	diccionario_deserializaciones_destruir();
-	diccionario_destrucciones_destruir();
+	serializacion_finalizar();
 }
 
 int main()
@@ -130,8 +126,6 @@ int main()
 		consola_leer_comando(consola, "Cliente: ");
 	terminar_programa();
 }
-
-
 
 /*static void operacion_consultar_PEDIDO(t_list* platos)
 {

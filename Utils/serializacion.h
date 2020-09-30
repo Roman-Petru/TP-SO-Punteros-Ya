@@ -10,9 +10,5 @@ typedef void* (*t_deserializador)(t_buffer* buffer);
 typedef void (*t_destructor)(void* datos);
 
 void destruir(t_codigo_de_operacion codigo_de_operacion, void* datos);
-void diccionario_serializaciones_inicializar();
-void diccionario_deserializaciones_inicializar();
-void diccionario_serializaciones_destruir();
-void diccionario_deserializaciones_destruir();
-void diccionario_destrucciones_inicializar();
-void diccionario_destrucciones_destruir();
+void serializacion_inicializar();
+void serializacion_finalizar();

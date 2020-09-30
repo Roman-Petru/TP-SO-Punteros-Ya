@@ -20,8 +20,8 @@ static t_respuesta* consultar_restaurantes()
 
 static t_respuesta* seleccionar_restaurante(char* restaurante)
 {
-
-	if(strcmp(restaurante, "Resto_Default")==0) //TODO App: seleccionar_restaurante ->  || esta_conectado(restaurante)
+	//TODO App: seleccionar_restaurante
+	if(strcmp(restaurante, "Resto_Default")==0) // || esta_conectado(restaurante)
 	{
 		log_info(logger_app, "Seleccionaron Restaurante %s.", restaurante);
 		return respuesta_crear(SELECCIONAR_RESTAURANTE_RESPUESTA, (void*) true);
@@ -56,14 +56,15 @@ static t_respuesta* consultar_platos(char* restaurante)
 
 static t_respuesta* terminar()
 {
+	serializacion_finalizar();
 	servidor_destruir(servidor_app);
 	log_info(logger_app, "TERMINE EL SERVIDOR");
 	return respuesta_crear(TERMINAR, NULL);
 }
 
-
 void inicializar_servidor()
 {
+	serializacion_inicializar();
 	servidor_app = servidor_crear("127.0.0.1", config_get_string_value(config_app, "PUERTO_ESCUCHA"));
 	servidor_agregar_operacion(servidor_app, TERMINAR, &terminar);
 	servidor_agregar_operacion(servidor_app, CONSULTAR_RESTAURANTES, &consultar_restaurantes);
@@ -71,7 +72,4 @@ void inicializar_servidor()
 	servidor_agregar_operacion(servidor_app, CONSULTAR_PLATOS, &consultar_platos);
 
 	log_info(logger_app, "Servidor listo para recibir al cliente");
-	diccionario_deserializaciones_inicializar();
-	diccionario_serializaciones_inicializar();
-	diccionario_destrucciones_inicializar();
 }

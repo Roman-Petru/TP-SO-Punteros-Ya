@@ -54,10 +54,7 @@ static void* deserializar_lista_string(t_buffer* buffer)
 }
 
 // ===== Destrucciones =====
-static void destruir_lista_string(void* datos)
-{
-	list_destroy_and_destroy_elements(datos, &free);
-}
+static void destruir_lista_string(void* datos) { list_destroy_and_destroy_elements(datos, &free); }
 
 static void* deserializar_bool(t_buffer* buffer)
 {
@@ -93,11 +90,6 @@ void diccionario_deserializaciones_inicializar()
 	dictionary_int_put(diccionario_deserializaciones, CONSULTAR_PLATOS_RESPUESTA, &deserializar_lista_string);
 }
 
-void diccionario_deserializaciones_destruir()
-{
-	dictionary_int_destroy(diccionario_deserializaciones);
-}
-
 //static void sin_free() {}
 static void si_free(void* datos) {if(datos != NULL) free(datos);}
 
@@ -113,14 +105,24 @@ void diccionario_destrucciones_inicializar()
 	dictionary_int_put(diccionario_destrucciones, CONSULTAR_PLATOS_RESPUESTA, &destruir_lista_string);
 }
 
-void diccionario_destrucciones_destruir()
-{
-	dictionary_int_destroy(diccionario_destrucciones);
-}
-
 void destruir(t_codigo_de_operacion codigo_de_operacion, void* datos)
 {
 	if(datos!=NULL)
 		((t_destructor) dictionary_int_get(diccionario_destrucciones, codigo_de_operacion))(datos);
+}
+
+// ===== Serializacion =====
+void serializacion_inicializar()
+{
+	diccionario_serializaciones_inicializar();
+	diccionario_deserializaciones_inicializar();
+	diccionario_serializaciones_destruir();
+}
+
+void serializacion_finalizar()
+{
+	dictionary_int_destroy(diccionario_serializaciones);
+	dictionary_int_destroy(diccionario_deserializaciones);
+	dictionary_int_destroy(diccionario_destrucciones);
 }
 
