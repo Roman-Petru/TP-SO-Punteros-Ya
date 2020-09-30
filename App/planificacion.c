@@ -147,7 +147,13 @@ void meter_en_cola(t_pedido* pedido, t_list* cola_nueva)
 	if (cola_nueva == cola_READY)
 		meter_en_cola_READY(pedido);
 	 else
-		list_add(cola_nueva, pedido);
+	 {
+		if (cola_nueva == cola_EXEC)
+			pedido->ciclos_en_ready = 0;
+
+		 list_add(cola_nueva, pedido);
+
+	 }
 }
 
 void meter_en_cola_READY(t_pedido* pedido)

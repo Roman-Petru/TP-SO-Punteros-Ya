@@ -147,3 +147,7 @@
 [INFO] 00:42:41:552 Cliente/(18926:18926): Plato2
 [INFO] 00:42:41:552 Cliente/(18926:18926): Plato3
 [INFO] 00:42:45:631 Cliente/(18926:18926): El servidor se cerro correctamente.
+[ERROR] 01:43:31:689 Cliente/(8117:8117): Cliente no entiende el mensaje asd.
+[INFO] 01:44:16:790 Cliente/(8117:8117): Restaurantes: 
+[INFO] 01:44:16:791 Cliente/(8117:8117): Resto_Default
+[INFO] 01:45:11:793 Cliente/(8211:8211): No se selecciono ningun Restaurante. 

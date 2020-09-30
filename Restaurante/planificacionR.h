@@ -2,12 +2,15 @@
 #define PLANI_RES
 
 #include "platos.h"
+#include "restaurante.h"
 #include <commons/collections/list.h>
+#include "../Utils/dictionary_int.h"
 
-t_list* diccionario_colas;
+t_dictionary_int* diccionario_colas;
 
 
-
+void ejecutar_ciclo();
+void planificar_corto_plazo();
 void cambiar_estado_a(t_platos_PCB* plato, ESTADO_PCB estado_a_pasar);
 int sacar_de_cola_actual(t_platos_PCB* pedido);
 void meter_en_cola(t_platos_PCB* plato, t_list* cola_nueva);
