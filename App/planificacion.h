@@ -19,7 +19,6 @@ extern t_list* cola_BLOCKED;
 extern t_list* cola_EXEC;
 extern t_list* cola_EXIT;
 
-
 void planificar_corto_plazo();
 void planificar_largo_plazo();
 void cambiar_estado_a(t_pedido* pedido, ESTADO_PCB estado_a_pasar);

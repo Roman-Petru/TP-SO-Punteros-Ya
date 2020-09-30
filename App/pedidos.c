@@ -20,7 +20,7 @@ t_pedido* crear_pedido(int id, t_posicion* posicion_de_restaurante, t_posicion* 
 	nuevo_pedido->ciclos_ejecutandose = 0;
 	nuevo_pedido->ciclos_descansados = 0;
 	nuevo_pedido->ciclos_en_ready = 0;
-	nuevo_pedido->estimacion = config_get_int_value(config, "ESTIMACION_INICIAL");
+	nuevo_pedido->estimacion = config_get_int_value(config_app, "ESTIMACION_INICIAL");
 
 	nuevo_pedido->esta_listo = resto_default ? true: false;
 
@@ -29,7 +29,7 @@ t_pedido* crear_pedido(int id, t_posicion* posicion_de_restaurante, t_posicion* 
 
 	sem_init(&(nuevo_pedido->mutex), 0, 0);
 	pthread_create(&(nuevo_pedido->hilo), NULL, (void*) &ciclo_pedido, nuevo_pedido);
-	pthread_detach(&(nuevo_pedido->hilo));
+	pthread_detach(nuevo_pedido->hilo);
 
 	log_info(logger_app, "Se asignó un pedido, ubicación de cliente: %d, %d; ubicación de restaurante: %d, %d", nuevo_pedido->posicion_cliente->x, nuevo_pedido->posicion_cliente->y, nuevo_pedido->posicion_de_restaurante->x, nuevo_pedido->posicion_de_restaurante->y);
 	log_info(logger_app, "el pedido %d paso a la cola NEW", nuevo_pedido->id_pedido);

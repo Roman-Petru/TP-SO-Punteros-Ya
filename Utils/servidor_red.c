@@ -22,7 +22,6 @@ static void servidor_enviar_respuesta(int socket_cliente, t_respuesta* respuesta
 	t_paquete* paquete_respuesta = paquete_crear(respuesta->codigo_operacion, buffer);
 	paquete_enviar(paquete_respuesta, socket_cliente);
 	paquete_destruir(paquete_respuesta);
-	//destruir respuesta
 }
 
 static void servidor_escuchar_mensajes(t_servidor_red* servidor)
@@ -45,6 +44,7 @@ static void servidor_escuchar_mensajes(t_servidor_red* servidor)
 	}
 	pthread_exit(NULL);
 }
+
 // ===== Servidor =====
 t_servidor_red* servidor_crear(char* ip, char* puerto)
 {

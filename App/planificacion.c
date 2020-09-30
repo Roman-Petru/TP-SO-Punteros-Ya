@@ -9,15 +9,12 @@ t_list* cola_EXIT;
 
 t_dictionary_int* diccionario_colas;
 
-t_config* config;
-
 //static int estimacion_proxima_rafaga(t_pedido* pedido);
-
 
 void planificar_corto_plazo()
 {
-	if (strcmp(config_get_string_value(config, "ALGORITMO_DE_PLANIFICACION"), "HRRN") == 0)
-		list_sort(cola_READY, &highest_ratio_response);
+	if (strcmp(config_get_string_value(config_app, "ALGORITMO_DE_PLANIFICACION"), "HRRN") == 0)
+		list_sort(cola_READY, (void*) &highest_ratio_response);
 
 	while (grado_multiprocesamiento > list_size(cola_EXEC)&&(!list_is_empty(cola_READY)))
 		cambiar_estado_a(list_remove(cola_READY, 0), EXEC);  //meter en cola EXEC (todavia no ejecuta)
@@ -69,7 +66,7 @@ static void actualizar_estado_ejecutados()
 			log_info(logger_app, "el pedido %d entrego el pedido al cliente", pedido->id_pedido);
 			cambiar_estado_a(pedido, EXIT);
 			list_add(lista_repartidores_libres, pedido->repartidor);
-			pthread_cancel(&(pedido->hilo));
+			pthread_cancel(pedido->hilo);
 			pedido->repartidor = NULL;
 
 		}
@@ -95,23 +92,18 @@ static void actualizar_estado_ejecutados()
 
 void ejecutar_ciclo()
 {
+	void ejecutar_pedido(t_pedido* pedido) { sem_post (&(pedido->mutex)); }
+	list_iterate(cola_EXEC, (void*) &ejecutar_pedido); //Ejecuta cada pedido en las cola EXEC
 
-	for (int i=0; i < list_size(cola_EXEC); i++)
-	{
-		t_pedido* pedido = list_get(cola_EXEC, i);
-		sem_post (&(pedido->mutex));
-	}
-	for (int i=0; i < list_size(cola_EXEC); i++)
-		sem_wait (&semaforo_app);
+	void esperar_pedido(t_pedido* pedido) { sem_wait (&semaforo_app); }
+	list_iterate(cola_EXEC, (void*) &esperar_pedido); //Espera que los pedidos en EXEC terminen de ejecutar
 
+	//sleep(1);
+	//sleep(config_get_int_value(config, "CICLO"));
 	actualizar_estado_listos();
 	actualizar_estado_bloqueados();
 	actualizar_estado_ejecutados();
-
-	sleep(1);
-
 }
-
 
 void planificar_largo_plazo()
 {
@@ -122,12 +114,8 @@ void planificar_largo_plazo()
 
 		pedido->repartidor = repartidor_cercano;
 		cambiar_estado_a(pedido, 1);
-
 	}
-
-
 }
-
 
 void cambiar_estado_a(t_pedido* pedido, ESTADO_PCB estado_a_pasar)
 {
@@ -138,12 +126,8 @@ void cambiar_estado_a(t_pedido* pedido, ESTADO_PCB estado_a_pasar)
 	logear_cambio_cola(pedido, cola_nueva);
 }
 
-
-
-
 int sacar_de_cola_actual(t_pedido* pedido)
 {
-
 		t_list* cola = dictionary_int_get(diccionario_colas, pedido->estado_pcb);
 
 
@@ -166,19 +150,17 @@ void meter_en_cola(t_pedido* pedido, t_list* cola_nueva)
 		list_add(cola_nueva, pedido);
 }
 
-
 void meter_en_cola_READY(t_pedido* pedido)
 {
-	if (strcmp(config_get_string_value(config, "ALGORITMO_DE_PLANIFICACION"), "FIFO") == 0)
+	if (strcmp(config_get_string_value(config_app, "ALGORITMO_DE_PLANIFICACION"), "FIFO") == 0)
 		meter_con_FIFO(pedido);
 
-	if (strcmp(config_get_string_value(config, "ALGORITMO_DE_PLANIFICACION"), "SJF-SD") == 0)
+	if (strcmp(config_get_string_value(config_app, "ALGORITMO_DE_PLANIFICACION"), "SJF-SD") == 0)
 		meter_con_SJF_SD(pedido);
 
-	if (strcmp(config_get_string_value(config, "ALGORITMO_DE_PLANIFICACION"), "HRRN") == 0)
+	if (strcmp(config_get_string_value(config_app, "ALGORITMO_DE_PLANIFICACION"), "HRRN") == 0)
 		meter_con_FIFO(pedido);
 }
-
 
 void meter_con_FIFO(t_pedido* pedido)  {list_add(cola_READY, pedido); }
 
@@ -223,7 +205,6 @@ bool highest_ratio_response(t_pedido* pedido1, t_pedido* pedido2)
 		else return false;
 
 }
-
 
 float convertir_string_en_float (char* token)
 {

@@ -9,3 +9,66 @@
 [ERROR] 17:07:17:215 Cliente/(14709:14709): Cliente no entiende el mensaje enviar.
 [ERROR] 17:07:55:759 Cliente/(14709:14709): Cliente no entiende el mensaje enviar.
 [ERROR] 17:07:59:623 Cliente/(14709:14709): Cliente no entiende el mensaje terminar.
+[ERROR] 19:35:26:426 Cliente/(6594:6594): Cliente no entiende el mensaje asljfaks.
+[INFO] 20:44:27:645 Cliente/(8523:8523): Restaurantes: 
+[INFO] 20:44:27:645 Cliente/(8523:8523): Resto_Default
+[INFO] 20:47:39:920 Cliente/(8712:8712): Restaurantes: 
+[INFO] 20:47:39:920 Cliente/(8712:8712): Resto_Default
+[INFO] 20:50:56:689 Cliente/(8825:8825): Restaurantes: 
+[INFO] 20:50:56:690 Cliente/(8825:8825): Resto_Default
+[INFO] 20:52:19:346 Cliente/(9048:9048): Restaurantes: 
+[INFO] 20:52:19:346 Cliente/(9048:9048): Resto_Default
+[ERROR] 20:54:22:601 Cliente/(9166:9166): Cliente no entiende el mensaje consukltar restaurantes.
+[INFO] 20:57:31:121 Cliente/(9399:9399): Restaurantes: 
+[INFO] 20:57:31:121 Cliente/(9399:9399): Resto_Default
+[ERROR] 20:58:36:770 Cliente/(9496:9496): Cliente no entiende el mensaje consultar restauratnes.
+[INFO] 20:58:42:236 Cliente/(9496:9496): Restaurantes: 
+[INFO] 20:58:42:236 Cliente/(9496:9496): Resto_Default
+[INFO] 21:59:12:431 Cliente/(11936:11936): Restaurantes: 
+[INFO] 21:59:12:431 Cliente/(11936:11936): Resto_Default
+[INFO] 22:00:05:717 Cliente/(11936:11936): Restaurantes: 
+[INFO] 22:00:05:717 Cliente/(11936:11936): Resto_Default
+[INFO] 22:00:19:692 Cliente/(11936:11936): No se selecciono ningun Restaurante. 
+[INFO] 22:10:28:262 Cliente/(12496:12496): Restaurantes: 
+[INFO] 22:10:28:262 Cliente/(12496:12496): Resto_Default
+[INFO] 22:26:52:829 Cliente/(13212:13212): Restaurantes: 
+[INFO] 22:26:52:829 Cliente/(13212:13212): Resto_Default
+[INFO] 22:38:42:717 Cliente/(13745:13745): Restaurantes: 
+[INFO] 22:38:42:717 Cliente/(13745:13745): Resto_Default
+[INFO] 22:42:09:394 Cliente/(14069:14069): Restaurantes: 
+[INFO] 22:42:09:394 Cliente/(14069:14069): Resto_Default
+[ERROR] 22:42:21:704 Cliente/(14069:14069): Cliente no entiende el mensaje seleccioanr restaurante.
+[ERROR] 22:42:28:777 Cliente/(14069:14069): Cliente no entiende el mensaje seleccinar restaurante.
+[INFO] 22:45:52:676 Cliente/(14178:14178): Restaurantes: 
+[INFO] 22:45:52:676 Cliente/(14178:14178): Resto_Default
+[ERROR] 22:47:57:16 Cliente/(14286:14286): Cliente no entiende el mensaje consultamos restaurantes.
+[INFO] 22:48:03:320 Cliente/(14286:14286): Restaurantes: 
+[INFO] 22:48:03:320 Cliente/(14286:14286): Resto_Default
+[INFO] 22:58:35:568 Cliente/(14768:14768): Restaurantes: 
+[INFO] 22:58:35:568 Cliente/(14768:14768): Resto_Default
+[INFO] 22:59:42:275 Cliente/(14827:14827): Restaurantes: 
+[INFO] 22:59:42:275 Cliente/(14827:14827): Resto_Default
+[INFO] 23:08:19:663 Cliente/(15153:15153): Restaurantes: 
+[INFO] 23:08:19:663 Cliente/(15153:15153): Resto_Default
+[INFO] 23:11:26:146 Cliente/(15362:15362): Restaurantes: 
+[INFO] 23:11:26:146 Cliente/(15362:15362): Resto_Default
+[INFO] 23:12:18:852 Cliente/(15410:15410): Restaurantes: 
+[INFO] 23:12:18:852 Cliente/(15410:15410): Resto_Default
+[INFO] 23:13:32:787 Cliente/(15410:15410): Platos: 
+[INFO] 23:13:32:787 Cliente/(15410:15410): Plato1
+[INFO] 23:13:32:787 Cliente/(15410:15410): Plato2
+[INFO] 23:13:32:787 Cliente/(15410:15410): Plato3
+[INFO] 23:20:24:79 Cliente/(15745:15745): Platos: 
+[INFO] 23:20:24:79 Cliente/(15745:15745): Plato1
+[INFO] 23:20:24:79 Cliente/(15745:15745): Plato2
+[INFO] 23:20:24:79 Cliente/(15745:15745): Plato3
+[INFO] 23:23:41:844 Cliente/(16010:16010): Platos: 
+[INFO] 23:23:41:844 Cliente/(16010:16010): Plato1
+[INFO] 23:23:41:844 Cliente/(16010:16010): Plato2
+[INFO] 23:23:41:844 Cliente/(16010:16010): Plato3
+[INFO] 23:30:38:873 Cliente/(16360:16360): Platos: 
+[INFO] 23:30:38:873 Cliente/(16360:16360): Plato1
+[INFO] 23:30:38:873 Cliente/(16360:16360): Plato2
+[INFO] 23:30:38:873 Cliente/(16360:16360): Plato3
+[INFO] 23:30:51:993 Cliente/(16360:16360): Restaurante seleccionado correctamente.
+[INFO] 23:32:56:263 Cliente/(16360:16360): Restaurante seleccionado correctamente.

@@ -30,7 +30,7 @@ static t_buffer* serializar_lista_string(void* datos)
 	return buffer;
 }
 
-static t_buffer* serializar_operacion_ok(void* datos)
+static t_buffer* serializar_bool(void* datos)
 {
 	t_buffer* buffer = buffer_crear(sizeof(bool));
 	buffer_serializar(buffer, datos, sizeof(bool));
@@ -56,10 +56,11 @@ static void* deserializar_lista_string(t_buffer* buffer)
 // ===== Destrucciones =====
 static void destruir_lista_string(void* datos)
 {
-	list_destroy_and_destroy_elements(datos, &free);
+	list_destroy(datos);
+	//list_destroy_and_destroy_elements(datos, &free);
 }
 
-static void* deserializar_operacion_ok(t_buffer* buffer)
+static void* deserializar_bool(t_buffer* buffer)
 {
 	return buffer_deserializar(buffer, sizeof(bool));
 }
@@ -69,9 +70,11 @@ void diccionario_serializaciones_inicializar()
 {
 	diccionario_serializaciones = dictionary_int_create();
 
-	dictionary_int_put(diccionario_serializaciones, OPERACION_OK, &serializar_operacion_ok);
 	dictionary_int_put(diccionario_serializaciones, CONSULTAR_RESTAURANTES, &serializar_lista_string);
 	dictionary_int_put(diccionario_serializaciones, SELECCIONAR_RESTAURANTE, &serializar_string);
+	dictionary_int_put(diccionario_serializaciones, SELECCIONAR_RESTAURANTE_RESPUESTA, &serializar_bool);
+	dictionary_int_put(diccionario_serializaciones, CONSULTAR_PLATOS, &serializar_string);
+	dictionary_int_put(diccionario_serializaciones, CONSULTAR_PLATOS_RESPUESTA, &serializar_lista_string);
 }
 
 void diccionario_serializaciones_destruir()
@@ -84,9 +87,12 @@ void diccionario_deserializaciones_inicializar()
 {
 	diccionario_deserializaciones = dictionary_int_create();
 
-	dictionary_int_put(diccionario_deserializaciones, OPERACION_OK, &deserializar_operacion_ok);
+	//dictionary_int_put(diccionario_deserializaciones, OPERACION_OK, &deserializar_bool);
 	dictionary_int_put(diccionario_deserializaciones, CONSULTAR_RESTAURANTES, &deserializar_lista_string);
 	dictionary_int_put(diccionario_deserializaciones, SELECCIONAR_RESTAURANTE, &deserializar_string);
+	dictionary_int_put(diccionario_deserializaciones, SELECCIONAR_RESTAURANTE_RESPUESTA, &deserializar_bool);
+	dictionary_int_put(diccionario_deserializaciones, CONSULTAR_PLATOS, &deserializar_string);
+	dictionary_int_put(diccionario_deserializaciones, CONSULTAR_PLATOS_RESPUESTA, &deserializar_lista_string);
 }
 
 void diccionario_deserializaciones_destruir()
@@ -94,18 +100,21 @@ void diccionario_deserializaciones_destruir()
 	dictionary_int_destroy(diccionario_deserializaciones);
 }
 
+static void sin_free() {}
+
 // ===== Diccionario de Destrucciones =====
 void diccionario_destrucciones_inicializar()
 {
 	diccionario_destrucciones = dictionary_int_create();
 
-	dictionary_int_put(diccionario_serializaciones, OPERACION_OK, &free);
 	dictionary_int_put(diccionario_destrucciones, CONSULTAR_RESTAURANTES, &destruir_lista_string);
+	dictionary_int_put(diccionario_destrucciones, SELECCIONAR_RESTAURANTE, &sin_free);
+	dictionary_int_put(diccionario_destrucciones, SELECCIONAR_RESTAURANTE_RESPUESTA, &free);
+	dictionary_int_put(diccionario_destrucciones, CONSULTAR_PLATOS, &free);
+	dictionary_int_put(diccionario_destrucciones, CONSULTAR_PLATOS_RESPUESTA, &destruir_lista_string);
 }
 
 void diccionario_destrucciones_destruir()
 {
 	dictionary_int_destroy(diccionario_destrucciones);
 }
-
-

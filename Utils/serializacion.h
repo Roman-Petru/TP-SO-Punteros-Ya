@@ -13,3 +13,5 @@ void diccionario_serializaciones_inicializar();
 void diccionario_deserializaciones_inicializar();
 void diccionario_serializaciones_destruir();
 void diccionario_deserializaciones_destruir();
+void diccionario_destrucciones_inicializar();
+void diccionario_destrucciones_destruir();

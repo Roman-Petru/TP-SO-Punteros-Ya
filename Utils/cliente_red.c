@@ -17,7 +17,6 @@ t_cliente_red* cliente_crear(char* ip, char* puerto)
 	cliente->puerto = malloc(strlen(ip)+1);
 	strcpy(cliente->puerto, puerto);
 	cliente->diccionario_operaciones = dictionary_int_create();
-	dictionary_int_put(cliente->diccionario_operaciones, OPERACION_OK, &operacion_ok);
 	//cliente_enviar_mensaje(cliente, HANDSHAKE_OK, NULL);
 
 	return cliente;
