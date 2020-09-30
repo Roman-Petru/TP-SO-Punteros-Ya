@@ -33,7 +33,6 @@ t_respuesta* respuesta_crear(t_codigo_de_operacion codigo_operacion, void* datos
 
 void respuesta_destruir(t_respuesta* respuesta)
 {
-	if(respuesta->datos!=NULL)
-		((t_destructor) dictionary_int_get(diccionario_destrucciones, respuesta->codigo_operacion))(respuesta->datos);
+	destruir(respuesta->codigo_operacion, respuesta->datos);
 	free(respuesta);
 }

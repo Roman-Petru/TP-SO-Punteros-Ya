@@ -56,13 +56,11 @@ static void* deserializar_lista_string(t_buffer* buffer)
 // ===== Destrucciones =====
 static void destruir_lista_string(void* datos)
 {
-	list_destroy(datos);
-	//list_destroy_and_destroy_elements(datos, &free);
+	list_destroy_and_destroy_elements(datos, &free);
 }
 
 static void* deserializar_bool(t_buffer* buffer)
 {
-	bool valor = buffer->stream;
 	return buffer_deserializar(buffer, sizeof(bool));
 }
 
@@ -100,7 +98,8 @@ void diccionario_deserializaciones_destruir()
 	dictionary_int_destroy(diccionario_deserializaciones);
 }
 
-static void sin_free() {}
+//static void sin_free() {}
+static void si_free(void* datos) {if(datos != NULL) free(datos);}
 
 // ===== Diccionario de Destrucciones =====
 void diccionario_destrucciones_inicializar()
@@ -108,9 +107,9 @@ void diccionario_destrucciones_inicializar()
 	diccionario_destrucciones = dictionary_int_create();
 
 	dictionary_int_put(diccionario_destrucciones, CONSULTAR_RESTAURANTES, &destruir_lista_string);
-	dictionary_int_put(diccionario_destrucciones, SELECCIONAR_RESTAURANTE, &sin_free);
-	dictionary_int_put(diccionario_destrucciones, SELECCIONAR_RESTAURANTE_RESPUESTA, &sin_free);
-	dictionary_int_put(diccionario_destrucciones, CONSULTAR_PLATOS, &free);
+	dictionary_int_put(diccionario_destrucciones, SELECCIONAR_RESTAURANTE, &si_free);
+	dictionary_int_put(diccionario_destrucciones, SELECCIONAR_RESTAURANTE_RESPUESTA, &si_free);
+	dictionary_int_put(diccionario_destrucciones, CONSULTAR_PLATOS, &si_free);
 	dictionary_int_put(diccionario_destrucciones, CONSULTAR_PLATOS_RESPUESTA, &destruir_lista_string);
 }
 
@@ -118,3 +117,10 @@ void diccionario_destrucciones_destruir()
 {
 	dictionary_int_destroy(diccionario_destrucciones);
 }
+
+void destruir(t_codigo_de_operacion codigo_de_operacion, void* datos)
+{
+	if(datos!=NULL)
+		((t_destructor) dictionary_int_get(diccionario_destrucciones, codigo_de_operacion))(datos);
+}
+

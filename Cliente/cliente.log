@@ -96,3 +96,54 @@
 [INFO] 00:08:14:128 Cliente/(17687:17687): Plato3
 [INFO] 00:08:22:672 Cliente/(17687:17687): Restaurante seleccionado correctamente.
 [INFO] 00:08:38:728 Cliente/(17687:17687): El servidor se cerro correctamente.
+[INFO] 00:10:39:940 Cliente/(17873:17873): Restaurantes: 
+[INFO] 00:10:39:981 Cliente/(17873:17873): Resto_Default
+[INFO] 00:10:45:679 Cliente/(17873:17873): Platos: 
+[INFO] 00:10:45:683 Cliente/(17873:17873): Plato1
+[INFO] 00:10:45:683 Cliente/(17873:17873): Plato2
+[INFO] 00:10:45:685 Cliente/(17873:17873): Plato3
+[INFO] 00:10:56:61 Cliente/(17873:17873): Restaurante seleccionado correctamente.
+[INFO] 00:11:00:835 Cliente/(17873:17873): El servidor se cerro correctamente.
+[INFO] 00:25:57:628 Cliente/(18424:18424): Restaurantes: 
+[INFO] 00:25:57:671 Cliente/(18424:18424): Resto_Default
+[INFO] 00:26:01:581 Cliente/(18424:18424): No se selecciono ningun Restaurante. 
+[INFO] 00:26:12:657 Cliente/(18424:18424): Restaurante seleccionado correctamente.
+[INFO] 00:26:21:766 Cliente/(18424:18424): Platos: 
+[INFO] 00:26:21:770 Cliente/(18424:18424): Plato1
+[INFO] 00:26:21:773 Cliente/(18424:18424): Plato2
+[INFO] 00:26:21:776 Cliente/(18424:18424): Plato3
+[INFO] 00:26:25:102 Cliente/(18424:18424): El servidor se cerro correctamente.
+[INFO] 00:28:13:986 Cliente/(18517:18517): Restaurantes: 
+[INFO] 00:28:14:31 Cliente/(18517:18517): Resto_Default
+[INFO] 00:28:25:316 Cliente/(18517:18517): Restaurante seleccionado correctamente.
+[INFO] 00:28:28:983 Cliente/(18517:18517): Platos: 
+[INFO] 00:28:28:985 Cliente/(18517:18517): Plato1
+[INFO] 00:28:28:988 Cliente/(18517:18517): Plato2
+[INFO] 00:28:28:992 Cliente/(18517:18517): Plato3
+[INFO] 00:28:38:917 Cliente/(18517:18517): El servidor se cerro correctamente.
+[INFO] 00:31:46:963 Cliente/(18619:18619): Restaurantes: 
+[INFO] 00:31:47:14 Cliente/(18619:18619): Resto_Default
+[INFO] 00:31:51:181 Cliente/(18619:18619): No se selecciono ningun Restaurante. 
+[INFO] 00:32:05:457 Cliente/(18619:18619): Restaurante seleccionado correctamente.
+[INFO] 00:32:10:31 Cliente/(18619:18619): Platos: 
+[INFO] 00:32:10:37 Cliente/(18619:18619): Plato1
+[INFO] 00:32:10:37 Cliente/(18619:18619): Plato2
+[INFO] 00:32:10:41 Cliente/(18619:18619): Plato3
+[INFO] 00:32:11:725 Cliente/(18619:18619): El servidor se cerro correctamente.
+[INFO] 00:35:01:712 Cliente/(18639:18639): Restaurantes: 
+[INFO] 00:35:01:712 Cliente/(18639:18639): Resto_Default
+[INFO] 00:35:13:161 Cliente/(18639:18639): Restaurante seleccionado correctamente.
+[INFO] 00:35:17:384 Cliente/(18639:18639): Platos: 
+[INFO] 00:35:17:384 Cliente/(18639:18639): Plato1
+[INFO] 00:35:17:384 Cliente/(18639:18639): Plato2
+[INFO] 00:35:17:384 Cliente/(18639:18639): Plato3
+[INFO] 00:35:20:952 Cliente/(18639:18639): El servidor se cerro correctamente.
+[INFO] 00:42:00:364 Cliente/(18926:18926): Restaurantes: 
+[INFO] 00:42:00:364 Cliente/(18926:18926): Resto_Default
+[INFO] 00:42:04:964 Cliente/(18926:18926): No se selecciono ningun Restaurante. 
+[INFO] 00:42:16:575 Cliente/(18926:18926): Restaurante seleccionado correctamente.
+[INFO] 00:42:41:551 Cliente/(18926:18926): Platos: 
+[INFO] 00:42:41:552 Cliente/(18926:18926): Plato1
+[INFO] 00:42:41:552 Cliente/(18926:18926): Plato2
+[INFO] 00:42:41:552 Cliente/(18926:18926): Plato3
+[INFO] 00:42:45:631 Cliente/(18926:18926): El servidor se cerro correctamente.

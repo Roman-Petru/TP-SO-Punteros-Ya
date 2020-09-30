@@ -2,6 +2,7 @@
 #include "buffer.h"
 #include "socket.h"
 #include "paquete.h"
+#include "serializacion.h"
 #include <netdb.h>
 #include <stdlib.h>
 #include <string.h>
@@ -40,7 +41,11 @@ static void cliente_recibir_respuesta(t_cliente_red* cliente)
 {
 	t_paquete* paquete = paquete_recibir(cliente->socket);
 	if(paquete_tiene_datos(paquete))
-		((t_operacion_cliente) dictionary_int_get(cliente->diccionario_operaciones, paquete->codigo_operacion))(paquete_desempaquetar(paquete));
+	{
+		void* datos = paquete_desempaquetar(paquete);
+		((t_operacion_cliente) dictionary_int_get(cliente->diccionario_operaciones, paquete->codigo_operacion))(datos);
+		destruir(paquete->codigo_operacion, datos);
+	}
 	else
 		((t_operacion_cliente_simple) dictionary_int_get(cliente->diccionario_operaciones, paquete->codigo_operacion))();
 	paquete_destruir(paquete);

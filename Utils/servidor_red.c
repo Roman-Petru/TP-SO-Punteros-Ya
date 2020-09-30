@@ -11,7 +11,11 @@
 static t_respuesta* servidor_procesar_paquete(t_servidor_red* servidor, t_paquete* paquete)
 {
 	if(paquete_tiene_datos(paquete))
-		return ((t_operacion_servidor) dictionary_int_get(servidor->diccionario_operaciones, paquete->codigo_operacion))(paquete_desempaquetar(paquete));
+	{
+		void* datos = paquete_desempaquetar(paquete);
+		return ((t_operacion_servidor) dictionary_int_get(servidor->diccionario_operaciones, paquete->codigo_operacion))(datos);
+		destruir(paquete->codigo_operacion, datos);
+	}
 	else
 		return ((t_operacion_servidor_simple) dictionary_int_get(servidor->diccionario_operaciones, paquete->codigo_operacion))();
 }
@@ -69,7 +73,6 @@ void servidor_destruir(t_servidor_red* servidor)
 	pthread_join(servidor->hilo_escucha, NULL);
 	dictionary_int_destroy(servidor->diccionario_operaciones);
 	free(servidor);
-
 }
 
 

@@ -7,6 +7,7 @@
 
 t_cliente_red* cliente;
 t_consola* consola;
+t_config* config;
 bool hay_que_leer;
 
 //DATOS TEMPORALES
@@ -53,12 +54,6 @@ static void consultar_platos()
 	cliente_enviar_mensaje(cliente, CONSULTAR_PLATOS, restaurante_seleccionado);
 }
 
-/*static void consultar_platos()
-{
-	char* restaurante = consola_leer("Ingrese el nombre del restaurante: ");
-	cliente_enviar_mensaje(cliente, CONSULTAR_PLATOS, restaurante);
-}*/
-
 //========== OPERACIONES ==========//
 static void operacion_consultar_restaurantes(t_list* restaurantes)
 {
@@ -87,26 +82,12 @@ static void operacion_consultar_platos(t_list* platos)
 	list_iterate(platos, &loggear_restaurante);
 }
 
-/*static void operacion_consultar_PEDIDO(t_list* platos)
-{
-	consola_log(consola, "Platos: ");
-
-	void loggear_plato(void* plato_void) {
-		t_plato* plato = plato_void;
-		consola_log(consola, "nombre: %s", plato->nombre);
-		consola_log(consola, "cant_total: %s", plato->cant_total);
-		consola_log(consola, "cant_lista: %s", plato->cant_lista);
-	}
-
-	list_iterate(restaurantes, &loggear_plato);
-}*/
-
 static void operacion_terminar_servidor() { consola_log(consola, "El servidor se cerro correctamente."); }
 
 //========== CLIENTE ==========//
 static void inicializar()
 {
-	t_config* config = config_create("cliente.config");
+	config = config_create("cliente.config");
 	diccionario_serializaciones_inicializar();
 	diccionario_deserializaciones_inicializar();
 	diccionario_destrucciones_inicializar();
@@ -114,7 +95,7 @@ static void inicializar()
 
 	//=== DATOS TEMPORALES ===//
 	id_pedido = 0;
-	restaurante_seleccionado = "Resto_Default"; //NULL;
+	restaurante_seleccionado = NULL;
 
 	//=== CLIENTE RED ===//
 	cliente = cliente_crear(config_get_string_value(config, "IP_APP"), config_get_string_value(config, "PUERTO_APP"));
@@ -134,6 +115,7 @@ static void inicializar()
 
 static void terminar_programa()
 {
+	config_destroy(config);
 	consola_destruir(consola);
 	cliente_destruir(cliente);
 	diccionario_serializaciones_destruir();
@@ -148,3 +130,20 @@ int main()
 		consola_leer_comando(consola, "Cliente: ");
 	terminar_programa();
 }
+
+
+
+/*static void operacion_consultar_PEDIDO(t_list* platos)
+{
+	consola_log(consola, "Platos: ");
+
+	void loggear_plato(void* plato_void) {
+		t_plato* plato = plato_void;
+		consola_log(consola, "nombre: %s", plato->nombre);
+		consola_log(consola, "cant_total: %s", plato->cant_total);
+		consola_log(consola, "cant_lista: %s", plato->cant_lista);
+	}
+
+	list_iterate(restaurantes, &loggear_plato);
+}*/
+
