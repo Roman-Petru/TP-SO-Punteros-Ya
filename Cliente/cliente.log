@@ -72,3 +72,27 @@
 [INFO] 23:30:38:873 Cliente/(16360:16360): Plato3
 [INFO] 23:30:51:993 Cliente/(16360:16360): Restaurante seleccionado correctamente.
 [INFO] 23:32:56:263 Cliente/(16360:16360): Restaurante seleccionado correctamente.
+[INFO] 23:53:00:616 Cliente/(16932:16932): Platos: 
+[INFO] 23:53:00:616 Cliente/(16932:16932): Plato1
+[INFO] 23:53:00:616 Cliente/(16932:16932): Plato2
+[INFO] 23:53:00:616 Cliente/(16932:16932): Plato3
+[ERROR] 23:53:11:600 Cliente/(16932:16932): Cliente no entiende el mensaje seleccionar restaurante Resto_Default.
+[INFO] 23:54:37:56 Cliente/(17055:17055): Platos: 
+[INFO] 23:54:37:57 Cliente/(17055:17055): Plato1
+[INFO] 23:54:37:57 Cliente/(17055:17055): Plato2
+[INFO] 23:54:37:57 Cliente/(17055:17055): Plato3
+[INFO] 00:04:26:158 Cliente/(17361:17361): Platos: 
+[INFO] 00:04:26:158 Cliente/(17361:17361): Plato1
+[INFO] 00:04:26:158 Cliente/(17361:17361): Plato2
+[INFO] 00:04:26:158 Cliente/(17361:17361): Plato3
+[INFO] 00:06:55:281 Cliente/(17687:17687): Platos: 
+[INFO] 00:06:55:281 Cliente/(17687:17687): Plato1
+[INFO] 00:06:55:281 Cliente/(17687:17687): Plato2
+[INFO] 00:06:55:281 Cliente/(17687:17687): Plato3
+[INFO] 00:07:12:900 Cliente/(17687:17687): Restaurante seleccionado correctamente.
+[INFO] 00:08:14:128 Cliente/(17687:17687): Platos: 
+[INFO] 00:08:14:128 Cliente/(17687:17687): Plato1
+[INFO] 00:08:14:128 Cliente/(17687:17687): Plato2
+[INFO] 00:08:14:128 Cliente/(17687:17687): Plato3
+[INFO] 00:08:22:672 Cliente/(17687:17687): Restaurante seleccionado correctamente.
+[INFO] 00:08:38:728 Cliente/(17687:17687): El servidor se cerro correctamente.

@@ -33,7 +33,7 @@ static t_buffer* serializar_lista_string(void* datos)
 static t_buffer* serializar_bool(void* datos)
 {
 	t_buffer* buffer = buffer_crear(sizeof(bool));
-	buffer_serializar(buffer, datos, sizeof(bool));
+	buffer_serializar(buffer, &datos, sizeof(bool));
 
 	return buffer;
 }
@@ -62,6 +62,7 @@ static void destruir_lista_string(void* datos)
 
 static void* deserializar_bool(t_buffer* buffer)
 {
+	bool valor = buffer->stream;
 	return buffer_deserializar(buffer, sizeof(bool));
 }
 
@@ -87,7 +88,6 @@ void diccionario_deserializaciones_inicializar()
 {
 	diccionario_deserializaciones = dictionary_int_create();
 
-	//dictionary_int_put(diccionario_deserializaciones, OPERACION_OK, &deserializar_bool);
 	dictionary_int_put(diccionario_deserializaciones, CONSULTAR_RESTAURANTES, &deserializar_lista_string);
 	dictionary_int_put(diccionario_deserializaciones, SELECCIONAR_RESTAURANTE, &deserializar_string);
 	dictionary_int_put(diccionario_deserializaciones, SELECCIONAR_RESTAURANTE_RESPUESTA, &deserializar_bool);
@@ -109,7 +109,7 @@ void diccionario_destrucciones_inicializar()
 
 	dictionary_int_put(diccionario_destrucciones, CONSULTAR_RESTAURANTES, &destruir_lista_string);
 	dictionary_int_put(diccionario_destrucciones, SELECCIONAR_RESTAURANTE, &sin_free);
-	dictionary_int_put(diccionario_destrucciones, SELECCIONAR_RESTAURANTE_RESPUESTA, &free);
+	dictionary_int_put(diccionario_destrucciones, SELECCIONAR_RESTAURANTE_RESPUESTA, &sin_free);
 	dictionary_int_put(diccionario_destrucciones, CONSULTAR_PLATOS, &free);
 	dictionary_int_put(diccionario_destrucciones, CONSULTAR_PLATOS_RESPUESTA, &destruir_lista_string);
 }

@@ -24,16 +24,12 @@ static t_respuesta* seleccionar_restaurante(char* restaurante)
 	if(strcmp(restaurante, "Resto_Default")==0) //TODO App: seleccionar_restaurante ->  || esta_conectado(restaurante)
 	{
 		log_info(logger_app, "Seleccionaron Restaurante %s.", restaurante);
-		bool* ok = malloc(sizeof(bool));
-		*ok = true;
-		return respuesta_crear(SELECCIONAR_RESTAURANTE_RESPUESTA, &ok);
+		return respuesta_crear(SELECCIONAR_RESTAURANTE_RESPUESTA, (void*) true);
 	}
 	else
 	{
 		log_info(logger_app, "Error al intentar seleccionar Restaurante %s.", restaurante);
-		bool* no_ok = malloc(sizeof(bool));
-		*no_ok = false;
-		return respuesta_crear(SELECCIONAR_RESTAURANTE_RESPUESTA, &no_ok);
+		return respuesta_crear(SELECCIONAR_RESTAURANTE_RESPUESTA, (void*) false);
 	}
 }
 
