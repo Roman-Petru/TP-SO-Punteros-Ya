@@ -1,7 +1,9 @@
 #include "restaurante.h"
 
+int id_PCB;
 int multiprocesamiento_restaurante;
 int cantidad_hornos;
+t_log* logger_resto;
 
 t_list* cola_Resto_NEW;
 t_list* cola_de_cola_Resto_READY;
@@ -19,12 +21,15 @@ sem_t semaforo_resto;
 void inicializar_restaurante()
 {
 
+	logger_resto = log_create("resto.log", "RESTAURANTE", true, LOG_LEVEL_INFO);
+
+	id_PCB = 0;
 	//obtener_metadata();
 	multiprocesamiento_restaurante = 5;
 
 	lista_afinidades = list_create();
 	t_afinidad* afinidad1 = malloc(sizeof(t_afinidad));
-	afinidad1->plato = "milanesas";
+	afinidad1->plato = "milanesa";
 	afinidad1->cantidad_cocineros = 1;
 	list_add(lista_afinidades, afinidad1);
 	t_afinidad* afinidad2 = malloc(sizeof(t_afinidad));
@@ -35,12 +40,12 @@ void inicializar_restaurante()
 	afinidad3->plato = "general";
 	afinidad3->cantidad_cocineros = 3;
 	list_add(lista_afinidades, afinidad3);
-
+/*
 	const char *platos[3];
-	platos[0] = "milanesas";
+	platos[0] = "milanesa";
 	platos[1] = "pure";
 	platos[2] = "ensalada";
-
+*/
 
 	cantidad_hornos = 3;
 
@@ -68,6 +73,8 @@ void inicializar_restaurante()
 	cola_Resto_EXIT = list_create();
 	cola_Hornos_READY = list_create();
 	cola_Hornos_EXEC = list_create();
+
+	inicializar_diccionario_recetas();
 	inicializar_diccionario_colas();
 }
 
@@ -76,8 +83,12 @@ int main()
 
 {
 	inicializar_restaurante();
+	crear_plato("milanesa", 54);
+	crear_plato("milanesa", 65);
+	crear_plato("milanesa", 80);
+	crear_plato("pure", 90);
 
-	//while (1)
+	while (1)
 	{
 		planificar_corto_plazo();
 		ejecutar_ciclo();

@@ -2,6 +2,7 @@
 #define RESTO
 
 #include <commons/collections/list.h>
+#include <commons/log.h>
 #include <semaphore.h>
 #include <stdio.h>
 #include <string.h>
@@ -22,6 +23,8 @@ extern t_list* lista_afinidades;
 
 extern sem_t semaforo_resto;
 extern int cantidad_hornos;
+extern int id_PCB;
+extern t_log* logger_resto;
 
 typedef struct{
 	char* plato;
