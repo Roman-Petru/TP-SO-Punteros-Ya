@@ -9,9 +9,10 @@ static void inicializar_app()
 	logger_app = log_create("app.log", "APP", true, LOG_LEVEL_INFO); //config_get_string_value(config_app, "ARCHIVO_LOG")
 	config_app = config_create("app.config");
 
-	cargar_repartidores(config_app);
+	cargar_repartidores();
 	inicializar_planificador();
 	inicializar_servidor();
+	inicializar_interrupciones();
 	sem_init (&(semaforo_app), 0, 0);
 }
 
@@ -25,6 +26,6 @@ int main()
 		planificar_largo_plazo();
 		planificar_corto_plazo();
 		ejecutar_ciclo();
-		//ejecutar_interrupciones();
+		ejecutar_interrupciones();
 	}
 }

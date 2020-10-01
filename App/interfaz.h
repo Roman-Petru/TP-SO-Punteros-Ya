@@ -1,5 +1,5 @@
-#ifndef APP_INTERFAZ
-#define APP_INTERFAZ
+#ifndef INTERFAZ_H_
+#define INTERFAZ_H_
 
 #include "../Utils/servidor_red.h"
 #include "../Utils/serializacion.h"
@@ -7,4 +7,4 @@
 
 void inicializar_servidor();
 
-#endif //APP_INTERFAZ
+#endif /*INTERFAZ_H_*/

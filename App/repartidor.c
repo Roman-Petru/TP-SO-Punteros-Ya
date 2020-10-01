@@ -1,4 +1,5 @@
 #include "repartidor.h"
+#include "app.h"
 
 t_list* repartidores_libres;
 
@@ -78,13 +79,13 @@ static void cargar_repartidor(char* posicion_str, char* frecuencia_de_descanso, 
 	list_add(repartidores_libres, repartidor);
 }
 
-void cargar_repartidores(t_config* config)
+void cargar_repartidores()
 {
 	repartidores_libres = list_create();
 
-	char** repartidores = config_get_array_value(config, "REPARTIDORES");
-	char** tiempos_de_descanso = config_get_array_value(config, "TIEMPO_DE_DESCANSO");
-	char** frecuencias_de_descanso = config_get_array_value(config, "FRECUENCIA_DE_DESCANSO");
+	char** repartidores = config_get_array_value(config_app, "REPARTIDORES");
+	char** tiempos_de_descanso = config_get_array_value(config_app, "TIEMPO_DE_DESCANSO");
+	char** frecuencias_de_descanso = config_get_array_value(config_app, "FRECUENCIA_DE_DESCANSO");
 
 	for (int i=0; repartidores[i] != NULL; i++)
 		cargar_repartidor(repartidores[i], frecuencias_de_descanso[i], tiempos_de_descanso[i]);

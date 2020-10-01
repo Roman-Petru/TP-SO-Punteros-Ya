@@ -1,11 +1,11 @@
-#ifndef REPARTIDOR
-#define REPARTIDOR
+#ifndef REPARTIDOR_H_
+#define REPARTIDOR_H_
 
+#include "../Utils/posicion.h"
 #include <commons/config.h>
 #include <commons/string.h>
 #include <commons/collections/list.h>
 #include <commons/config.h>
-#include "../Utils/posicion.h"
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -29,7 +29,7 @@ void repartidor_destruir(t_repartidor* repartidor);
 void repartidor_mover_hacia(t_repartidor* repartidor, t_posicion* destino);
 void repartidor_descansar(t_repartidor* repartidor);
 
-void cargar_repartidores(t_config* config);
+void cargar_repartidores();
 t_repartidor* repartidor_obtener_mas_cercano(t_posicion* destino);
 
-#endif //REPARTIDOR
+#endif /*REPARTIDOR_H_*/

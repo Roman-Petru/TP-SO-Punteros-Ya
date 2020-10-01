@@ -1,5 +1,5 @@
-#ifndef PEDIDO_APP
-#define PEDIDO_APP
+#ifndef PEDIDO_H_
+#define PEDIDO_H_
 
 #include "stddef.h"
 #include <pthread.h>
@@ -51,4 +51,4 @@ void descansar_repartidor(t_pedido* pedido);
 
 t_pedido* crear_pedido_default(int id);
 
-#endif //PEDIDO_APP
+#endif /*PEDIDO_H_*/

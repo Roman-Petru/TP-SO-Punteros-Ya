@@ -1,5 +1,4 @@
 #include "planificador.h"
-
 #include "app.h"
 #include "../Utils/posicion.h"
 
@@ -18,6 +17,7 @@ static void meter_con_FIFO(t_pedido* pedido);
 static void meter_con_SJF_SD(t_pedido* pedido);
 static bool highest_response_ratio(t_pedido* pedido1, t_pedido* pedido2);
 
+//========== PLANIFICADOR ==========//
 void inicializar_planificador()
 {
 	//===COLAS===//
@@ -74,7 +74,6 @@ static void actualizar_estado_listos()
 		t_pedido* pedido = list_get(cola_READY, i);
 		pedido->ciclos_en_ready = pedido->ciclos_en_ready + 1;
 	}
-
 }
 
 static void actualizar_estado_bloqueados()
@@ -197,7 +196,7 @@ static void meter_en_cola_READY(t_pedido* pedido)
 	((t_insertador) dictionary_get(diccionario_algoritmos, config_get_string_value(config_app, "ALGORITMO_DE_PLANIFICACION")))(pedido);
 }
 
-static void meter_en_cola(t_pedido* pedido, ESTADO_PCB estado)
+void meter_en_cola(t_pedido* pedido, ESTADO_PCB estado)
 {
 	if (estado == READY)
 		meter_en_cola_READY(pedido);
@@ -212,7 +211,6 @@ void cambiar_estado_a(t_pedido* pedido, ESTADO_PCB estado)
 	sacar_de_cola_actual(pedido);
 	meter_en_cola(pedido, estado);
 }
-
 
 float convertir_string_en_float (char* token)
 {
