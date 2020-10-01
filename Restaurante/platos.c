@@ -19,7 +19,9 @@ t_platos_PCB* crear_plato(char* plato, int id_pedido)
 	nuevo_plato->hubo_cambio_operacion = false;
 
 	nuevo_plato->pasos_receta_faltantes = malloc (sizeof(t_receta));
-	nuevo_plato->pasos_receta_faltantes = dictionary_get(diccionario_recetas, plato); //ENCONTRE EL BUG, COMPARTEN LA RECETA, FALTA ARREGLARLO
+	nuevo_plato->pasos_receta_faltantes = dictionary_get(diccionario_recetas, plato); //ENCONTRE EL BUG, COMPARTEN LA RECETA, FALTA ARREGLARLO, 
+	//PROBAR ALGUNA FORMA DE DUPLICAR LA LISTA
+	
 	t_paso* paso = list_get(nuevo_plato->pasos_receta_faltantes, 0);
 	nuevo_plato->ciclos_restantes_paso_actual = paso->ciclos;
 
