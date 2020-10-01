@@ -1,5 +1,12 @@
+#ifndef PLATOS_RES
+#define PLATOS_RES
+
 #include <pthread.h>
 #include <semaphore.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <commons/collections/list.h>
+
 
 typedef enum{
 	NEW = 0,
@@ -13,8 +20,9 @@ typedef enum{
 typedef struct {
 	char* nombre_plato;
 	int id_pedido;
-//	t_list* pasos_receta;
-	int paso_actual;
+	t_list* pasos_receta_faltantes;
+	int ciclos_restantes_paso_actual;
+
 
 	int ciclos_ejecutandose;
 	ESTADO_PCB estado_pcb;
@@ -24,5 +32,15 @@ typedef struct {
 }t_platos_PCB;
 
 
+typedef struct {
+	char* operacion;
+	int ciclos;
+}t_paso;
+
+
 
 t_platos_PCB* crear_plato(char* plato, int id_pedido);
+void ciclo_plato(t_platos_PCB* plato);
+bool avanzar_paso_receta (t_platos_PCB* plato);
+
+#endif //PLATOS_RES

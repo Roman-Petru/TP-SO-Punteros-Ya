@@ -37,7 +37,7 @@ void ejecutar_interrupciones()
 	if(list_is_empty(interrupciones))
 		return;
 	list_iterate(interrupciones, (void*) &ejecutar_interrupcion);
-	list_clean_and_destroy_elements(interrupciones, &interrupcion_destruir);
+	list_clean_and_destroy_elements(interrupciones, (void*) &interrupcion_destruir);
 }
 
 //========== INTERRUPCIONES ==========//
