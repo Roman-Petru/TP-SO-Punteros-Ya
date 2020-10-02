@@ -4,6 +4,7 @@ t_log* logger_app;
 t_config* config_app;
 sem_t semaforo_app;
 
+
 static void inicializar_app()
 {
 	logger_app = log_create("app.log", "APP", true, LOG_LEVEL_INFO); //config_get_string_value(config_app, "ARCHIVO_LOG")
