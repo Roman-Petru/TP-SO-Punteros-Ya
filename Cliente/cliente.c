@@ -16,7 +16,6 @@ char* restaurante_seleccionado;
 
 
 
-
 static void terminar_programa()
 {
 	config_destroy(config);
@@ -24,6 +23,8 @@ static void terminar_programa()
 	cliente_destruir(cliente);
 	serializacion_finalizar();
 }
+
+
 
 int main()
 {

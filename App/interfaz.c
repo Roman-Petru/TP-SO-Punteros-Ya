@@ -9,13 +9,13 @@ static t_respuesta* consultar_restaurantes()
 
 	t_list* restaurantes = list_create();
 
-	//TODO App: consultar_restaurantes
+	//TODO App: consultar_restaurantes  //Descomentar cuando este hecha la lista
 	//if(hay_restaurantes)
 	//	cargar_restaurantes(restaurantes);
 	//else
 		list_add(restaurantes, "Resto_Default");
 
-	return respuesta_crear(CONSULTAR_RESTAURANTES, restaurantes);
+	return respuesta_crear(CONSULTAR_RESTAURANTES_RESPUESTA, restaurantes);  //Antes no decia RESTAURANTES
 }
 
 static t_respuesta* seleccionar_restaurante(char* restaurante)

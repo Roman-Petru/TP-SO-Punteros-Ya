@@ -9,6 +9,7 @@
 #include <string.h>
 #include "planificacionR.h"
 #include "platos.h"
+#include "interfaz_restaurante.h"
 
 extern t_log* logger_resto;
 extern t_config* config_resto;
