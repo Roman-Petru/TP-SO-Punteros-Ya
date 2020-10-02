@@ -159,6 +159,7 @@ static void actualizar_estado_ejecutados()
 //----------------------------------------------------------------SI ES ALGORITMO RR--------------------------//
 					}	else if (strcmp(config_get_string_value(config_resto, "ALGORITMO_PLANIFICACION"), "RR") == 0  && plato->ciclos_ejecutandose == quantum)
 						cambiar_estado_a(plato, READY);
+						plato->ciclos_ejecutandose = 0;
 			}
 		}
 	}
