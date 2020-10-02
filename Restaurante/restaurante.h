@@ -3,12 +3,15 @@
 
 #include <commons/collections/list.h>
 #include <commons/log.h>
+#include <commons/config.h>
 #include <semaphore.h>
 #include <stdio.h>
 #include <string.h>
 #include "planificacionR.h"
 #include "platos.h"
 
+extern t_log* logger_resto;
+extern t_config* config_resto;
 
 extern t_list* cola_Resto_NEW;
 extern t_list* cola_de_cola_Resto_READY;
@@ -24,7 +27,8 @@ extern t_list* lista_afinidades;
 extern sem_t semaforo_resto;
 extern int cantidad_hornos;
 extern int id_PCB;
-extern t_log* logger_resto;
+extern int quantum;
+
 
 typedef struct{
 	char* plato;

@@ -1,8 +1,10 @@
 #include "restaurante.h"
 
+t_config* config_resto;
 int id_PCB;
-int multiprocesamiento_restaurante;
 int cantidad_hornos;
+int quantum;
+
 t_log* logger_resto;
 
 t_list* cola_Resto_NEW;
@@ -24,8 +26,9 @@ void inicializar_restaurante()
 	logger_resto = log_create("resto.log", "RESTAURANTE", true, LOG_LEVEL_INFO);
 
 	id_PCB = 0;
+	config_resto = config_create("restaurante.config");
+	quantum = config_get_int_value(config_resto, "QUANTUM");
 	//obtener_metadata();
-	multiprocesamiento_restaurante = 5;
 
 	lista_afinidades = list_create();
 	t_afinidad* afinidad1 = malloc(sizeof(t_afinidad));
@@ -47,7 +50,7 @@ void inicializar_restaurante()
 	platos[2] = "ensalada";
 */
 
-	cantidad_hornos = 3;
+	cantidad_hornos = 1;
 
 	//obtener recetas
 	//termina metadata
@@ -86,6 +89,9 @@ int main()
 	crear_plato("milanesa", 54);
 	crear_plato("milanesa", 65);
 	crear_plato("milanesa", 80);
+	crear_plato("ensalada", 100);
+	crear_plato("ensalada", 120);
+	crear_plato("ensalada", 130);
 	crear_plato("pure", 90);
 
 	while (1)

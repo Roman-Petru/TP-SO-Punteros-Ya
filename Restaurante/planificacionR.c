@@ -3,7 +3,6 @@
 static void actualizar_estado_hornos();
 static void actualizar_estado_bloqueados();
 static void actualizar_estado_ejecutados();
-static void terminar_plato (t_platos_PCB* plato);
 
 void planificar_corto_plazo()
 {
@@ -14,7 +13,8 @@ void planificar_corto_plazo()
 		t_afinidad* afinidad = list_get(lista_afinidades, i);
 		while (afinidad->cantidad_cocineros > list_size(list_get(cola_de_cola_Resto_EXEC, i))&&(!list_is_empty(list_get(cola_de_cola_Resto_READY, i))))
 		{
-			log_info(logger_resto, "El plato con PCB %d paso a Cola EXEC", ((t_platos_PCB*) list_get(list_get(cola_de_cola_Resto_READY, i), 0))->id_PCB);
+		logear_inicio_operacion(list_get(list_get(cola_de_cola_Resto_READY, i), 0));
+			//log_info(logger_resto, "El plato con PCB %d ahora proseguira a %s", ((t_platos_PCB*) list_get(list_get(cola_de_cola_Resto_READY, i), 0))->id_PCB);
 			cambiar_estado_a(list_get(list_get(cola_de_cola_Resto_READY, i), 0), EXEC);
 		}
 	}
@@ -22,11 +22,15 @@ void planificar_corto_plazo()
 	//----------------------------PLANIFICAR HORNOS ------------------------//
 
 	while (cantidad_hornos > list_size(cola_Hornos_EXEC)&&(!list_is_empty(cola_Hornos_READY)))
+	{
+		logear_inicio_operacion(list_get(cola_Hornos_READY, 0));
 		list_add(cola_Hornos_EXEC, list_remove(cola_Hornos_READY, 0));
+	}
 }
 
 void ejecutar_ciclo()
 {
+
 	int semaforos_de_reposar = 0;
 	for (int i=0; i<list_size(lista_afinidades); i++)
 	{
@@ -38,16 +42,15 @@ void ejecutar_ciclo()
 		list_iterate(cola_Hornos_EXEC, (void*) &ejecutar_horno);
 
 		void ejecutar_reposados(t_platos_PCB* plato) {
-			t_paso* paso_actual = list_get(plato->pasos_receta_faltantes, 0);
-			if (strcmp(paso_actual->operacion, "REPOSAR") == 0)
+
+			if (!list_is_empty(plato->pasos_receta_faltantes)  && strcmp (((t_paso*) list_get(plato->pasos_receta_faltantes, 0))->operacion, "REPOSAR") == 0)
 			{
 				sem_post (&(plato->mutex));
 				semaforos_de_reposar++;
 			}
 			}
 
-		list_iterate(cola_Resto_BLOCKED, (void*) &ejecutar_reposados);  //bug: puede llegar a bloqueado un plato terminado
-
+		list_iterate(cola_Resto_BLOCKED, (void*) &ejecutar_reposados);
 
 
 	for (int i=0; i<list_size(lista_afinidades); i++)
@@ -151,7 +154,11 @@ static void actualizar_estado_ejecutados()
 					cambiar_estado_a(plato, BLOCKED);
 					list_add(cola_Hornos_READY, plato);
 				} else if (strcmp(paso->operacion, "REPOSAR") == 0)
+					{
 					cambiar_estado_a(plato, BLOCKED);
+//----------------------------------------------------------------SI ES ALGORITMO RR--------------------------//
+					}	else if (strcmp(config_get_string_value(config_resto, "ALGORITMO_PLANIFICACION"), "RR") == 0  && plato->ciclos_ejecutandose == quantum)
+						cambiar_estado_a(plato, READY);
 			}
 		}
 	}
@@ -163,7 +170,7 @@ void cambiar_estado_a(t_platos_PCB* plato, ESTADO_PCB estado_a_pasar)
 	plato->estado_pcb = estado_a_pasar;
 	t_list* cola_nueva = dictionary_int_get(diccionario_colas, plato->estado_pcb);
 	meter_en_cola(plato, cola_nueva);
-	log_info(logger_resto, "Cambio de cola del plato %d a cola %d", plato->id_PCB, estado_a_pasar);
+	//log_info(logger_resto, "Cambio de cola del plato %d a cola %d", plato->id_PCB, estado_a_pasar);
 }
 
 
@@ -238,12 +245,6 @@ int numero_de_cola (char* nombre)
 			return i;
 	}
 	return i;
-}
-
-static void terminar_plato (t_platos_PCB* plato)
-{
-	cambiar_estado_a(plato, EXIT);
-	log_info(logger_resto, "Se finalizo %s, correspondiente al PCB %d", plato->nombre_plato, plato->id_PCB);
 }
 
 
