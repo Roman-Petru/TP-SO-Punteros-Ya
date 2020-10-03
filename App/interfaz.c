@@ -15,7 +15,7 @@ static t_respuesta* consultar_restaurantes()
 	//else
 		list_add(restaurantes, "Resto_Default");
 
-	return respuesta_crear(CONSULTAR_RESTAURANTES_RESPUESTA, restaurantes);  //Antes no decia RESTAURANTES
+	return respuesta_crear(CONSULTAR_RESTAURANTES_RESPUESTA, restaurantes);  //Antes no decia RESPUESTA
 }
 
 static t_respuesta* seleccionar_restaurante(char* restaurante)
@@ -54,6 +54,7 @@ static t_respuesta* consultar_platos(char* restaurante)
 	return respuesta_crear(CONSULTAR_PLATOS_RESPUESTA, platos);
 }
 
+
 static t_respuesta* terminar()
 {
 	serializacion_finalizar();
@@ -61,6 +62,7 @@ static t_respuesta* terminar()
 	log_info(logger_app, "TERMINE EL SERVIDOR");
 	return respuesta_crear(TERMINAR, NULL);
 }
+
 
 void inicializar_servidor()
 {
