@@ -15,7 +15,7 @@ static t_respuesta* consultar_restaurantes()
 	//else
 		list_add(restaurantes, "Resto_Default");
 
-	return respuesta_crear(CONSULTAR_RESTAURANTES_RESPUESTA, restaurantes);  //Antes no decia RESPUESTA
+	return respuesta_crear(CONSULTAR_RESTAURANTES, restaurantes);
 }
 
 static t_respuesta* seleccionar_restaurante(char* restaurante)

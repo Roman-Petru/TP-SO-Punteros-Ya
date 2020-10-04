@@ -1,4 +1,4 @@
-#include "interfaz_cliente.h"
+#include "interfaz.h"
 #include "cliente.h"
 
 t_cliente_red* cliente;
@@ -85,7 +85,7 @@ static void operacion_consultar_platos(t_list* platos)
 static void operacion_terminar_servidor() { consola_log(consola, "El servidor se cerro correctamente."); }
 
 
-static void inicializar_servidor()//me queda subrayado de amarillo, revisar...
+void inicializar()
 {
 
 	    config = config_create("cliente.config");

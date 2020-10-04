@@ -34,17 +34,5 @@ int main()
 	terminar_programa();
 }
 
-/*static void operacion_consultar_PEDIDO(t_list* platos)
-{
-	consola_log(consola, "Platos: ");
 
-	void loggear_plato(void* plato_void) {
-		t_plato* plato = plato_void;
-		consola_log(consola, "nombre: %s", plato->nombre);
-		consola_log(consola, "cant_total: %s", plato->cant_total);
-		consola_log(consola, "cant_lista: %s", plato->cant_lista);
-	}
-
-	list_iterate(restaurantes, &loggear_plato);
-}*/
 
