@@ -1,6 +1,5 @@
 #include "interrupciones.h"
-#include "planificador.h"
-#include "pedido.h"
+#include "app.h"
 
 t_list* interrupciones;
 t_dictionary_int* diccionario_interrupciones;
@@ -41,14 +40,16 @@ void ejecutar_interrupciones()
 }
 
 //========== INTERRUPCIONES ==========//
-void interrupcion_nuevo_pedido(t_pedido* pedido)
-{
-	meter_en_cola(pedido, NEW);
-}
+void interrupcion_nuevo_pedido(t_pedido* pedido) { meter_en_cola(pedido, NEW); }
+
+void interrupcion_terminar_app(void* null) { terminar(); }
 
 //========== DICCIONARIO INTERRUPCIONES ==========//
 void inicializar_interrupciones()
 {
+	interrupciones = list_create();
+
 	diccionario_interrupciones = dictionary_int_create();
 	dictionary_int_put(diccionario_interrupciones, NUEVO_PEDIDO, &interrupcion_nuevo_pedido);
+	dictionary_int_put(diccionario_interrupciones, TERMINAR_APP, &interrupcion_terminar_app);
 }

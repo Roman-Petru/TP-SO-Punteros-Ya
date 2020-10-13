@@ -1,8 +1,14 @@
+#ifndef OPERACIONES_H_
+#define OPERACIONES_H_
 
-#include "../Utils/servidor_red.h"
-#include "../Utils/serializacion.h"
+#include "cliente.h"
+#include "interfaz.h"
 #include "../Utils/protocolo.h"
+#include <commons/config.h>
+#include <stdlib.h>
+#include <stdbool.h>
 
-void inicializar();
 
+void agregar_operaciones();
 
+#endif /*OPERACIONES_H_*/

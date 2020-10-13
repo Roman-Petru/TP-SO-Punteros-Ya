@@ -1,25 +1,34 @@
 #include "app.h"
 
-t_log* logger_app;
-t_config* config_app;
-sem_t semaforo_app;
+t_servidor_red* servidor;
+t_config* config;
+t_log* logger;
+sem_t sem_ciclo;
 
-
-static void inicializar_app()
+static void inicializar()
 {
-	logger_app = log_create("app.log", "APP", true, LOG_LEVEL_INFO); //config_get_string_value(config_app, "ARCHIVO_LOG")
-	config_app = config_create("app.config");
+	logger = log_create("app.log", "APP", true, LOG_LEVEL_INFO); //config_get_string_value(config_app, "ARCHIVO_LOG")
+	config = config_create("app.config");
 
 	cargar_repartidores();
 	inicializar_planificador();
-	inicializar_servidor();
 	inicializar_interrupciones();
-	sem_init (&(semaforo_app), 0, 0);
+	serializacion_inicializar();
+	servidor = servidor_crear("127.0.0.1", config_get_string_value(config, "PUERTO_ESCUCHA"));
+	cargar_interfaz();
+	sem_init (&(sem_ciclo), 0, 0);
 }
 
+void terminar()
+{
+	//serializacion_finalizar();
+	servidor_destruir(servidor);
+	log_info(logger, "TERMINE");
+	exit(0);
+}
 int main()
 {
-	inicializar_app();
+	inicializar();
 	recibir_pedidos_default(3); // Para Test
 
 	while(true)

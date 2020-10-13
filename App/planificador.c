@@ -60,10 +60,10 @@ void inicializar_planificador()
 
 void planificar_corto_plazo()
 {
-	if (strcmp(config_get_string_value(config_app, "ALGORITMO_DE_PLANIFICACION"), "HRRN") == 0)
+	if (strcmp(config_get_string_value(config, "ALGORITMO_DE_PLANIFICACION"), "HRRN") == 0)
 		list_sort(cola_READY, (void*) &highest_response_ratio);
 
-	while (config_get_int_value(config_app, "GRADO_DE_MULTIPROCESAMIENTO") > list_size(cola_EXEC)&&(!list_is_empty(cola_READY)))
+	while (config_get_int_value(config, "GRADO_DE_MULTIPROCESAMIENTO") > list_size(cola_EXEC)&&(!list_is_empty(cola_READY)))
 		cambiar_estado_a(list_remove(cola_READY, 0), EXEC);  //meter en cola EXEC (todavia no ejecuta)
 }
 
@@ -126,7 +126,7 @@ static void actualizar_estado_ejecutados()
 		t_pedido* pedido = list_get(cola_EXEC, i);
 		if (pedido->instruccion_a_realizar == IR_A_CLIENTE && posicion_es_igual(pedido->repartidor->posicion, pedido->posicion_cliente))
 		{
-			log_info(logger_app, "el pedido %d entrego el pedido al cliente", pedido->id_pedido);
+			log_info(logger, "el pedido %d entrego el pedido al cliente", pedido->id_pedido);
 			cambiar_estado_a(pedido, EXIT);
 			list_add(repartidores_libres, pedido->repartidor);
 			pthread_cancel(pedido->hilo);
@@ -157,7 +157,7 @@ void ejecutar_ciclo()
 	void ejecutar_pedido(t_pedido* pedido) { sem_post (&(pedido->mutex)); }
 	list_iterate(cola_EXEC, (void*) &ejecutar_pedido); //Ejecuta cada pedido en las cola EXEC
 
-	void esperar_pedido(t_pedido* pedido) { sem_wait (&semaforo_app); }
+	void esperar_pedido(t_pedido* pedido) { sem_wait (&sem_ciclo); }
 	list_iterate(cola_EXEC, (void*) &esperar_pedido); //Espera que los pedidos en EXEC terminen de ejecutar
 
 	//sleep(1);
@@ -193,7 +193,7 @@ static void sacar_de_cola_actual(t_pedido* pedido)
 
 static void meter_en_cola_READY(t_pedido* pedido)
 {
-	((t_insertador) dictionary_get(diccionario_algoritmos, config_get_string_value(config_app, "ALGORITMO_DE_PLANIFICACION")))(pedido);
+	((t_insertador) dictionary_get(diccionario_algoritmos, config_get_string_value(config, "ALGORITMO_DE_PLANIFICACION")))(pedido);
 }
 
 void meter_en_cola(t_pedido* pedido, ESTADO_PCB estado)
@@ -203,7 +203,7 @@ void meter_en_cola(t_pedido* pedido, ESTADO_PCB estado)
 	else
 		list_add(dictionary_int_get(diccionario_colas, estado), pedido);
 	pedido->estado_pcb = estado;
-	log_info(logger_app, "El pedido %d paso a la cola %s", pedido->id_pedido, dictionary_int_get(diccionario_estado_string, estado));
+	log_info(logger, "El pedido %d paso a la cola %s", pedido->id_pedido, dictionary_int_get(diccionario_estado_string, estado));
 }
 
 void cambiar_estado_a(t_pedido* pedido, ESTADO_PCB estado)

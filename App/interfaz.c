@@ -1,11 +1,9 @@
 #include "interfaz.h"
 #include "app.h"
 
-t_servidor_red* servidor_app;
-
 static t_respuesta* consultar_restaurantes()
 {
-	log_info(logger_app, "Me consultaron las Restaurantes.");
+	log_info(logger, "Me consultaron las Restaurantes.");
 
 	t_list* restaurantes = list_create();
 
@@ -15,7 +13,7 @@ static t_respuesta* consultar_restaurantes()
 	//else
 		list_add(restaurantes, "Resto_Default");
 
-	return respuesta_crear(CONSULTAR_RESTAURANTES, restaurantes);
+	return respuesta_crear(CONSULTAR_RESTAURANTES_RESPUESTA, restaurantes, true);
 }
 
 static t_respuesta* seleccionar_restaurante(char* restaurante)
@@ -23,19 +21,19 @@ static t_respuesta* seleccionar_restaurante(char* restaurante)
 	//TODO App: seleccionar_restaurante
 	if(strcmp(restaurante, "Resto_Default")==0) // || esta_conectado(restaurante)
 	{
-		log_info(logger_app, "Seleccionaron Restaurante %s.", restaurante);
-		return respuesta_crear(SELECCIONAR_RESTAURANTE_RESPUESTA, (void*) true);
+		log_info(logger, "Seleccionaron Restaurante %s.", restaurante);
+		return respuesta_crear(SELECCIONAR_RESTAURANTE_RESPUESTA, (void*) true, false);
 	}
 	else
 	{
-		log_info(logger_app, "Error al intentar seleccionar Restaurante %s.", restaurante);
-		return respuesta_crear(SELECCIONAR_RESTAURANTE_RESPUESTA, (void*) false);
+		log_info(logger, "Error al intentar seleccionar Restaurante %s.", restaurante);
+		return respuesta_crear(SELECCIONAR_RESTAURANTE_RESPUESTA, (void*) false, false);
 	}
 }
 
 static void platos_default(t_list* platos)
 {
-	char** platos_default = config_get_array_value(config_app, "PLATOS_DEFAULT");
+	char** platos_default = config_get_array_value(config, "PLATOS_DEFAULT");
 	for (int i=0; platos_default[i] != NULL; i++)
 		list_add(platos, platos_default[i]);
 	free(platos_default);
@@ -43,7 +41,7 @@ static void platos_default(t_list* platos)
 
 static t_respuesta* consultar_platos(char* restaurante)
 {
-	log_info(logger_app, "Se consulto platos de Restaurante %s.", restaurante);
+	log_info(logger, "Se consulto platos de Restaurante %s.", restaurante);
 	t_list* platos = list_create();
 
 	//TODO App: consultar_platos
@@ -51,27 +49,22 @@ static t_respuesta* consultar_platos(char* restaurante)
 	//	consultar platos a restaurante y cargar en t_list* platos
 	//else
 		platos_default(platos);
-	return respuesta_crear(CONSULTAR_PLATOS_RESPUESTA, platos);
+	return respuesta_crear(CONSULTAR_PLATOS_RESPUESTA, platos, true);
 }
 
 
-static t_respuesta* terminar()
+static t_respuesta* operacion_terminar()
 {
-	serializacion_finalizar();
-	servidor_destruir(servidor_app);
-	log_info(logger_app, "TERMINE EL SERVIDOR");
-	return respuesta_crear(TERMINAR, NULL);
+	agregar_interrupcion(TERMINAR_APP, NULL);
+	return respuesta_crear(TERMINAR, NULL, false);
 }
 
 
-void inicializar_servidor()
+void cargar_interfaz()
 {
-	serializacion_inicializar();
-	servidor_app = servidor_crear("127.0.0.1", config_get_string_value(config_app, "PUERTO_ESCUCHA"));
-	servidor_agregar_operacion(servidor_app, TERMINAR, &terminar);
-	servidor_agregar_operacion(servidor_app, CONSULTAR_RESTAURANTES, &consultar_restaurantes);
-	servidor_agregar_operacion(servidor_app, SELECCIONAR_RESTAURANTE, &seleccionar_restaurante);
-	servidor_agregar_operacion(servidor_app, CONSULTAR_PLATOS, &consultar_platos);
+	servidor_agregar_operacion(servidor, TERMINAR, &operacion_terminar);
+	servidor_agregar_operacion(servidor, CONSULTAR_RESTAURANTES, &consultar_restaurantes);
+	servidor_agregar_operacion(servidor, SELECCIONAR_RESTAURANTE, &seleccionar_restaurante);
+	servidor_agregar_operacion(servidor, CONSULTAR_PLATOS, &consultar_platos);
 
-	log_info(logger_app, "Servidor listo para recibir al cliente");
 }
