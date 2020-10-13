@@ -1,5 +1,4 @@
 #include "receta.h"
-#include <stdlib.h>
 
 t_dictionary* diccionario_recetas;
 

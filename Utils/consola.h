@@ -1,6 +1,13 @@
+#ifndef CONSOLA_H_
+#define CONSOLA_H_
+
+#include "protocolo.h"
 #include <commons/collections/dictionary.h>
 #include <commons/collections/list.h>
+#include <readline/readline.h>
 #include <commons/log.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 typedef struct {
 	char* modulo;
@@ -17,3 +24,5 @@ char* consola_leer(char* intro);
 void consola_leer_comando(t_consola* consola, char* intro);
 void consola_log(t_consola* consola, char* mensaje);
 void consola_agregar_comando(t_consola* consola, char* mensaje, void* comando);
+
+#endif /*CONSOLA_H_*/

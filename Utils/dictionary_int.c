@@ -1,6 +1,3 @@
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include "dictionary_int.h"
 
 t_dictionary_int* dictionary_int_create()

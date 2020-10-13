@@ -1,7 +1,12 @@
-#pragma once
+#ifndef DICTIONARY_INT_H_
+#define DICTIONARY_INT_H_
+
 #include <commons/collections/dictionary.h>
 #include <commons/collections/list.h>
+#include <stdbool.h>
+#include <stdlib.h>
 #include <netdb.h>
+#include <stdio.h>
 
 typedef struct
 {
@@ -22,3 +27,5 @@ extern int dictionary_int_size(t_dictionary_int* diccionario);
 extern void dictionary_int_destroy(t_dictionary_int* diccionario);
 extern void dictionary_int_destroy_and_destroy_elements(t_dictionary_int* diccionario, void(*data_destroyer)(void*));
 extern t_list* dictionary_int_toList(t_dictionary_int* diccionario);
+
+#endif /*DICTIONARY_INT_H_*/

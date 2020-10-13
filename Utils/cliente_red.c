@@ -1,13 +1,4 @@
 #include "cliente_red.h"
-#include "buffer.h"
-#include "socket.h"
-#include "paquete.h"
-#include "serializacion.h"
-#include <netdb.h>
-#include <stdlib.h>
-#include <string.h>
-#include <pthread.h>
-#include <stdbool.h>
 
 // ===== Cliente =====
 t_cliente_red* cliente_crear(char* ip, char* puerto)
@@ -18,7 +9,6 @@ t_cliente_red* cliente_crear(char* ip, char* puerto)
 	cliente->puerto = malloc(strlen(ip)+1);
 	strcpy(cliente->puerto, puerto);
 	cliente->diccionario_operaciones = dictionary_int_create();
-	//cliente_enviar_mensaje(cliente, HANDSHAKE_OK, NULL);
 
 	return cliente;
 }

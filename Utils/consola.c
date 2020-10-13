@@ -1,8 +1,4 @@
 #include "consola.h"
-#include "protocolo.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <readline/readline.h>
 
 static bool consola_tiene_comando(t_consola* consola, char* comando_string)
 {

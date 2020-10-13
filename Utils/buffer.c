@@ -1,7 +1,5 @@
 #include "buffer.h"
 #include "serializacion.h"
-#include <stdlib.h>
-#include <string.h>
 
 // ===== Buffer =====
 t_buffer* buffer_crear(size_t tamanio)

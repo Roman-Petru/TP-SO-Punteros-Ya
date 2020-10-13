@@ -1,23 +1,18 @@
 #include "servidor_red.h"
-#include "cliente_red.h"
-#include "socket.h"
-#include "paquete.h"
-#include "protocolo.h"
-#include "serializacion.h"
-#include <string.h>
-#include <stdlib.h>
-#include <commons/log.h>
 
 static t_respuesta* servidor_procesar_paquete(t_servidor_red* servidor, t_paquete* paquete)
 {
+	t_respuesta* respuesta;
 	if(paquete_tiene_datos(paquete))
 	{
 		void* datos = paquete_desempaquetar(paquete);
-		return ((t_operacion_servidor) dictionary_int_get(servidor->diccionario_operaciones, paquete->codigo_operacion))(datos);
+		respuesta =((t_operacion_servidor) dictionary_int_get(servidor->diccionario_operaciones, paquete->codigo_operacion))(datos);
 		destruir(paquete->codigo_operacion, datos);
 	}
 	else
-		return ((t_operacion_servidor_simple) dictionary_int_get(servidor->diccionario_operaciones, paquete->codigo_operacion))();
+		respuesta = ((t_operacion_servidor_simple) dictionary_int_get(servidor->diccionario_operaciones, paquete->codigo_operacion))();
+
+	return respuesta;
 }
 
 static void servidor_enviar_respuesta(int socket_cliente, t_respuesta* respuesta)
@@ -46,7 +41,6 @@ static void servidor_escuchar_mensajes(t_servidor_red* servidor)
 		servidor_enviar_respuesta(socket_cliente, respuesta);
 		respuesta_destruir(respuesta);
 	}
-	pthread_exit(NULL);
 }
 
 // ===== Servidor =====
@@ -58,6 +52,7 @@ t_servidor_red* servidor_crear(char* ip, char* puerto)
 	servidor->socket = socket;
 	servidor->diccionario_operaciones = dictionary_int_create();
 	pthread_create(&(servidor->hilo_escucha), NULL, (void*) servidor_escuchar_mensajes, servidor);
+	pthread_detach(servidor->hilo_escucha);
 
 	return servidor;
 }
@@ -69,10 +64,8 @@ void servidor_agregar_operacion(t_servidor_red* servidor, t_codigo_de_operacion 
 
 void servidor_destruir(t_servidor_red* servidor)
 {
+	pthread_cancel(servidor->hilo_escucha);
 	socket_cerrar(servidor->socket);
-	pthread_join(servidor->hilo_escucha, NULL);
 	dictionary_int_destroy(servidor->diccionario_operaciones);
 	free(servidor);
 }
-
-

@@ -1,4 +1,8 @@
+#ifndef POSICION_H_
+#define POSICION_H_
+
 #include <commons/collections/dictionary.h>
+#include <stdlib.h>
 
 extern t_dictionary* diccionario_recetas;
 
@@ -16,3 +20,5 @@ typedef struct {
 
 void inicializar_diccionario_recetas();
 void destruit_diccionario_recetas();
+
+#endif /*POSICION_H_*/
