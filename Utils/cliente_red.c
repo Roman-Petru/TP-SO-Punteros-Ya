@@ -1,24 +1,47 @@
 #include "cliente_red.h"
 
 // ===== Cliente =====
-t_cliente_red* cliente_crear(char* ip, char* puerto)
+t_cliente_red* cliente_crear(t_config* config, char* servidor)
 {
 	t_cliente_red* cliente = malloc(sizeof(t_cliente_red));
-	cliente->ip = malloc(strlen(ip)+1);
-	strcpy(cliente->ip, ip);
-	cliente->puerto = malloc(strlen(ip)+1);
-	strcpy(cliente->puerto, puerto);
+	cliente->config =  config;
+	cliente->servidor = malloc(strlen(cliente->servidor)+1);
+	strcpy(cliente->servidor, servidor);
 	cliente->diccionario_operaciones = dictionary_int_create();
 
 	return cliente;
 }
 
+char* cliente_ip(t_cliente_red* cliente)
+{
+	char* key = malloc(3+strlen(cliente->servidor)+1);
+	sprintf(key, "IP_%s", cliente->servidor);
+	char* ip = config_get_string_value(cliente->config, key);
+	free(key);
+	return ip;
+}
+
+char* cliente_puerto(t_cliente_red* cliente)
+{
+	char* key = malloc(7+strlen(cliente->servidor)+1);
+	sprintf(key, "PUERTO_%s", cliente->servidor);
+	char* puerto = config_get_string_value(cliente->config, key);
+	free(key);
+	return puerto;
+}
+
 void cliente_destruir(t_cliente_red* cliente)
 {
 	dictionary_int_destroy(cliente->diccionario_operaciones);
-	free(cliente->puerto);
-	free(cliente->ip);
+	free(cliente->servidor);
 	free(cliente);
+}
+
+void cliente_cambiar_servidor(t_cliente_red* cliente, char* servidor)
+{
+	free(cliente->servidor);
+	cliente->servidor = malloc(strlen(cliente->servidor)+1);
+	strcpy(cliente->servidor, servidor);
 }
 
 void cliente_agregar_operacion(t_cliente_red* cliente, t_codigo_de_operacion codigo_operacion, void* operacion)
@@ -54,7 +77,7 @@ static void cliente_recibir_respuesta(t_cliente_red* cliente)
 // ===== Enviar Mensaje =====
 void cliente_enviar_mensaje(t_cliente_red* cliente, t_codigo_de_operacion codigo_operacion, void* datos)
 {
-	cliente->socket = socket_crear(cliente->ip, cliente->puerto);
+	cliente->socket = socket_crear(cliente_ip(cliente), cliente_puerto(cliente));
 	t_buffer* buffer = buffer_crear_con_datos(codigo_operacion, datos);
 	t_paquete* paquete = paquete_crear(codigo_operacion, buffer);
 	paquete_enviar(paquete, cliente->socket);

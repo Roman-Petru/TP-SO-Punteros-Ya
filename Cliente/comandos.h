@@ -1,5 +1,5 @@
-#ifndef INTERFAZ_H_
-#define INTERFAZ_H_
+#ifndef COMANDOS_H_
+#define COMANDOS_H_
 
 #include "cliente.h"
 #include "operaciones.h"
@@ -10,4 +10,4 @@
 void agregar_comandos();
 void leer_comandos();
 
-#endif /*INTERFAZ_H_*/
+#endif /*COMANDOS_H_*/

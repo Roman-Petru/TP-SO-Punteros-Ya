@@ -1,6 +1,5 @@
 #include "operaciones.h"
 
-//Obtener Restaurante
 //Crear Pedido
 //Guardar Pedido
 //Añadir Plato
@@ -12,6 +11,8 @@
 //Finalizar Pedido
 //Terminar Pedido
 //Obtener Receta
+
+static void terminar_servidor() { consola_log(consola, "El servidor se cerro correctamente."); }
 
 //========== INTERFAZ ==========//
 static void consultar_restaurantes(t_list* restaurantes)
@@ -29,8 +30,13 @@ static void seleccionar_restaurante(bool operacion_ok)
 	else
 	{
 		restaurante_seleccionado = NULL;
-		consola_log(consola, "Error al seleccionar el restaurante. Intentelo nuevamente.");
+		consola_log(consola, "ERROR: Restaurante Invalido.");
 	}
+}
+
+static void obtener_restaurante(void* restaurantes) // void -> t_restaurante
+{
+	consola_log(consola, "Datos Restaurante: ");
 }
 
 static void consultar_platos(t_list* platos)
@@ -41,13 +47,24 @@ static void consultar_platos(t_list* platos)
 	list_iterate(platos, &loggear_restaurante);
 }
 
-static void terminar_servidor() { consola_log(consola, "El servidor se cerro correctamente."); }
+static void crear_pedido(int id_nuevo_pedido)
+{
+	if(id_nuevo_pedido == -1)
+	{
+		consola_log(consola, "ERROR: El pedido no pudo ser creado.");
+		return;
+	}
+	id_pedido = id_nuevo_pedido;
+}
 
 //========== CLIENTE RED ==========//
 void agregar_operaciones()
 {
 	cliente_agregar_operacion(cliente, CONSULTAR_RESTAURANTES_RESPUESTA, &consultar_restaurantes);
 	cliente_agregar_operacion(cliente, SELECCIONAR_RESTAURANTE_RESPUESTA, &seleccionar_restaurante);
+	cliente_agregar_operacion(cliente, OBTENER_RESTAURANTE_RESPUESTA, &obtener_restaurante);
 	cliente_agregar_operacion(cliente, CONSULTAR_PLATOS_RESPUESTA, &consultar_platos);
+	cliente_agregar_operacion(cliente, CREAR_PEDIDO_RESPUESTA, &crear_pedido);
+
 	cliente_agregar_operacion(cliente, TERMINAR, &terminar_servidor);
 }

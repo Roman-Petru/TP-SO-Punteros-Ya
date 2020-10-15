@@ -19,4 +19,3 @@ void respuesta_destruir(t_respuesta* respuesta)
 		destruir_datos_respuesta(respuesta->codigo_operacion, respuesta->datos);
 	free(respuesta);
 }
-

@@ -1,10 +1,4 @@
 #include "socket.h"
-#include <stdio.h>
-#include <netdb.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <arpa/inet.h>
 
 static struct addrinfo hints_crear()
 {
