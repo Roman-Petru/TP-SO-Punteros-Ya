@@ -5,7 +5,7 @@ static void desconectar() {	hay_que_leer = false; }
 static void terminar()
 {
 	hay_que_leer= false;
-	cliente_enviar_mensaje(cliente, TERMINAR, NULL);
+	cliente_enviar_mensaje(cliente, servidor, TERMINAR, NULL);
 }
 
 static void seleccionar_modulo()
@@ -24,18 +24,13 @@ static void seleccionar_modulo()
 }
 
 //========== INTERFAZ ==========//
-static void consultar_restaurantes()
-{
-	cliente_cambiar_servidor(cliente, "APP");
-	cliente_enviar_mensaje(cliente, CONSULTAR_RESTAURANTES, NULL);
-	cliente_cambiar_servidor(cliente, servidor);
-}
+static void consultar_restaurantes() { cliente_enviar_mensaje(cliente, "APP", CONSULTAR_RESTAURANTES, NULL); }
 
 static void seleccionar_restaurante()
 {
 	char* restaurante = consola_leer("Ingrese el nombre del restaurante: ");
 	restaurante_seleccionado = restaurante;
-	cliente_enviar_mensaje(cliente, SELECCIONAR_RESTAURANTE, restaurante);
+	cliente_enviar_mensaje(cliente, "APP", SELECCIONAR_RESTAURANTE, restaurante);
 }
 
 static void obtener_restaurante()
@@ -45,7 +40,7 @@ static void obtener_restaurante()
 		consola_log(consola, "No se selecciono ningun Restaurante. ");
 		return;
 	}
-	cliente_enviar_mensaje(cliente, OBTENER_RESTAURANTE, restaurante_seleccionado);
+	cliente_enviar_mensaje(cliente, "SINDICATO", OBTENER_RESTAURANTE, restaurante_seleccionado);
 }
 
 static void consultar_platos()
@@ -55,17 +50,23 @@ static void consultar_platos()
 		consola_log(consola, "No se selecciono ningun Restaurante. ");
 		return;
 	}
-	cliente_enviar_mensaje(cliente, CONSULTAR_PLATOS, restaurante_seleccionado);
+	if(strcmp(servidor, "COMANDA")==0)
+	{
+		consola_log(consola, "No se puede consultar platos al modulo Comanda. ");
+		return;
+	}
+
+	cliente_enviar_mensaje(cliente, servidor, CONSULTAR_PLATOS, restaurante_seleccionado);
 }
 
 static void crear_pedido()
 {
 	if(strcmp(servidor, "APP")!=0 && strcmp(servidor, "RESTAURANTE")!=0 )
 	{
-		consola_log(consola, "El mensaje solo puede ser enviado al modulp APP o al modulo RESTAURANTE");
+		consola_log(consola, "El mensaje solo puede ser enviado al modulo APP o al modulo RESTAURANTE");
 		return;
 	}
-	cliente_enviar_mensaje(cliente, CREAR_PEDIDO, NULL);
+	cliente_enviar_mensaje(cliente, servidor, CREAR_PEDIDO, NULL);
 }
 
 void agregar_comandos()

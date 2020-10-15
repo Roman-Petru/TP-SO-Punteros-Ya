@@ -27,7 +27,7 @@ static void inicializar()
 	hay_que_leer = true;
 
 	serializacion_inicializar();
-	cliente = cliente_crear(config, "APP");
+	cliente = cliente_crear(config);
 	consola = consola_crear("cliente.log", "Cliente"); //config_get_string_value(config, "ARCHIVO_LOG")
 
 	//=== INTERFAZ ===//
