@@ -30,6 +30,15 @@ void consola_log(t_consola* consola, char* mensaje)
 	log_info(consola->logger, mensaje);
 }
 
+bool consola_if(t_consola* consola, bool condicion)
+{
+	if(condicion)
+		log_info(consola->logger, "SUCCES!");
+	else
+		log_info(consola->logger, "ERROR");
+	return condicion;
+}
+
 t_consola* consola_crear(char* archivo_log, char* modulo)
 {
 	t_consola* consola = malloc(sizeof(t_consola));

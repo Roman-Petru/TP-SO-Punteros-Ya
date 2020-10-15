@@ -8,6 +8,6 @@
 
 
 void agregar_comandos();
-void leer_comandos();
+void seleccionar_modulo();
 
 #endif /*COMANDOS_H_*/

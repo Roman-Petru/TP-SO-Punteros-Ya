@@ -21,7 +21,7 @@ static void inicializar()
 {
 	config = config_create("cliente.config");
 
-	servidor = "APP";
+	servidor = NULL;
 	id_pedido = 0;
 	restaurante_seleccionado = NULL;
 	hay_que_leer = true;
@@ -29,6 +29,10 @@ static void inicializar()
 	serializacion_inicializar();
 	cliente = cliente_crear(config);
 	consola = consola_crear("cliente.log", "Cliente"); //config_get_string_value(config, "ARCHIVO_LOG")
+
+	consola_log(consola, "Seleccione el modulo con el que se comunicara.");
+	while(servidor == NULL)
+		seleccionar_modulo();
 
 	//=== INTERFAZ ===//
 	agregar_operaciones();

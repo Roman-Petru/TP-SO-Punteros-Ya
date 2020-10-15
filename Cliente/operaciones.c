@@ -1,11 +1,5 @@
 #include "operaciones.h"
 
-//Crear Pedido
-//Guardar Pedido
-//Añadir Plato
-//Guardar Plato
-//Confirmar Pedido
-//Plato Listo
 //Consultar Pedido
 //Obtener Pedido
 //Finalizar Pedido
@@ -23,16 +17,7 @@ static void consultar_restaurantes(t_list* restaurantes)
 	list_iterate(restaurantes, &loggear_restaurante);
 }
 
-static void seleccionar_restaurante(bool operacion_ok)
-{
-	if(operacion_ok)
-		consola_log(consola, "Restaurante seleccionado correctamente.");
-	else
-	{
-		restaurante_seleccionado = NULL;
-		consola_log(consola, "ERROR: Restaurante Invalido.");
-	}
-}
+static void confirmacion(bool operacion_ok) { consola_if(consola, operacion_ok); }
 
 static void obtener_restaurante(void* restaurantes) // void -> t_restaurante
 {
@@ -49,11 +34,8 @@ static void consultar_platos(t_list* platos)
 
 static void crear_pedido(int id_nuevo_pedido)
 {
-	if(id_nuevo_pedido == -1)
-	{
-		consola_log(consola, "ERROR: El pedido no pudo ser creado.");
+	if(consola_if(consola, id_nuevo_pedido == -1))
 		return;
-	}
 	id_pedido = id_nuevo_pedido;
 }
 
@@ -61,10 +43,16 @@ static void crear_pedido(int id_nuevo_pedido)
 void agregar_operaciones()
 {
 	cliente_agregar_operacion(cliente, CONSULTAR_RESTAURANTES_RESPUESTA, &consultar_restaurantes);
-	cliente_agregar_operacion(cliente, SELECCIONAR_RESTAURANTE_RESPUESTA, &seleccionar_restaurante);
+	cliente_agregar_operacion(cliente, SELECCIONAR_RESTAURANTE_RESPUESTA, &confirmacion);
 	cliente_agregar_operacion(cliente, OBTENER_RESTAURANTE_RESPUESTA, &obtener_restaurante);
 	cliente_agregar_operacion(cliente, CONSULTAR_PLATOS_RESPUESTA, &consultar_platos);
 	cliente_agregar_operacion(cliente, CREAR_PEDIDO_RESPUESTA, &crear_pedido);
+	cliente_agregar_operacion(cliente, GUARDAR_PEDIDO_RESPUESTA, &confirmacion);
+	cliente_agregar_operacion(cliente, AGREGAR_PLATO_RESPUESTA, &confirmacion);
+	cliente_agregar_operacion(cliente, GUARDAR_PLATO_RESPUESTA, &confirmacion);
+	cliente_agregar_operacion(cliente, CONFIRMAR_PEDIDO_RESPUESTA, &confirmacion);
+	cliente_agregar_operacion(cliente, PLATO_LISTO_RESPUESTA, &confirmacion);
+	cliente_agregar_operacion(cliente, TERMINAR_PEDIDO_RESPUESTA, &confirmacion);
 
 	cliente_agregar_operacion(cliente, TERMINAR, &terminar_servidor);
 }

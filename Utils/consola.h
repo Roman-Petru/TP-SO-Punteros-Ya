@@ -24,5 +24,6 @@ char* consola_leer(char* intro);
 void consola_leer_comando(t_consola* consola, char* intro);
 void consola_log(t_consola* consola, char* mensaje);
 void consola_agregar_comando(t_consola* consola, char* mensaje, void* comando);
+bool consola_if(t_consola* consola, bool condicion);
 
 #endif /*CONSOLA_H_*/
