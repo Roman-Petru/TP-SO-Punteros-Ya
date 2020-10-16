@@ -43,7 +43,7 @@ void ejecutar_ciclo()
 
 		void ejecutar_reposados(t_platos_PCB* plato) {
 
-			if (!list_is_empty(plato->pasos_receta_faltantes)  && strcmp (((t_paso*) list_get(plato->pasos_receta_faltantes, 0))->operacion, "REPOSAR") == 0)
+			if (!list_is_empty(plato->pasos_receta_faltantes)  && strcmp (((t_paso*) list_get(plato->pasos_receta_faltantes, 0))->operacion, "Reposar") == 0)
 			{
 				sem_post (&(plato->mutex));
 				semaforos_de_reposar++;
@@ -70,23 +70,12 @@ void ejecutar_ciclo()
 
 		sleep(1);
 
-		actualizar_estado_hornos();
+
 		actualizar_estado_bloqueados();
 		actualizar_estado_ejecutados();
-
+		actualizar_estado_hornos();
 }
 
-
-static void	actualizar_estado_hornos()
-{
-	for (int i=0; i < list_size(cola_Hornos_EXEC); i++)
-		{
-			t_platos_PCB* plato = list_get(cola_Hornos_EXEC, i);
-			t_paso* paso = list_get(plato->pasos_receta_faltantes, 0);
-			if (list_is_empty(plato->pasos_receta_faltantes) || strcmp(paso->operacion, "HORNEAR") != 0)
-				list_remove(cola_Hornos_EXEC, i);
-		}
-}
 
 static void actualizar_estado_bloqueados()
 {
@@ -94,47 +83,24 @@ static void actualizar_estado_bloqueados()
 	for (int i=0; i < list_size(cola_Resto_BLOCKED); i++)
 		{
 			t_platos_PCB* plato = list_get(cola_Resto_BLOCKED, i);
+			cambiar_paso_de_ser_necesario(plato);
 			if (list_is_empty(plato->pasos_receta_faltantes))
 			{
 				terminar_plato(plato);
+				i--;
 			} else if (plato->hubo_cambio_operacion){
 				plato->hubo_cambio_operacion = false;
 				t_paso* paso = list_get(plato->pasos_receta_faltantes, 0);
-				if (strcmp(paso->operacion, "HORNEAR") == 0)
+				if (strcmp(paso->operacion, "Hornear") == 0)
 					list_add(cola_Hornos_READY, plato);
-				if (strcmp(paso->operacion, "REPOSAR") != 0 && strcmp(paso->operacion, "HORNEAR") != 0)
+				if (strcmp(paso->operacion, "Reposar") == 0)
+					logear_inicio_operacion(plato);
+				if (strcmp(paso->operacion, "Reposar") != 0 && strcmp(paso->operacion, "Hornear") != 0)
 					cambiar_estado_a(plato, READY);
+					i--;
 			}
 	}
 }
-
-
-	//VERSION KILOMBO DE actualizar_estado_bloqueados, SIN EJECUTAR BLOQUEADOS
-/*	for (int i=0; i < list_size(cola_Resto_BLOCKED); i++)
-	{
-		t_platos_PCB* plato = list_get(cola_Resto_BLOCKED, i);
-		if (list_is_empty(plato->pasos_receta_faltantes))
-		{
-			//sacar de lista de hornos si estaban
-			terminar_plato(plato);
-		} else {
-		t_paso* paso = list_get(plato->pasos_receta_faltantes, 0);
-		if (strcmp(paso->operacion, "REPOSAR") == 0)
-		{
-			if (avanzar_paso_receta(plato))   //ESPERO QUE NO PUEDAN PONER 2 VECES SEGUIDAS REPOSAR
-				{
-				if (strcmp(paso->operacion, "HORNEAR") == 0)
-				{
-					list_add(cola_Hornos_READY, plato);
-				}
-				else cambiar_estado_a(plato, READY);
-				}
-		} else if (strcmp(paso->operacion, "HORNEAR") != 0)
-				cambiar_estado_a(plato, READY);
-		//sacar de lista de hornos si estaban
-		}
-	}*/
-
 
 static void actualizar_estado_ejecutados()
 {
@@ -143,28 +109,50 @@ static void actualizar_estado_ejecutados()
 		for(int j=0; j < list_size(list_get(cola_de_cola_Resto_EXEC, i)); j++)
 		{
 			t_platos_PCB* plato = list_get(list_get(cola_de_cola_Resto_EXEC, i), j);
+			cambiar_paso_de_ser_necesario(plato);
 			if (list_is_empty(plato->pasos_receta_faltantes))
 			{
 				terminar_plato(plato);
+				j--;
 			} else
 			{
 				t_paso* paso = list_get(plato->pasos_receta_faltantes, 0);
-				if (strcmp(paso->operacion, "HORNEAR") == 0)
+				if (strcmp(paso->operacion, "Hornear") == 0)
 				{
 					cambiar_estado_a(plato, BLOCKED);
+					j--;
+					plato->hubo_cambio_operacion = false;
 					list_add(cola_Hornos_READY, plato);
-				} else if (strcmp(paso->operacion, "REPOSAR") == 0)
+				} else if (strcmp(paso->operacion, "Reposar") == 0)
 					{
 					cambiar_estado_a(plato, BLOCKED);
+					j--;
+					plato->hubo_cambio_operacion = false;
+					logear_inicio_operacion(plato);
 //----------------------------------------------------------------SI ES ALGORITMO RR--------------------------//
 					}	else if (strcmp(config_get_string_value(config_resto, "ALGORITMO_PLANIFICACION"), "RR") == 0  && plato->ciclos_ejecutandose == quantum)
 						{
 						cambiar_estado_a(plato, READY);
+						j--;
 						plato->ciclos_ejecutandose = 0;
 						}
 			}
 		}
 	}
+}
+
+static void	actualizar_estado_hornos()
+{
+	for (int i=0; i < list_size(cola_Hornos_EXEC); i++)
+		{
+			t_platos_PCB* plato = list_get(cola_Hornos_EXEC, i);
+			t_paso* paso = list_get(plato->pasos_receta_faltantes, 0);
+			if (list_is_empty(plato->pasos_receta_faltantes) || strcmp(paso->operacion, "Hornear") != 0)
+			{
+				list_remove(cola_Hornos_EXEC, i);
+				i--;
+			}
+		}
 }
 
 void cambiar_estado_a(t_platos_PCB* plato, ESTADO_PCB estado_a_pasar)
@@ -249,7 +237,6 @@ int numero_de_cola (char* nombre)
 	}
 	return i;
 }
-
 
 void inicializar_diccionario_colas()
 {

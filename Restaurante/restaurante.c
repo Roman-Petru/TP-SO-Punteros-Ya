@@ -33,7 +33,7 @@ void inicializar_restaurante()
 	lista_afinidades = list_create();
 	t_afinidad* afinidad1 = malloc(sizeof(t_afinidad));
 	afinidad1->plato = "milanesa";
-	afinidad1->cantidad_cocineros = 1;
+	afinidad1->cantidad_cocineros = 3;
 	list_add(lista_afinidades, afinidad1);
 	t_afinidad* afinidad2 = malloc(sizeof(t_afinidad));
 	afinidad2->plato = "pure";
@@ -50,7 +50,7 @@ void inicializar_restaurante()
 	platos[2] = "ensalada";
 */
 
-	cantidad_hornos = 1;
+	cantidad_hornos = 3;
 
 	//obtener recetas
 	//termina metadata
