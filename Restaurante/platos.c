@@ -18,7 +18,6 @@ t_platos_PCB* crear_plato(char* plato, int id_pedido)
 	nuevo_plato->ciclos_ejecutandose = 0;
 	nuevo_plato->hubo_cambio_operacion = false;
 
-	list_create(nuevo_plato->pasos_receta_faltantes);
 	nuevo_plato->pasos_receta_faltantes = list_duplicate(dictionary_get(diccionario_recetas, plato));
 	
 	t_paso* paso = list_get(nuevo_plato->pasos_receta_faltantes, 0);
@@ -132,7 +131,7 @@ void inicializar_diccionario_recetas()
 	diccionario_recetas = dictionary_create();
 	dictionary_put(diccionario_recetas, milanesa->nombre_plato, milanesa->pasos_receta);
 
-
+	free(milanesa);
 
 	t_receta* pure = malloc(sizeof(t_receta));
 	pure->nombre_plato = "pure";
@@ -147,17 +146,18 @@ void inicializar_diccionario_recetas()
 	list_add(pure->pasos_receta, paso5);
 	t_paso* paso7 = malloc(sizeof(t_paso));
 	paso7->operacion = "Reposar";
-	paso7->ciclos = 4;
+	paso7->ciclos = 2;
 	list_add(pure->pasos_receta, paso7);
 
 	dictionary_put(diccionario_recetas, pure->nombre_plato, pure->pasos_receta);
+	free(pure);
 
 	t_receta* ensalada = malloc(sizeof(t_receta));
 	ensalada->nombre_plato = "ensalada";
 	ensalada->pasos_receta = list_create();
 	t_paso* paso8 = malloc(sizeof(t_paso));
 	paso8->operacion = "Reposar";
-	paso8->ciclos = 6;
+	paso8->ciclos = 3;
 	list_add(ensalada->pasos_receta, paso8);
 	t_paso* paso9 = malloc(sizeof(t_paso));
 	paso9->operacion = "PAPEAR";
@@ -165,9 +165,9 @@ void inicializar_diccionario_recetas()
 	list_add(ensalada->pasos_receta, paso9);
 	t_paso* paso10 = malloc(sizeof(t_paso));
 	paso10->operacion = "Hornear";
-	paso10->ciclos = 10;
+	paso10->ciclos = 1;
 	list_add(ensalada->pasos_receta, paso10);
 
-
 	dictionary_put(diccionario_recetas, ensalada->nombre_plato, ensalada->pasos_receta);
+	free(ensalada);
 }

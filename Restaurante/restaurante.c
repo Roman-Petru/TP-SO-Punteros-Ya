@@ -63,12 +63,14 @@ void inicializar_restaurante()
 	cola_de_cola_Resto_READY = list_create();
 	cola_de_cola_Resto_EXEC = list_create();
 	for (int i=0; i<list_size(lista_afinidades);i++){
-		t_list* cola_Resto_READY = malloc (sizeof(t_list));
+		t_list* cola_Resto_READY;
 		cola_Resto_READY = list_create();
 		list_add(cola_de_cola_Resto_READY, cola_Resto_READY);
-		t_list* cola_Resto_EXIT = malloc (sizeof(t_list));
+		//free(cola_Resto_READY);
+		t_list* cola_Resto_EXIT;
 		cola_Resto_EXIT = list_create();
 		list_add(cola_de_cola_Resto_EXEC, cola_Resto_EXIT);
+		//free(cola_Resto_EXIT);
 	}
 
 
