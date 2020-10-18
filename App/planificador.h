@@ -13,11 +13,20 @@
 
 typedef enum
 {
-	ASIGNO_PEDIDO,
-	ENTREGO_PEDIDO,
-	CANSADO,
-	DESCANSO,
-	FIN_QUANTUM
+	A_NEW,
+	A_EXEC,
+
+	/*A_READY*/
+	A_READY_ASIGNO,
+	A_READY_DESCANSO,
+	A_READY_LISTO,
+
+	/*A_BLOCKED*/
+	A_BLOCKED_CANSADO,
+	A_BLOCKED_ESPERA,
+	A_BLOCKED_FIN_QUANTUM,
+
+	A_EXIT
 }RAZON_CAMBIO_COLA;
 
 typedef void* (*t_insertador)(t_pedido*);
@@ -25,8 +34,8 @@ typedef void* (*t_insertador)(t_pedido*);
 void inicializar_planificador();
 void planificar_corto_plazo();
 void planificar_largo_plazo();
-void cambiar_estado_a(t_pedido* pedido, ESTADO_PCB estado);
-void meter_en_cola(t_pedido* pedido, ESTADO_PCB estado);
+void cambiar_estado_a(t_pedido* pedido, ESTADO_PCB estado, RAZON_CAMBIO_COLA razon);
+void meter_en_cola(t_pedido* pedido, ESTADO_PCB estado, RAZON_CAMBIO_COLA razon);
 bool highest_ratio_response(t_pedido* pedido1, t_pedido* pedido2);
 void ejecutar_ciclo();
 void logear_cambio_cola(t_pedido* pedido, t_list* cola_nueva);

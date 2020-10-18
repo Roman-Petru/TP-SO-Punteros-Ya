@@ -45,11 +45,20 @@ void inicializar_planificador()
 
 	//===DICCIONARIO DE RAZONES===//
 	diccionario_razones = dictionary_int_create();
-	dictionary_int_put(diccionario_razones, ASIGNO_PEDIDO, "fin de quantum");
-	dictionary_int_put(diccionario_razones, ENTREGO_PEDIDO, "entreda/salida");
-	dictionary_int_put(diccionario_razones, CANSADO, "fin de ejecucion");
-	dictionary_int_put(diccionario_razones, DESCANSO, "asignarsele una captura pokemon");
-	dictionary_int_put(diccionario_razones, FIN_QUANTUM, "asignarsele un intercambio");
+	dictionary_int_put(diccionario_razones, A_NEW, "haber sido elegido por el planificador de largo plazo.");
+	dictionary_int_put(diccionario_razones, A_EXEC, "ser elegido por el planificador de corto plazo.");
+
+	/*A_READY*/
+	dictionary_int_put(diccionario_razones, A_READY_ASIGNO, "asignarsele un repartidor.");
+	dictionary_int_put(diccionario_razones, A_READY_DESCANSO, "haber descansado el repartidor.");
+	dictionary_int_put(diccionario_razones, A_READY_LISTO, "estar listo cuando el repartidor lo espera.");
+
+	/*A_BLOCKED*/
+	dictionary_int_put(diccionario_razones, A_BLOCKED_CANSADO, "cansancio del repartidor.");
+	dictionary_int_put(diccionario_razones, A_BLOCKED_ESPERA, "no estar terminado cuando el repartidor llego al restaurante.");
+	dictionary_int_put(diccionario_razones, A_BLOCKED_FIN_QUANTUM, "fin de quantum.");
+
+	dictionary_int_put(diccionario_razones, A_EXIT, "haber sido entregado al cliente.");
 
 	//===DICCIONARIO DE ALGORITMOS===//
 	diccionario_algoritmos = dictionary_create();
@@ -63,8 +72,8 @@ void planificar_corto_plazo()
 	if (strcmp(config_get_string_value(config, "ALGORITMO_DE_PLANIFICACION"), "HRRN") == 0)
 		list_sort(cola_READY, (void*) &highest_response_ratio);
 
-	while (config_get_int_value(config, "GRADO_DE_MULTIPROCESAMIENTO") > list_size(cola_EXEC)&&(!list_is_empty(cola_READY)))
-		cambiar_estado_a(list_remove(cola_READY, 0), EXEC);  //meter en cola EXEC (todavia no ejecuta)
+	while (!list_is_empty(cola_READY) && config_get_int_value(config, "GRADO_DE_MULTIPROCESAMIENTO") > list_size(cola_EXEC))
+		cambiar_estado_a(list_remove(cola_READY, 0), EXEC, A_EXEC);  //meter en cola EXEC (todavia no ejecuta)
 }
 
 static void actualizar_estado_listos()
@@ -84,39 +93,19 @@ static void actualizar_estado_bloqueados()
 		{
 			if (pedido->esta_listo)
 			{
-				cambiar_estado_a(pedido, READY);
+				cambiar_estado_a(pedido, READY, A_READY_LISTO);
 				pedido->instruccion_a_realizar = IR_A_CLIENTE;
 			}
 		}
 		else
 		{
-			//TODO: Revisar Posible Bug
 			repartidor_descansar(pedido->repartidor);
 			if (!pedido->repartidor->esta_cansado)
-				cambiar_estado_a(pedido, READY);
+				cambiar_estado_a(pedido, READY, A_READY_DESCANSO);
 		}
 	}
 
 	list_iterate(cola_BLOCKED, (void*) &actualizar_estado);
-	/*
-	for (int i=0; i < list_size(cola_BLOCKED); i++)
-	{
-		t_pedido* pedido = list_get(cola_BLOCKED, i);
-		if (pedido->instruccion_a_realizar == ESPERAR_EN_RESTAURANTE)
-		{
-			if (!pedido->esta_listo)
-				continue;
-			cambiar_estado_a(pedido, READY);
-			pedido->instruccion_a_realizar = IR_A_CLIENTE;
-		}
-		else
-		{
-			//TODO: Revisar Posible Bug
-			repartidor_descansar(pedido->repartidor);
-			if (!pedido->repartidor->esta_cansado)
-				cambiar_estado_a(pedido, READY);
-		}
-	}*/
 }
 
 static void actualizar_estado_ejecutados()
@@ -126,8 +115,7 @@ static void actualizar_estado_ejecutados()
 		t_pedido* pedido = list_get(cola_EXEC, i);
 		if (pedido->instruccion_a_realizar == IR_A_CLIENTE && posicion_es_igual(pedido->repartidor->posicion, pedido->posicion_cliente))
 		{
-			log_info(logger, "el pedido %d entrego el pedido al cliente", pedido->id_pedido);
-			cambiar_estado_a(pedido, EXIT);
+			cambiar_estado_a(pedido, EXIT, A_EXIT);
 			list_add(repartidores_libres, pedido->repartidor);
 			pthread_cancel(pedido->hilo);
 			pedido->repartidor = NULL;
@@ -141,12 +129,12 @@ static void actualizar_estado_ejecutados()
 					pedido->instruccion_a_realizar = IR_A_CLIENTE;
 				else
 				{
-					cambiar_estado_a(pedido, BLOCKED);
+					cambiar_estado_a(pedido, BLOCKED, A_BLOCKED_ESPERA);
 					pedido->instruccion_a_realizar = ESPERAR_EN_RESTAURANTE;
 				}
 			}
 			if (pedido->repartidor->esta_cansado)
-				cambiar_estado_a(pedido, BLOCKED);
+				cambiar_estado_a(pedido, BLOCKED, A_BLOCKED_CANSADO);
 
 		}
 	}
@@ -160,7 +148,7 @@ void ejecutar_ciclo()
 	void esperar_pedido(t_pedido* pedido) { sem_wait (&sem_ciclo); }
 	list_iterate(cola_EXEC, (void*) &esperar_pedido); //Espera que los pedidos en EXEC terminen de ejecutar
 
-	//sleep(1);
+	sleep(1);
 	//sleep(config_get_int_value(config, "CICLO"));
 	actualizar_estado_listos();
 	actualizar_estado_bloqueados();
@@ -175,7 +163,7 @@ void planificar_largo_plazo()
 		t_repartidor* repartidor_cercano = repartidor_obtener_mas_cercano(pedido->posicion_de_restaurante);
 
 		pedido->repartidor = repartidor_cercano;
-		cambiar_estado_a(pedido, 1);
+		cambiar_estado_a(pedido, READY, A_READY_ASIGNO);
 	}
 }
 
@@ -196,20 +184,20 @@ static void meter_en_cola_READY(t_pedido* pedido)
 	((t_insertador) dictionary_get(diccionario_algoritmos, config_get_string_value(config, "ALGORITMO_DE_PLANIFICACION")))(pedido);
 }
 
-void meter_en_cola(t_pedido* pedido, ESTADO_PCB estado)
+void meter_en_cola(t_pedido* pedido, ESTADO_PCB estado, RAZON_CAMBIO_COLA razon)
 {
 	if (estado == READY)
 		meter_en_cola_READY(pedido);
 	else
 		list_add(dictionary_int_get(diccionario_colas, estado), pedido);
 	pedido->estado_pcb = estado;
-	log_info(logger, "El pedido %d paso a la cola %s", pedido->id_pedido, dictionary_int_get(diccionario_estado_string, estado));
+	log_info(logger, "El pedido %d paso a la cola %s por %s", pedido->id_pedido, dictionary_int_get(diccionario_estado_string, estado), dictionary_int_get(diccionario_razones, razon));
 }
 
-void cambiar_estado_a(t_pedido* pedido, ESTADO_PCB estado)
+void cambiar_estado_a(t_pedido* pedido, ESTADO_PCB estado, RAZON_CAMBIO_COLA razon)
 {
 	sacar_de_cola_actual(pedido);
-	meter_en_cola(pedido, estado);
+	meter_en_cola(pedido, estado, razon);
 }
 
 float convertir_string_en_float (char* token)
@@ -256,6 +244,5 @@ bool highest_response_ratio(t_pedido* pedido1, t_pedido* pedido2)
 void recibir_pedidos_default(int cantidad)
 {
 	for(int i=1;i<cantidad+1;i++)
-		meter_en_cola(crear_pedido_default(i), NEW);
+		meter_en_cola(crear_pedido_default(i), NEW, A_NEW);
 }
-

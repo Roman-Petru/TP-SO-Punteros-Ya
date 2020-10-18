@@ -11,17 +11,17 @@
 extern t_dictionary_int* diccionario_acciones;
 
 typedef enum{
-	NEW = 0,
-	READY = 1,
-	EXEC = 2,
-	BLOCKED = 3,
-	EXIT = 4
+	NEW,
+	READY,
+	EXEC,
+	BLOCKED,
+	EXIT
 } ESTADO_PCB;
 
 typedef enum {
-	IR_A_RESTAURANTE = 0,
-	IR_A_CLIENTE = 1,
-	ESPERAR_EN_RESTAURANTE = 2
+	IR_A_RESTAURANTE,
+	IR_A_CLIENTE,
+	ESPERAR_EN_RESTAURANTE
 } INSTRUCCION_A_REALIZAR;
 
 typedef struct {

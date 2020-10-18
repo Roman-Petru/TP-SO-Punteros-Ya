@@ -19,9 +19,8 @@ static void ciclo_pedido(t_pedido* pedido)
 	{
 		sem_wait(&(pedido->mutex));
 
-		//mover_repartidor_del_pedido(pedido);
 		repartidor_mover_hacia(pedido->repartidor,  pedido_destino(pedido));
-		log_info(logger, "el pedido %d se movio a (%d,%d)", pedido->id_pedido, pedido_posicion(pedido)->x, pedido_posicion(pedido)->y);
+		log_info(logger, "El pedido %d se movio a (%d,%d)", pedido->id_pedido, pedido_posicion(pedido)->x, pedido_posicion(pedido)->y);
 
 		sem_post(&(sem_ciclo));
 	}
@@ -41,19 +40,18 @@ t_pedido* crear_pedido(int id, t_posicion* posicion_de_restaurante, t_posicion* 
 	nuevo_pedido->estimacion = config_get_int_value(config, "ESTIMACION_INICIAL");
 
 	nuevo_pedido->esta_listo = resto_default ? true: false;
-
-	//nuevo_pedido->estado_pcb = NULL;
 	nuevo_pedido->instruccion_a_realizar = IR_A_RESTAURANTE;
 
 	sem_init(&(nuevo_pedido->mutex), 0, 0);
 	pthread_create(&(nuevo_pedido->hilo), NULL, (void*) &ciclo_pedido, nuevo_pedido);
 	pthread_detach(nuevo_pedido->hilo);
 
+	/*
 	log_info(logger, "Se recibió un nuevo pedido:");
 	log_info(logger, "	Id del pedido: %d", nuevo_pedido->id_pedido);
 	log_info(logger, "	Ubicación del cliente: (%d, %d)", nuevo_pedido->posicion_cliente->x, nuevo_pedido->posicion_cliente->y);
 	log_info(logger, "	Ubicación del restaurante: (%d, %d)", nuevo_pedido->posicion_de_restaurante->x, nuevo_pedido->posicion_de_restaurante->y);
-
+	*/
 	return nuevo_pedido;
 }
 

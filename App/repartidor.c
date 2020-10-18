@@ -51,7 +51,7 @@ void repartidor_mover_hacia(t_repartidor* repartidor, t_posicion* destino)
 	else if(y_actual != y_destino) // Si no esta en y se acerca una pos a y
 		repartidor->posicion->y = y_actual + (y_destino>y_actual ? 1 : -1 );
 
-	repartidor->ciclos_viajando++; //TODO: Confirmar ciclos_viajando++
+	repartidor->ciclos_viajando++;
 
 	if(repartidor->ciclos_viajando < repartidor->frecuencia_descanso)
 		return;

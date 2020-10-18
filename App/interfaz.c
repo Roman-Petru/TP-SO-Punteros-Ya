@@ -1,25 +1,32 @@
 #include "interfaz.h"
 #include "app.h"
 
+//========== RESTAURANTES CONE ==========//
+static bool hay_restaurantes_conectados() { return !list_is_empty(restaurantes_conectados); }
+static bool esta_conectado(char* restaurante)
+{
+	bool es_mismo_resto(void* resto) { return strcmp(restaurante, resto)==0; }
+	return list_any_satisfy(restaurantes_conectados, &es_mismo_resto);
+}
+
+
+//========== INTERFAZ ==========//
 static t_respuesta* consultar_restaurantes()
 {
 	log_info(logger, "Me consultaron las Restaurantes.");
 
-	t_list* restaurantes = list_create();
+	if(hay_restaurantes_conectados())
+		return respuesta_crear(CONSULTAR_RESTAURANTES_RESPUESTA, restaurantes_conectados, true);
 
-	//TODO App: consultar_restaurantes  //Descomentar cuando este hecha la lista
-	//if(hay_restaurantes)
-	//	cargar_restaurantes(restaurantes);
-	//else
-		list_add(restaurantes, "Resto_Default");
+	t_list* resto_default = list_create();
+	list_add(resto_default, "Resto_Default");
 
-	return respuesta_crear(CONSULTAR_RESTAURANTES_RESPUESTA, restaurantes, true);
+	return respuesta_crear(CONSULTAR_RESTAURANTES_RESPUESTA, resto_default, true);
 }
 
 static t_respuesta* seleccionar_restaurante(char* restaurante)
 {
-	//TODO App: seleccionar_restaurante
-	if(strcmp(restaurante, "Resto_Default")==0) // || esta_conectado(restaurante)
+	if(strcmp(restaurante, "Resto_Default")==0 || esta_conectado(restaurante))
 	{
 		log_info(logger, "Seleccionaron Restaurante %s.", restaurante);
 		return respuesta_crear(SELECCIONAR_RESTAURANTE_RESPUESTA, (void*) true, false);
@@ -42,16 +49,15 @@ static void platos_default(t_list* platos)
 static t_respuesta* consultar_platos(char* restaurante)
 {
 	log_info(logger, "Se consulto platos de Restaurante %s.", restaurante);
-	t_list* platos = list_create();
 
-	//TODO App: consultar_platos
-	//if(esta_conectado(restaurante))
-	//	consultar platos a restaurante y cargar en t_list* platos
-	//else
-		platos_default(platos);
+	if(esta_conectado(restaurante))
+		return respuesta_crear(CONSULTAR_PLATOS_RESPUESTA, cliente_enviar_mensaje(cliente, "RESTAURANTE", CONSULTAR_PLATOS, NULL), true); //TODO: DUDA IP_PUERO RESTO
+
+	t_list* platos = list_create();
+	platos_default(platos);
+
 	return respuesta_crear(CONSULTAR_PLATOS_RESPUESTA, platos, true);
 }
-
 
 static t_respuesta* operacion_terminar()
 {
