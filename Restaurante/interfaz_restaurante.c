@@ -1,4 +1,4 @@
-
+/*
 #include "interfaz_restaurante.h"
 #include "restaurante.h"
 
@@ -32,4 +32,4 @@ void inicializar_restaurante()
 	consola_agregar_comando(consola, "consultar platos", &operacion_consultar_platos); //TODO ver si esto es necesario
 
 	log_info(logger_resto, "Servidor listo para recibir al restaurante");
-}
+}*/

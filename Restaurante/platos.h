@@ -48,7 +48,8 @@ typedef struct {
 
 t_platos_PCB* crear_plato(char* plato, int id_pedido);
 void ciclo_plato(t_platos_PCB* plato);
-bool avanzar_paso_receta (t_platos_PCB* plato);
+void avanzar_paso_receta (t_platos_PCB* plato);
+void cambiar_paso_de_ser_necesario(t_platos_PCB* plato);
 void logear_inicio_operacion(t_platos_PCB* plato);
 void terminar_plato (t_platos_PCB* plato);
 void inicializar_diccionario_recetas();

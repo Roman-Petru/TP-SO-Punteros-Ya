@@ -33,7 +33,7 @@ void inicializar_restaurante()
 	lista_afinidades = list_create();
 	t_afinidad* afinidad1 = malloc(sizeof(t_afinidad));
 	afinidad1->plato = "milanesa";
-	afinidad1->cantidad_cocineros = 1;
+	afinidad1->cantidad_cocineros = 3;
 	list_add(lista_afinidades, afinidad1);
 	t_afinidad* afinidad2 = malloc(sizeof(t_afinidad));
 	afinidad2->plato = "pure";
@@ -50,7 +50,7 @@ void inicializar_restaurante()
 	platos[2] = "ensalada";
 */
 
-	cantidad_hornos = 1;
+	cantidad_hornos = 3;
 
 	//obtener recetas
 	//termina metadata
@@ -63,12 +63,14 @@ void inicializar_restaurante()
 	cola_de_cola_Resto_READY = list_create();
 	cola_de_cola_Resto_EXEC = list_create();
 	for (int i=0; i<list_size(lista_afinidades);i++){
-		t_list* cola_Resto_READY = malloc (sizeof(t_list));
+		t_list* cola_Resto_READY;
 		cola_Resto_READY = list_create();
 		list_add(cola_de_cola_Resto_READY, cola_Resto_READY);
-		t_list* cola_Resto_EXIT = malloc (sizeof(t_list));
+		//free(cola_Resto_READY);
+		t_list* cola_Resto_EXIT;
 		cola_Resto_EXIT = list_create();
 		list_add(cola_de_cola_Resto_EXEC, cola_Resto_EXIT);
+		//free(cola_Resto_EXIT);
 	}
 
 

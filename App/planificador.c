@@ -110,6 +110,9 @@ static void actualizar_estado_bloqueados()
 
 static void actualizar_estado_ejecutados()
 {
+	//BUGGG descubierto, el list_size(COLA_EXEC) (y la cola en si) pueden cambiar mientras se itera, esta iteracion puede no funcionar bien,
+	//POSIBLE SOLUCION: agregar un i--; CUANDO SE CAMBIE DE ESTADO UN PCB
+
 	for (int i=0; i < list_size(cola_EXEC); i++)
 	{
 		t_pedido* pedido = list_get(cola_EXEC, i);
