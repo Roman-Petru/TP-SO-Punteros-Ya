@@ -63,7 +63,7 @@ static void* deserializar_sin_datos(t_buffer* buffer)
 	return NULL;
 }
 // ===== Destrucciones =====
-static void destruir_lista_string(void* datos) { list_destroy_and_destroy_elements(datos, &free); }
+void destruir_lista_string(void* datos) { list_destroy_and_destroy_elements(datos, &free); }
 
 static void* deserializar_bool(t_buffer* buffer)
 {

@@ -1,11 +1,10 @@
 #include "cliente_red.h"
 
-// ===== Cliente =====
+// ===== Cliente ===== //
 t_cliente_red* cliente_crear(t_config* config)
 {
 	t_cliente_red* cliente = malloc(sizeof(t_cliente_red));
 	cliente->config =  config;
-	cliente->diccionario_operaciones = dictionary_int_create();
 
 	return cliente;
 }
@@ -28,51 +27,26 @@ static char* cliente_puerto(t_cliente_red* cliente, char* servidor)
 	return puerto;
 }
 
-void cliente_destruir(t_cliente_red* cliente)
-{
-	dictionary_int_destroy(cliente->diccionario_operaciones);
-	free(cliente);
-}
+void cliente_destruir(t_cliente_red* cliente) {	free(cliente); }
 
-void cliente_agregar_operacion(t_cliente_red* cliente, t_codigo_de_operacion codigo_operacion, void* operacion)
-{
-	dictionary_int_put(cliente->diccionario_operaciones, codigo_operacion, operacion);
-}
+// ===== Enviar Mensaje ===== //
 
-// ===== Recibir Respuesta =====
-static void cliente_recibir_respuesta(t_cliente_red* cliente)
-{
-	t_paquete* paquete = paquete_recibir(cliente->socket);
-	if(paquete_tiene_datos(paquete))
-	{
-		void* datos = paquete_desempaquetar(paquete);
-		((t_operacion_cliente) dictionary_int_get(cliente->diccionario_operaciones, paquete->codigo_operacion))(datos);
-		destruir(paquete->codigo_operacion, datos);
-	}
-	else
-		((t_operacion_cliente_simple) dictionary_int_get(cliente->diccionario_operaciones, paquete->codigo_operacion))();
-	paquete_destruir(paquete);
-	socket_cerrar(cliente->socket);
-}
-
-/*static void cliente_crear_hilo_recibir_respuesta(t_cliente_red* cliente)
-{
-	cliente->hilo_escucha = malloc(sizeof(pthread_t));
-	pthread_attr_t attr;
-	pthread_attr_init(&attr);
-	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-	pthread_create(cliente->hilo_escucha, &attr, (void*)&cliente_recibir_respuesta, cliente);
-}*/
-
-// ===== Enviar Mensaje =====
-void cliente_enviar_mensaje(t_cliente_red* cliente, char* servidor, t_codigo_de_operacion codigo_operacion, void* datos)
+void* cliente_enviar_mensaje(t_cliente_red* cliente, char* servidor, t_codigo_de_operacion codigo_operacion, void* datos)
 {
 	cliente->socket = socket_crear(cliente_ip(cliente, servidor), cliente_puerto(cliente, servidor));
-	t_buffer* buffer = buffer_crear_con_datos(codigo_operacion, datos);
-	t_paquete* paquete = paquete_crear(codigo_operacion, buffer);
+	t_paquete* paquete = paquete_crear(codigo_operacion, buffer_crear_con_datos(codigo_operacion, datos));
 	paquete_enviar(paquete, cliente->socket);
 	paquete_destruir(paquete);
 
-	//cliente_crear_hilo_recibir_respuesta(cliente);
-	cliente_recibir_respuesta(cliente);
+	paquete = paquete_recibir(cliente->socket);
+	void* pedido;
+
+	if(paquete_tiene_datos(paquete))
+		pedido = paquete_desempaquetar(paquete);
+	else
+		pedido = NULL;
+	paquete_destruir(paquete);
+	socket_cerrar(cliente->socket);
+
+	return pedido;
 }

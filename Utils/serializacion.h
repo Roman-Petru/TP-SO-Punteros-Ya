@@ -19,5 +19,6 @@ void destruir(t_codigo_de_operacion codigo_de_operacion, void* datos);
 void destruir_datos_respuesta(t_codigo_de_operacion codigo_de_operacion, void* datos);
 void serializacion_inicializar();
 void serializacion_finalizar();
+void destruir_lista_string(void* datos);
 
 #endif /*SERIALIZACION_H_*/

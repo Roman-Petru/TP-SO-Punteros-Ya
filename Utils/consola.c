@@ -33,7 +33,7 @@ void consola_log(t_consola* consola, char* mensaje)
 bool consola_if(t_consola* consola, bool condicion)
 {
 	if(condicion)
-		log_info(consola->logger, "SUCCES!");
+		log_info(consola->logger, "SUCCESS!");
 	else
 		log_info(consola->logger, "ERROR");
 	return condicion;
