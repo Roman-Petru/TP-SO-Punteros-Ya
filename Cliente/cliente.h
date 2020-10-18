@@ -1,13 +1,11 @@
 #ifndef CLIENTE_H_
 #define CLIENTE_H_
 
+#include "interfaz.h"
 #include "../Utils/serializacion.h"
 #include "../Utils/cliente_red.h"
 #include "../Utils/consola.h"
 #include <commons/config.h>
-
-#include "comandos.h"
-#include "operaciones.h"
 
 extern t_config* config;
 extern t_consola* consola;

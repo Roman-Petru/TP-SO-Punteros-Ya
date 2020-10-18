@@ -1,4 +1,9 @@
-#include "comandos.h"
+#include "interfaz.h"
+
+//Consultar Pedido
+//Obtener Pedido
+//Finalizar Pedido
+//Obtener Receta
 
 //========== VALIDACIONES ==========//
 static char* validar_modulo(char* modulo)
@@ -58,11 +63,14 @@ static void terminar()
 {
 	hay_que_leer= false;
 	cliente_enviar_mensaje(cliente, servidor, TERMINAR, NULL);
+	consola_log(consola, "El servidor se cerro correctamente.");
 }
 
 void seleccionar_modulo()
 {
-	servidor = validar_modulo(consola_leer("Ingrese el nombre del modulo: "));
+	char* modulo = consola_leer("Ingrese el nombre del modulo: ");
+	servidor = validar_modulo(modulo);
+	free(modulo);
 	if(servidor == NULL)
 		consola_log(consola, "No se reconoce el modulo.");
 	else
@@ -70,13 +78,25 @@ void seleccionar_modulo()
 }
 
 //========== INTERFAZ ==========//
-static void consultar_restaurantes() { cliente_enviar_mensaje(cliente, "APP", CONSULTAR_RESTAURANTES, NULL); }
+static void consultar_restaurantes()
+{
+	t_list* restaurantes = cliente_enviar_mensaje(cliente, "APP", CONSULTAR_RESTAURANTES, NULL);
+
+	consola_log(consola, "Restaurantes: ");
+
+	void loggear_restaurante(void* restaurante) { consola_log(consola, restaurante); }
+	list_iterate(restaurantes, &loggear_restaurante);
+	destruir_lista_string(restaurantes);
+}
 
 static void seleccionar_restaurante()
 {
 	char* restaurante = consola_leer("Ingrese el nombre del restaurante: ");
+	if(restaurante_seleccionado!=NULL)
+		free(restaurante_seleccionado);
 	restaurante_seleccionado = restaurante;
-	cliente_enviar_mensaje(cliente, "APP", SELECCIONAR_RESTAURANTE, restaurante);
+	bool operacion_ok = cliente_enviar_mensaje(cliente, "APP", SELECCIONAR_RESTAURANTE, restaurante);
+	consola_if(consola, operacion_ok);
 }
 
 static void obtener_restaurante()
@@ -84,7 +104,10 @@ static void obtener_restaurante()
 	if(validar_restaurante())
 		return;
 
+	//void* restaurante = cliente_enviar_mensaje(cliente, "SINDICATO", OBTENER_RESTAURANTE, restaurante_seleccionado);
 	cliente_enviar_mensaje(cliente, "SINDICATO", OBTENER_RESTAURANTE, restaurante_seleccionado);
+
+	consola_log(consola, "Datos Restaurante: ");
 }
 
 static void consultar_platos()
@@ -93,7 +116,13 @@ static void consultar_platos()
 	if(validar_restaurante() && validar_servidor(modulos, 3, true))
 		return;
 
-	cliente_enviar_mensaje(cliente, servidor, CONSULTAR_PLATOS, restaurante_seleccionado);
+	t_list* platos = cliente_enviar_mensaje(cliente, servidor, CONSULTAR_PLATOS, restaurante_seleccionado);
+
+	consola_log(consola, "Platos: ");
+
+	void loggear_restaurante(void* plato) { consola_log(consola, plato); }
+	list_iterate(platos, &loggear_restaurante);
+	destruir_lista_string(platos);
 }
 
 static void crear_pedido()
@@ -102,7 +131,11 @@ static void crear_pedido()
 	if(validar_servidor(modulos, 2, true))
 		return;
 
-	cliente_enviar_mensaje(cliente, servidor, CREAR_PEDIDO, NULL);
+	int id_nuevo_pedido = (int) cliente_enviar_mensaje(cliente, servidor, CREAR_PEDIDO, NULL);
+
+	if(consola_if(consola, id_nuevo_pedido == -1))
+		return;
+	id_pedido = id_nuevo_pedido;
 }
 
 static void guardar_pedido()
@@ -114,7 +147,8 @@ static void guardar_pedido()
 	datos.restaurante = restaurante_seleccionado;
 	datos.id_pedido = id_pedido;
 
-	cliente_enviar_mensaje(cliente, servidor, CREAR_PEDIDO, &datos);
+	bool operacion_ok = cliente_enviar_mensaje(cliente, servidor, CREAR_PEDIDO, &datos);
+	consola_if(consola, operacion_ok);
 }
 
 static void agregar_plato()
@@ -126,7 +160,9 @@ static void agregar_plato()
 	datos.plato = consola_leer("Ingrese el nombre del plato: ");;
 	datos.id_pedido = id_pedido;
 
-	cliente_enviar_mensaje(cliente, servidor, AGREGAR_PLATO, &datos);
+	bool operacion_ok = cliente_enviar_mensaje(cliente, servidor, AGREGAR_PLATO, &datos);
+	consola_if(consola, operacion_ok);
+	free(datos.plato);
 }
 
 static void guardar_plato()
@@ -141,7 +177,11 @@ static void guardar_plato()
 	datos.comida = consola_leer("Ingrese el nombre de la comida: ");
 	datos.restaurante = consola_leer("Ingrese la cantidad: ");
 
-	cliente_enviar_mensaje(cliente, servidor, GUARDAR_PLATO, &datos);
+	bool operacion_ok = cliente_enviar_mensaje(cliente, servidor, GUARDAR_PLATO, &datos);
+	consola_if(consola, operacion_ok);
+
+	free(datos.comida);
+	free(datos.restaurante);
 }
 
 static void confirmar_pedido() //POLIMORFISMO?
@@ -153,7 +193,8 @@ static void confirmar_pedido() //POLIMORFISMO?
 	datos.restaurante = restaurante_seleccionado;
 	datos.id_pedido = id_pedido;
 
-	cliente_enviar_mensaje(cliente, servidor, CONFIRMAR_PEDIDO, &datos);
+	bool operacion_ok = cliente_enviar_mensaje(cliente, servidor, CONFIRMAR_PEDIDO, &datos);
+	consola_if(consola, operacion_ok);
 }
 
 static void plato_listo()
@@ -167,7 +208,9 @@ static void plato_listo()
 	datos.id_pedido = id_pedido;
 	datos.comida = consola_leer("Ingrese el nombre de la comida: ");
 
-	cliente_enviar_mensaje(cliente, servidor, PLATO_LISTO, &datos);
+	bool operacion_ok = cliente_enviar_mensaje(cliente, servidor, PLATO_LISTO, &datos);
+	consola_if(consola, operacion_ok);
+	free(datos.comida);
 }
 
 static void terminar_pedido()
@@ -179,10 +222,11 @@ static void terminar_pedido()
 	datos.restaurante = restaurante_seleccionado;
 	datos.id_pedido = id_pedido;
 
-	cliente_enviar_mensaje(cliente, "SINDICATO", TERMINAR_PEDIDO, &datos);
+	bool operacion_ok = cliente_enviar_mensaje(cliente, "SINDICATO", TERMINAR_PEDIDO, &datos);
+	consola_if(consola, operacion_ok);
 }
 
-void agregar_comandos()
+void cargar_interfaz()
 {
 	consola_agregar_comando(consola, "desconectar", &desconectar);
 	consola_agregar_comando(consola, "terminar", &terminar);

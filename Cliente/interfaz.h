@@ -1,13 +1,12 @@
-#ifndef COMANDOS_H_
-#define COMANDOS_H_
+#ifndef INTERFAZ_H_
+#define INTERFAZ_H_
 
 #include "cliente.h"
-#include "operaciones.h"
 #include "../Utils/protocolo.h"
+#include "../Utils/serializacion.h"
 #include <stdbool.h>
 
-
-void agregar_comandos();
+void cargar_interfaz();
 void seleccionar_modulo();
 
-#endif /*COMANDOS_H_*/
+#endif /*INTERFAZ_H_*/

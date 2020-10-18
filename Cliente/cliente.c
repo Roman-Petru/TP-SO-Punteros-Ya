@@ -34,9 +34,8 @@ static void inicializar()
 	while(servidor == NULL)
 		seleccionar_modulo();
 
-	//=== INTERFAZ ===//
-	agregar_operaciones();
-	agregar_comandos();
+
+	cargar_interfaz();
 }
 
 int main()
