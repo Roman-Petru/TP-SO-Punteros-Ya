@@ -4,6 +4,7 @@ t_config* config_resto;
 int id_PCB;
 int cantidad_hornos;
 int quantum;
+t_servidor_red* servidor;
 
 t_log* logger_resto;
 
@@ -28,6 +29,11 @@ void inicializar_restaurante()
 	id_PCB = 0;
 	config_resto = config_create("restaurante.config");
 	quantum = config_get_int_value(config_resto, "QUANTUM");
+
+
+	serializacion_inicializar();
+	servidor = servidor_crear("127.0.0.1", config_get_string_value(config_resto, "PUERTO_ESCUCHA"));
+
 	//obtener_metadata();
 
 	lista_afinidades = list_create();
@@ -52,7 +58,6 @@ void inicializar_restaurante()
 
 	cantidad_hornos = 3;
 
-	//obtener recetas
 	//termina metadata
 
 	sem_init (&(semaforo_resto), 0, 0);
@@ -66,11 +71,11 @@ void inicializar_restaurante()
 		t_list* cola_Resto_READY;
 		cola_Resto_READY = list_create();
 		list_add(cola_de_cola_Resto_READY, cola_Resto_READY);
-		//free(cola_Resto_READY);
+
 		t_list* cola_Resto_EXIT;
 		cola_Resto_EXIT = list_create();
 		list_add(cola_de_cola_Resto_EXEC, cola_Resto_EXIT);
-		//free(cola_Resto_EXIT);
+
 	}
 
 
@@ -79,8 +84,18 @@ void inicializar_restaurante()
 	cola_Hornos_READY = list_create();
 	cola_Hornos_EXEC = list_create();
 
+	inicializar_interrupciones();
+
 	inicializar_diccionario_recetas();
 	inicializar_diccionario_colas();
+}
+
+void terminar()
+{
+	serializacion_finalizar();
+	servidor_destruir(servidor);
+	log_info(logger_resto, "TERMINE");
+	exit(0);
 }
 
 
@@ -88,19 +103,21 @@ int main()
 
 {
 	inicializar_restaurante();
-	crear_plato("milanesa", 54);
-	crear_plato("milanesa", 65);
-	crear_plato("milanesa", 80);
-	crear_plato("ensalada", 100);
-	crear_plato("ensalada", 120);
-	crear_plato("ensalada", 130);
-	crear_plato("pure", 90);
+
+
+	((t_insertador_platos) dictionary_int_get(diccionario_interrupciones, NUEVO_PLATO))("milanesa", 145);
+	((t_insertador_platos) dictionary_int_get(diccionario_interrupciones, NUEVO_PLATO))("milanesa", 202);
+	((t_insertador_platos) dictionary_int_get(diccionario_interrupciones, NUEVO_PLATO))("milanesa", 304);
+	((t_insertador_platos) dictionary_int_get(diccionario_interrupciones, NUEVO_PLATO))("pure", 505);
+	((t_insertador_platos) dictionary_int_get(diccionario_interrupciones, NUEVO_PLATO))("ensalada", 106);
+	((t_insertador_platos) dictionary_int_get(diccionario_interrupciones, NUEVO_PLATO))("milanesa", 720);
+	((t_insertador_platos) dictionary_int_get(diccionario_interrupciones, NUEVO_PLATO))("milanesa", 350);
 
 	while (1)
 	{
 		planificar_corto_plazo();
 		ejecutar_ciclo();
-
+		ejecutar_interrupciones();
 	}
 
 }

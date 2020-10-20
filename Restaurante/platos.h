@@ -45,6 +45,7 @@ typedef struct {
 	t_list* pasos_receta;
 }t_receta;
 
+typedef void* (*t_insertador_platos)(char*, int);
 
 t_platos_PCB* crear_plato(char* plato, int id_pedido);
 void ciclo_plato(t_platos_PCB* plato);
