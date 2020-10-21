@@ -116,16 +116,16 @@ void inicializar_diccionario_recetas()
 	milanesa->nombre_plato = "milanesa";
 	milanesa->pasos_receta = list_create();
 	t_paso* paso1 = malloc(sizeof(t_paso));
-	paso1->operacion = "Hornear";
-	paso1->ciclos = 3;
+	paso1->operacion = "Amasar";
+	paso1->ciclos = 4;
 	list_add(milanesa->pasos_receta, paso1);
 	t_paso* paso2 = malloc(sizeof(t_paso));
-	paso2->operacion = "Reposar";
+	paso2->operacion = "Panear";
 	paso2->ciclos = 2;
 	list_add(milanesa->pasos_receta, paso2);
 	t_paso* paso3 = malloc(sizeof(t_paso));
-	paso3->operacion = "CUCHI";
-	paso3->ciclos = 2;
+	paso3->operacion = "Cuchi";
+	paso3->ciclos = 4;
 	list_add(milanesa->pasos_receta, paso3);
 
 	diccionario_recetas = dictionary_create();
@@ -138,10 +138,10 @@ void inicializar_diccionario_recetas()
 	pure->pasos_receta = list_create();
 	t_paso* paso4 = malloc(sizeof(t_paso));
 	paso4->operacion = "trocear";
-	paso4->ciclos = 3;
+	paso4->ciclos = 2;
 	list_add(pure->pasos_receta, paso4);
 	t_paso* paso5 = malloc(sizeof(t_paso));
-	paso5->operacion = "Hornear";
+	paso5->operacion = "Calentar";
 	paso5->ciclos = 2;
 	list_add(pure->pasos_receta, paso5);
 	t_paso* paso7 = malloc(sizeof(t_paso));

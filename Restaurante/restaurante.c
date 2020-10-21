@@ -1,35 +1,17 @@
 #include "restaurante.h"
 
 t_config* config_resto;
-int id_PCB;
 int cantidad_hornos;
-int quantum;
 t_servidor_red* servidor;
-
 t_log* logger_resto;
 
-t_list* cola_Resto_NEW;
-t_list* cola_de_cola_Resto_READY;
-t_list* cola_Resto_BLOCKED;
-t_list* cola_de_cola_Resto_EXEC;
-t_list* cola_Resto_EXIT;
-
-t_list* cola_Hornos_READY;
-t_list* cola_Hornos_EXEC;
-
 t_list* lista_afinidades;
-
-sem_t semaforo_resto;
 
 void inicializar_restaurante()
 {
 
 	logger_resto = log_create("resto.log", "RESTAURANTE", true, LOG_LEVEL_INFO);
-
-	id_PCB = 0;
 	config_resto = config_create("restaurante.config");
-	quantum = config_get_int_value(config_resto, "QUANTUM");
-
 
 	serializacion_inicializar();
 	servidor = servidor_crear("127.0.0.1", config_get_string_value(config_resto, "PUERTO_ESCUCHA"));
@@ -60,34 +42,10 @@ void inicializar_restaurante()
 
 	//termina metadata
 
-	sem_init (&(semaforo_resto), 0, 0);
-
-	cola_Resto_NEW = list_create();
-	cola_Resto_BLOCKED = list_create();
-
-	cola_de_cola_Resto_READY = list_create();
-	cola_de_cola_Resto_EXEC = list_create();
-	for (int i=0; i<list_size(lista_afinidades);i++){
-		t_list* cola_Resto_READY;
-		cola_Resto_READY = list_create();
-		list_add(cola_de_cola_Resto_READY, cola_Resto_READY);
-
-		t_list* cola_Resto_EXIT;
-		cola_Resto_EXIT = list_create();
-		list_add(cola_de_cola_Resto_EXEC, cola_Resto_EXIT);
-
-	}
-
-
-
-	cola_Resto_EXIT = list_create();
-	cola_Hornos_READY = list_create();
-	cola_Hornos_EXEC = list_create();
-
+	inicializar_planificador();
 	inicializar_interrupciones();
-
 	inicializar_diccionario_recetas();
-	inicializar_diccionario_colas();
+
 }
 
 void terminar()
@@ -104,14 +62,22 @@ int main()
 {
 	inicializar_restaurante();
 
+	//para test
+	for (int i=0; i < 6; i++)
+	{
+	t_para_nuevo_plato* pure = malloc(sizeof(t_para_nuevo_plato));
+	pure->nombre_plato = "pure";
+	pure->id_pedido = i;
+	agregar_interrupcion(NUEVO_PLATO, pure);
+	}
 
-	((t_insertador_platos) dictionary_int_get(diccionario_interrupciones, NUEVO_PLATO))("milanesa", 145);
-	((t_insertador_platos) dictionary_int_get(diccionario_interrupciones, NUEVO_PLATO))("milanesa", 202);
-	((t_insertador_platos) dictionary_int_get(diccionario_interrupciones, NUEVO_PLATO))("milanesa", 304);
-	((t_insertador_platos) dictionary_int_get(diccionario_interrupciones, NUEVO_PLATO))("pure", 505);
-	((t_insertador_platos) dictionary_int_get(diccionario_interrupciones, NUEVO_PLATO))("ensalada", 106);
-	((t_insertador_platos) dictionary_int_get(diccionario_interrupciones, NUEVO_PLATO))("milanesa", 720);
-	((t_insertador_platos) dictionary_int_get(diccionario_interrupciones, NUEVO_PLATO))("milanesa", 350);
+	for (int i=7; i < 13; i++)
+	{
+	t_para_nuevo_plato* pure = malloc(sizeof(t_para_nuevo_plato));
+	pure->nombre_plato = "milanesa";
+	pure->id_pedido = i;
+	agregar_interrupcion(NUEVO_PLATO, pure);
+	}
 
 	while (1)
 	{
