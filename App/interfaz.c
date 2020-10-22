@@ -51,7 +51,7 @@ static t_respuesta* consultar_platos(char* restaurante)
 	log_info(logger, "Se consulto platos de Restaurante %s.", restaurante);
 
 	if(esta_conectado(restaurante))
-		return respuesta_crear(CONSULTAR_PLATOS_RESPUESTA, cliente_enviar_mensaje(cliente, "RESTAURANTE", CONSULTAR_PLATOS, NULL), true); //TODO: DUDA IP_PUERO RESTO
+		return respuesta_crear(CONSULTAR_PLATOS_RESPUESTA, cliente_enviar_mensaje(cliente, "RESTAURANTE", CONSULTAR_PLATOS, NULL), true); //TODO: DUDA IP_PUERTO RESTO
 
 	t_list* platos = list_create();
 	platos_default(platos);

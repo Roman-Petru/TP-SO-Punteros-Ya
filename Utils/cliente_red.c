@@ -39,12 +39,11 @@ void* cliente_enviar_mensaje(t_cliente_red* cliente, char* servidor, t_codigo_de
 	paquete_destruir(paquete);
 
 	paquete = paquete_recibir(cliente->socket);
-	void* pedido;
+	void* pedido = NULL;
 
 	if(paquete_tiene_datos(paquete))
 		pedido = paquete_desempaquetar(paquete);
-	else
-		pedido = NULL;
+
 	paquete_destruir(paquete);
 	socket_cerrar(cliente->socket);
 

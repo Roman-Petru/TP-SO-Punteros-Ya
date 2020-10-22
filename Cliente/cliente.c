@@ -34,7 +34,6 @@ static void inicializar()
 	while(servidor == NULL)
 		seleccionar_modulo();
 
-
 	cargar_interfaz();
 }
 

@@ -45,11 +45,11 @@ void inicializar_planificador()
 
 	//===DICCIONARIO DE RAZONES===//
 	diccionario_razones = dictionary_int_create();
-	dictionary_int_put(diccionario_razones, A_NEW, "haber sido elegido por el planificador de largo plazo.");
+	dictionary_int_put(diccionario_razones, A_NEW, "haber llegado un nueuvo pedido para planificar.");
 	dictionary_int_put(diccionario_razones, A_EXEC, "ser elegido por el planificador de corto plazo.");
 
 	/*A_READY*/
-	dictionary_int_put(diccionario_razones, A_READY_ASIGNO, "asignarsele un repartidor.");
+	dictionary_int_put(diccionario_razones, A_READY_ASIGNO, "haber sido elegido por el planificador de largo plazo.");
 	dictionary_int_put(diccionario_razones, A_READY_DESCANSO, "haber descansado el repartidor.");
 	dictionary_int_put(diccionario_razones, A_READY_LISTO, "estar listo cuando el repartidor lo espera.");
 
@@ -106,12 +106,12 @@ static void actualizar_estado_bloqueados()
 	}
 
 	list_iterate(cola_BLOCKED, (void*) &actualizar_estado);
+	//TODO: lista cambios
 }
 
 static void actualizar_estado_ejecutados()
 {
-	//BUGGG descubierto, el list_size(COLA_EXEC) (y la cola en si) pueden cambiar mientras se itera, esta iteracion puede no funcionar bien,
-	//POSIBLE SOLUCION: agregar un i--; CUANDO SE CAMBIE DE ESTADO UN PCB
+	//TODO: lista cambios
 
 	for (int i=0; i < list_size(cola_EXEC); i++)
 	{
@@ -119,6 +119,7 @@ static void actualizar_estado_ejecutados()
 		if (pedido->instruccion_a_realizar == IR_A_CLIENTE && posicion_es_igual(pedido->repartidor->posicion, pedido->posicion_cliente))
 		{
 			cambiar_estado_a(pedido, EXIT, A_EXIT);
+			i--;
 			list_add(repartidores_libres, pedido->repartidor);
 			pthread_cancel(pedido->hilo);
 			pedido->repartidor = NULL;
@@ -133,12 +134,15 @@ static void actualizar_estado_ejecutados()
 				else
 				{
 					cambiar_estado_a(pedido, BLOCKED, A_BLOCKED_ESPERA);
+					i--;
 					pedido->instruccion_a_realizar = ESPERAR_EN_RESTAURANTE;
 				}
 			}
 			if (pedido->repartidor->esta_cansado)
+			{
 				cambiar_estado_a(pedido, BLOCKED, A_BLOCKED_CANSADO);
-
+				i--;
+			}
 		}
 	}
 }
@@ -225,16 +229,6 @@ static void meter_con_SJF_SD(t_pedido* pedido)
 	for(t_pedido* pivot = list_get(cola_READY, i); pivot != NULL && (pivot->estimacion <=pedido->estimacion); pivot = list_get(cola_READY, i))
 		i++;
 	list_add_in_index(cola_READY, i, pedido);
-	/*
-	int i = 0;
-	t_pedido* pivot = list_get(cola_READY, i);
-	while(pivot != NULL && (pivot->estimacion <=pedido->estimacion))
-	{
-		i++;
-		pivot = list_get(cola_READY, i);
-	}
-	list_add_in_index(cola_READY, i, pedido);
-	*/
 }
 
 //========== HRRN ==========//

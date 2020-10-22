@@ -14,6 +14,8 @@
 #include "interfaz_restaurante.h"
 #include "interrupciones.h"
 
+extern t_servidor_red* servidor;
+extern t_cliente_red* cliente;
 extern t_log* logger_resto;
 extern t_config* config_resto;
 

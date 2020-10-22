@@ -2,4 +2,4 @@
 #include "../Utils/serializacion.h"
 #include "../Utils/protocolo.h"
 
-void inicializar_restaurante();
+void inicializar_servidor();

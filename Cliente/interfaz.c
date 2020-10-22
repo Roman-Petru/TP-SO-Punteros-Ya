@@ -86,6 +86,7 @@ static void consultar_restaurantes()
 
 	void loggear_restaurante(void* restaurante) { consola_log(consola, restaurante); }
 	list_iterate(restaurantes, &loggear_restaurante);
+
 	destruir_lista_string(restaurantes);
 }
 
@@ -95,6 +96,7 @@ static void seleccionar_restaurante()
 	if(restaurante_seleccionado!=NULL)
 		free(restaurante_seleccionado);
 	restaurante_seleccionado = restaurante;
+
 	bool operacion_ok = cliente_enviar_mensaje(cliente, "APP", SELECCIONAR_RESTAURANTE, restaurante);
 	consola_if(consola, operacion_ok);
 }
@@ -140,7 +142,8 @@ static void crear_pedido()
 
 static void guardar_pedido()
 {
-	if(validar_restaurante() && validar_pedido())
+	char* modulos[] = { "APP", "RESTAURANTE" };
+	if(alidar_servidor(modulos, 2, true) && validar_restaurante() && validar_pedido())
 		return;
 
 	t_datos_pedido datos;
@@ -184,7 +187,7 @@ static void guardar_plato()
 	free(datos.restaurante);
 }
 
-static void confirmar_pedido() //POLIMORFISMO?
+static void confirmar_pedido()
 {
 	if(validar_restaurante() && validar_pedido())
 			return;
@@ -244,6 +247,5 @@ void cargar_interfaz()
 	consola_agregar_comando(consola, "confirmar pedido", &confirmar_pedido);
 	consola_agregar_comando(consola, "plato listo", &plato_listo);
 	consola_agregar_comando(consola, "terminar pedido", &terminar_pedido);
-
 }
 

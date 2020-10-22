@@ -1,35 +1,18 @@
-/*
 #include "interfaz_restaurante.h"
 #include "restaurante.h"
 
-t_servidor_red* servidor_restaurant;
-//Va a recibir los siguientes mensajes:
-
-
-	//Consultar Platos: El Restaurante le consulta los platos al Sindicato
-
-static void operacion_consultar_platos(t_list* platos)
+static t_respuesta* consultar_platos()
 {
-	consola_log(consola, "Platos: ");
+	log_info(logger_resto, "Me consultaron los platos.");
 
-	void loggear_sindicato(void* plato) { consola_log(consola, plato); }
-	list_iterate(platos, &loggear_sindicato);
+	t_list* platos = cliente_enviar_mensaje(cliente, "SINDICATO", CONSULTAR_PLATOS, config_get_string_value(config_resto, "NOMBRE_RESTAURANTE"));
+
+	return respuesta_crear(CONSULTAR_RESTAURANTES_RESPUESTA, platos, true);
 }
 
-	//Crear Pedido
-
-	//Añadir Plato
-
-	//Confirmar Pedido
-
-	//Consultar Pedido
-
-
-void inicializar_restaurante()
+void cargar_interfaz()
 {
 	serializacion_inicializar();
-	servidor_restaurant = servidor_crear("127.0.0.1", config_get_string_value(config_resto, "PUERTO_ESCUCHA"));
-	consola_agregar_comando(consola, "consultar platos", &operacion_consultar_platos); //TODO ver si esto es necesario
 
-	log_info(logger_resto, "Servidor listo para recibir al restaurante");
-}*/
+	servidor_agregar_operacion(servidor, CONSULTAR_PLATOS, &consultar_platos);
+}

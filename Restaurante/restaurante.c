@@ -1,10 +1,11 @@
 #include "restaurante.h"
 
-t_config* config_resto;
+
 int cantidad_hornos;
 t_servidor_red* servidor;
+t_cliente_red* cliente;
 t_log* logger_resto;
-
+t_config* config_resto;
 t_list* lista_afinidades;
 
 void inicializar_restaurante()

@@ -31,7 +31,7 @@ static void inicializar()
 static void comiezo_ciclo()
 {
 	cant_ciclo++;
-	log_info(logger, "===== INSTANTE %d =====", cant_ciclo);
+	//log_info(logger, "===== INSTANTE %d =====", cant_ciclo);
 }
 
 void terminar()
