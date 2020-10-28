@@ -2,6 +2,7 @@
 
 t_list* interrupciones;
 t_dictionary_int* diccionario_interrupciones;
+sem_t mutex_interrupciones;
 
 static bool ordenar_interrupciones (t_datos_interrupcion* interrupcion1, t_datos_interrupcion* interrupcion2);
 
@@ -29,7 +30,9 @@ static void ejecutar_interrupcion(t_datos_interrupcion* interrupcion)
 //========== LISTA INTERRUPCIONES ==========//
 void agregar_interrupcion(t_tipo_interrupcion tipo, void* datos)
 {
+	sem_wait (&mutex_interrupciones);
 	list_add(interrupciones, interrupcion_crear(tipo, datos));
+	sem_post (&mutex_interrupciones);
 }
 
 void ejecutar_interrupciones()
@@ -83,6 +86,7 @@ static bool ordenar_interrupciones (t_datos_interrupcion* interrupcion1, t_datos
 //========== DICCIONARIO INTERRUPCIONES ==========//
 void inicializar_interrupciones()
 {
+	sem_init (&(mutex_interrupciones), 0, 1);
 	interrupciones = list_create();
 
 	diccionario_interrupciones = dictionary_int_create();

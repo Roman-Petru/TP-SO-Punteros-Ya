@@ -11,7 +11,8 @@ static char* validar_modulo(char* modulo)
 	if(strcmp(modulo, "APP")==0 || strcmp(modulo, "app")==0)
 		return "APP";
 	else if(strcmp(modulo, "RESTAURANTE")==0 || strcmp(modulo, "restaurante")==0)
-		return "RESTAURANTE";
+		{restaurante_seleccionado = "restaurante original";
+		return "RESTAURANTE";}
 	else if(strcmp(modulo, "COMANDA")==0 || strcmp(modulo, "comanda")==0)
 		return "COMANDA";
 	else if(strcmp(modulo, "SINDICATO")==0 || strcmp(modulo, "sindicato")==0)
@@ -143,7 +144,7 @@ static void crear_pedido()
 static void guardar_pedido()
 {
 	char* modulos[] = { "APP", "RESTAURANTE" };
-	if(alidar_servidor(modulos, 2, true) && validar_restaurante() && validar_pedido())
+	if(validar_servidor(modulos, 2, true) && validar_restaurante() && validar_pedido())
 		return;
 
 	t_datos_pedido datos;

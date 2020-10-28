@@ -72,7 +72,7 @@ void avanzar_paso_receta (t_platos_PCB* plato)
 	if(plato->estado_pcb == EXEC)
 		plato->ciclos_ejecutandose++;
 
-	//log_info(logger_resto, "Se avanzo un paso en el plato con PCB %d, ahora quedan %d pasos en la operacion que se encuentra", plato->id_PCB, plato->ciclos_restantes_paso_actual);
+	log_info(logger_resto, "Se avanzo un paso en el plato con PCB %d, ahora quedan %d pasos en la operacion que se encuentra", plato->id_PCB, plato->ciclos_restantes_paso_actual);
 }
 
 void cambiar_paso_de_ser_necesario(t_platos_PCB* plato)
@@ -80,14 +80,13 @@ void cambiar_paso_de_ser_necesario(t_platos_PCB* plato)
 	if (plato->ciclos_restantes_paso_actual == 0)
 	{
 		log_info(logger_resto, "Se finalizo con la operacion de %s del plato de %s con PCB %d", (((t_paso*) list_get(plato->pasos_receta_faltantes, 0))->operacion), plato->nombre_plato,plato->id_PCB);
-
+		plato->hubo_cambio_operacion = true;
 		list_remove(plato->pasos_receta_faltantes, 0);
 		if (!list_is_empty(plato->pasos_receta_faltantes))
 		{
 			t_paso* paso = list_get(plato->pasos_receta_faltantes, 0);
 			plato->ciclos_restantes_paso_actual = paso->ciclos;
 			//log_info(logger_resto, "Se avanzo en la operacion, el plato con PCB %d ahora se va a %s", plato->id_PCB, paso->operacion);
-			plato->hubo_cambio_operacion = true;
 		}
 	}
 
