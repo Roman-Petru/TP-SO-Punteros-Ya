@@ -22,7 +22,7 @@ void inicializar_restaurante()
 	lista_afinidades = list_create();
 	t_afinidad* afinidad1 = malloc(sizeof(t_afinidad));
 	afinidad1->plato = "milanesa";
-	afinidad1->cantidad_cocineros = 3;
+	afinidad1->cantidad_cocineros = 1;
 	list_add(lista_afinidades, afinidad1);
 	t_afinidad* afinidad2 = malloc(sizeof(t_afinidad));
 	afinidad2->plato = "pure";
@@ -79,7 +79,13 @@ int main()
 	pure->id_pedido = i;
 	agregar_interrupcion(NUEVO_PLATO, pure);
 	}
-
+	for (int i=11; i < 12; i++)
+	{
+	t_para_nuevo_plato* pure = malloc(sizeof(t_para_nuevo_plato));
+	pure->nombre_plato = "ensalada";
+	pure->id_pedido = i;
+	agregar_interrupcion(NUEVO_PLATO, pure);
+	}
 	while (1)
 	{
 		planificar_corto_plazo();

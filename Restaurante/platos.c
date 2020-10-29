@@ -72,7 +72,7 @@ void avanzar_paso_receta (t_platos_PCB* plato)
 	if(plato->estado_pcb == EXEC)
 		plato->ciclos_ejecutandose++;
 
-	log_info(logger_resto, "Se avanzo un paso en el plato con PCB %d, ahora quedan %d pasos en la operacion que se encuentra", plato->id_PCB, plato->ciclos_restantes_paso_actual);
+	//log_info(logger_resto, "Se avanzo un paso en el plato con PCB %d, ahora quedan %d pasos en la operacion que se encuentra", plato->id_PCB, plato->ciclos_restantes_paso_actual);
 }
 
 void cambiar_paso_de_ser_necesario(t_platos_PCB* plato)
@@ -115,7 +115,7 @@ void inicializar_diccionario_recetas()
 	milanesa->nombre_plato = "milanesa";
 	milanesa->pasos_receta = list_create();
 	t_paso* paso1 = malloc(sizeof(t_paso));
-	paso1->operacion = "Amasar";
+	paso1->operacion = "Hornear";
 	paso1->ciclos = 4;
 	list_add(milanesa->pasos_receta, paso1);
 	t_paso* paso2 = malloc(sizeof(t_paso));
@@ -155,7 +155,7 @@ void inicializar_diccionario_recetas()
 	ensalada->nombre_plato = "ensalada";
 	ensalada->pasos_receta = list_create();
 	t_paso* paso8 = malloc(sizeof(t_paso));
-	paso8->operacion = "Reposar";
+	paso8->operacion = "Hornear";
 	paso8->ciclos = 3;
 	list_add(ensalada->pasos_receta, paso8);
 	t_paso* paso9 = malloc(sizeof(t_paso));

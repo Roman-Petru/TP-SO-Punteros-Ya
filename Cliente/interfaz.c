@@ -139,6 +139,10 @@ static void crear_pedido()
 	if(consola_if(consola, id_nuevo_pedido == -1))
 		return;
 	id_pedido = id_nuevo_pedido;
+
+	consola_log(consola, "Se creo el pedido con algun id");
+
+	//	log_info(consola, "Se creo el pedido con id %d", id_pedido);
 }
 
 static void guardar_pedido()
