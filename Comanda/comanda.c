@@ -23,4 +23,6 @@ void inicializar_comanda(){
 int main()
 {
 	inicializar_comanda();
+	guardar_Pedido(idPedido,restaurante);
+	guardar_Plato(idPedido,restaurante,comida,cantidad);
 }
