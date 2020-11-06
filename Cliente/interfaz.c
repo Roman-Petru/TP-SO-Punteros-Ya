@@ -149,9 +149,10 @@ static void crear_pedido()
 		return;
 	id_pedido = id_nuevo_pedido;
 
-	consola_log(consola, "Se creo el pedido con algun id");
+	char mensaje[80];
+	sprintf(mensaje, "Se creo el pedido con id %d", id_pedido);
 
-	//	log_info(consola, "Se creo el pedido con id %d", id_pedido);
+	consola_log(consola, mensaje);
 }
 
 static void guardar_pedido()

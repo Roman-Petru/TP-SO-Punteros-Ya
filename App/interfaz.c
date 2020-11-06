@@ -91,19 +91,6 @@ static t_respuesta* operacion_terminar()
 	return respuesta_crear(TERMINAR, NULL, false);
 }
 
-<<<<<<< HEAD
-=======
-static t_respuesta* guardar_Pedido()
-{
-
-}
-
-static t_respuesta* guardar_Plato()
-{
-
-}
-
->>>>>>> 9528137c0d6c2592868888aaf74d9be6d38c11aa
 void cargar_interfaz()
 {
 	servidor_agregar_operacion(servidor, TERMINAR, &operacion_terminar);
@@ -111,11 +98,6 @@ void cargar_interfaz()
 	servidor_agregar_operacion(servidor, CONSULTAR_RESTAURANTES, &consultar_restaurantes);
 	servidor_agregar_operacion(servidor, SELECCIONAR_RESTAURANTE, &seleccionar_restaurante);
 	servidor_agregar_operacion(servidor, CONSULTAR_PLATOS, &consultar_platos);
-<<<<<<< HEAD
 	servidor_agregar_operacion(servidor, CREAR_PEDIDO, &crear_pedido);
-=======
-	servidor_agregar_operacion(servidor,GUARDAR_PEDIDO,&guardar_Pedido);
-	servidor_agregar_operacion(servidor,GUARDAR_PLATO,&guardar_Plato);
->>>>>>> 9528137c0d6c2592868888aaf74d9be6d38c11aa
 }
 
