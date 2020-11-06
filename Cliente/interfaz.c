@@ -78,6 +78,15 @@ void seleccionar_modulo()
 }
 
 //========== INTERFAZ ==========//
+void handshake_con_app()
+{
+	id = (int) cliente_enviar_mensaje(cliente, "APP", CONEXION_CLIENTE, posicion_crear(config_get_int_value(config, "POSICION_X"), config_get_int_value(config, "POSICION_Y")));
+
+	char mensaje[80];
+	sprintf(mensaje, "Id Cliente: %d", id);
+	consola_log(consola, mensaje);
+}
+
 static void consultar_restaurantes()
 {
 	t_list* restaurantes = cliente_enviar_mensaje(cliente, "APP", CONSULTAR_RESTAURANTES, NULL);
@@ -97,7 +106,7 @@ static void seleccionar_restaurante()
 		free(restaurante_seleccionado);
 	restaurante_seleccionado = restaurante;
 
-	bool operacion_ok = cliente_enviar_mensaje(cliente, "APP", SELECCIONAR_RESTAURANTE, restaurante);
+	bool operacion_ok = cliente_enviar_mensaje(cliente, "APP", SELECCIONAR_RESTAURANTE, crear_datos_seleccion_restaurante(id, restaurante_seleccionado));
 	consola_if(consola, operacion_ok);
 }
 
@@ -133,7 +142,7 @@ static void crear_pedido()
 	if(validar_servidor(modulos, 2, true))
 		return;
 
-	int id_nuevo_pedido = (int) cliente_enviar_mensaje(cliente, servidor, CREAR_PEDIDO, NULL);
+	int id_nuevo_pedido = (int) cliente_enviar_mensaje(cliente, servidor, CREAR_PEDIDO, (void*) id);
 
 	if(consola_if(consola, id_nuevo_pedido == -1))
 		return;
@@ -143,7 +152,7 @@ static void crear_pedido()
 static void guardar_pedido()
 {
 	char* modulos[] = { "APP", "RESTAURANTE" };
-	if(alidar_servidor(modulos, 2, true) && validar_restaurante() && validar_pedido())
+	if(validar_servidor(modulos, 2, true) && validar_restaurante() && validar_pedido())
 		return;
 
 	t_datos_pedido datos;

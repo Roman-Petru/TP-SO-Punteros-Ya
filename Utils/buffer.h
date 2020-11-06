@@ -20,8 +20,10 @@ t_buffer* buffer_crear_con_datos(t_codigo_de_operacion codigo_operacion, void* d
 void buffer_destruir(t_buffer* buffer);
 void buffer_serializar(t_buffer* buffer, void* datos, size_t tamanio);
 void buffer_serializar_string(t_buffer* buffer, char* string);
+void buffer_serializar_int(t_buffer* buffer, uint32_t integer);
 void* buffer_deserializar(t_buffer* buffer, size_t tamanio);
 char* buffer_deserializar_string(t_buffer* buffer);
+uint32_t buffer_deserializar_int(t_buffer* buffer);
 bool buffer_leido(t_buffer* buffer);
 
 #endif /*BUFFER_H_*/

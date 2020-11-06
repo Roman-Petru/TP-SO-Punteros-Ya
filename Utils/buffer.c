@@ -5,7 +5,7 @@
 t_buffer* buffer_crear(size_t tamanio)
 {
 	t_buffer* buffer = malloc(sizeof(t_buffer));
-	buffer->stream = calloc(1, tamanio);
+	buffer->stream = malloc(tamanio);
 	buffer->desplazamiento = 0;
 	buffer->tamanio = tamanio;
 
@@ -44,6 +44,12 @@ void buffer_serializar_string(t_buffer* buffer, char* string)
 	buffer_serializar(buffer, string, tamanio);
 }
 
+
+void buffer_serializar_int(t_buffer* buffer, uint32_t integer)
+{
+	buffer_serializar(buffer, &integer, sizeof(uint32_t));
+}
+
 void* buffer_deserializar(t_buffer* buffer, size_t tamanio)
 {
 	if(buffer->tamanio < buffer->desplazamiento + tamanio)
@@ -68,4 +74,10 @@ char* buffer_deserializar_string(t_buffer* buffer)
 	free(tamanio);
 
 	return string;
+}
+
+uint32_t buffer_deserializar_int(t_buffer* buffer)
+{
+	uint32_t* integer = buffer_deserializar(buffer, sizeof(uint32_t));;
+	return *integer;
 }

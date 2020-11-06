@@ -44,7 +44,7 @@ typedef struct {
 
 typedef void (*t_accion)(t_pedido* pedido);
 
-t_pedido* crear_pedido(int id, t_posicion* posicion_de_restaurante, t_posicion* posicion_cliente, bool resto_default);
+t_pedido* pedido_crear(int id, t_posicion* posicion_de_restaurante, t_posicion* posicion_cliente, bool resto_default);
 bool pedido_es_mismo(t_pedido* pedido_A, t_pedido* pedido_B);
 void inicializar_diccionario_acciones();
 void descansar_repartidor(t_pedido* pedido);

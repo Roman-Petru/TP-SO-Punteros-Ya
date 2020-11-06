@@ -14,7 +14,6 @@ static void inicializar()
 	logger = log_create("app.log", "APP", true, LOG_LEVEL_INFO); //config_get_string_value(config_app, "ARCHIVO_LOG")
 	config = config_create("app.config");
 
-
 	cargar_repartidores();
 	inicializar_planificador();
 	inicializar_interrupciones();
@@ -26,6 +25,8 @@ static void inicializar()
 	cant_ciclo = 0;
 
 	restaurantes_conectados = list_create();
+
+	inicializar_gestor_clientes();
 }
 
 static void comiezo_ciclo()
@@ -45,7 +46,7 @@ void terminar()
 int main()
 {
 	inicializar();
-	recibir_pedidos_default(3); // Para Test
+	//recibir_pedidos_default(3); // Para Test
 
 	while(true)
 	{

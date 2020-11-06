@@ -2,6 +2,7 @@
 #define SERIALIZACION_H_
 
 #include "buffer.h"
+#include "posicion.h"
 #include "protocolo.h"
 #include "dictionary_int.h"
 #include <string.h>

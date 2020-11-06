@@ -1,6 +1,7 @@
 #ifndef PROTOCOLO_H_
 #define PROTOCOLO_H_
 
+#include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
 #include <commons/log.h>
@@ -9,6 +10,8 @@ typedef enum
 {
 	//=== CLIENTE/SERVIDOR ===//
 	TERMINAR,
+	CONEXION_CLIENTE,
+	CONEXION_CLIENTE_RESPUESTA,
 	CONSULTAR_RESTAURANTES,
 	CONSULTAR_RESTAURANTES_RESPUESTA,
 	SELECCIONAR_RESTAURANTE,
@@ -35,6 +38,12 @@ typedef enum
 	ERROR = -1,
 	ERROR_DESERIALIZAR_BUFFER = -2
 } t_codigo_de_operacion;
+
+typedef struct
+{
+	uint32_t id_cliente;
+	char* restaurante;
+} t_datos_seleccion_restaurante;
 
 typedef struct
 {
@@ -70,6 +79,8 @@ typedef struct
 	char* comida;
 } t_plato_listo;
 
+t_datos_pedido* crear_datos_pedido(int id_pedido, char* restaurante);
+t_datos_seleccion_restaurante* crear_datos_seleccion_restaurante(int id_cliente, char* restaurante);
 
 typedef t_respuesta* (*t_operacion_servidor)(void* datos);
 typedef t_respuesta* (*t_operacion_servidor_simple)();

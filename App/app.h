@@ -6,6 +6,7 @@
 #include <semaphore.h>
 #include "../Utils/servidor_red.h"
 #include "../Utils/cliente_red.h"
+#include "gestor_clientes.h"
 #include "interrupciones.h"
 #include "planificador.h"
 #include "repartidor.h"
