@@ -14,15 +14,15 @@ void inicializar_restaurante()
 	logger_resto = log_create("resto.log", "RESTAURANTE", true, LOG_LEVEL_INFO);
 	config_resto = config_create("restaurante.config");
 
-	serializacion_inicializar();
 	servidor = servidor_crear("127.0.0.1", config_get_string_value(config_resto, "PUERTO_ESCUCHA"));
-
+	cliente = cliente_crear(config_resto);
+	cargar_interfaz();
 	//obtener_metadata();
 
 	lista_afinidades = list_create();
 	t_afinidad* afinidad1 = malloc(sizeof(t_afinidad));
 	afinidad1->plato = "milanesa";
-	afinidad1->cantidad_cocineros = 3;
+	afinidad1->cantidad_cocineros = 1;
 	list_add(lista_afinidades, afinidad1);
 	t_afinidad* afinidad2 = malloc(sizeof(t_afinidad));
 	afinidad2->plato = "pure";
@@ -64,7 +64,7 @@ int main()
 	inicializar_restaurante();
 
 	//para test
-	for (int i=0; i < 6; i++)
+	for (int i=0; i < 2; i++)
 	{
 	t_para_nuevo_plato* pure = malloc(sizeof(t_para_nuevo_plato));
 	pure->nombre_plato = "pure";
@@ -72,14 +72,20 @@ int main()
 	agregar_interrupcion(NUEVO_PLATO, pure);
 	}
 
-	for (int i=7; i < 13; i++)
+	for (int i=7; i < 8; i++)
 	{
 	t_para_nuevo_plato* pure = malloc(sizeof(t_para_nuevo_plato));
 	pure->nombre_plato = "milanesa";
 	pure->id_pedido = i;
 	agregar_interrupcion(NUEVO_PLATO, pure);
 	}
-
+	for (int i=11; i < 12; i++)
+	{
+	t_para_nuevo_plato* pure = malloc(sizeof(t_para_nuevo_plato));
+	pure->nombre_plato = "ensalada";
+	pure->id_pedido = i;
+	agregar_interrupcion(NUEVO_PLATO, pure);
+	}
 	while (1)
 	{
 		planificar_corto_plazo();

@@ -3,3 +3,4 @@
 #include "../Utils/protocolo.h"
 
 void inicializar_servidor();
+void cargar_interfaz();

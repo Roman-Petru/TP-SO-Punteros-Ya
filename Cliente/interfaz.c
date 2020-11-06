@@ -11,7 +11,8 @@ static char* validar_modulo(char* modulo)
 	if(strcmp(modulo, "APP")==0 || strcmp(modulo, "app")==0)
 		return "APP";
 	else if(strcmp(modulo, "RESTAURANTE")==0 || strcmp(modulo, "restaurante")==0)
-		return "RESTAURANTE";
+		{restaurante_seleccionado = "restaurante original";
+		return "RESTAURANTE";}
 	else if(strcmp(modulo, "COMANDA")==0 || strcmp(modulo, "comanda")==0)
 		return "COMANDA";
 	else if(strcmp(modulo, "SINDICATO")==0 || strcmp(modulo, "sindicato")==0)
@@ -147,6 +148,10 @@ static void crear_pedido()
 	if(consola_if(consola, id_nuevo_pedido == -1))
 		return;
 	id_pedido = id_nuevo_pedido;
+
+	consola_log(consola, "Se creo el pedido con algun id");
+
+	//	log_info(consola, "Se creo el pedido con id %d", id_pedido);
 }
 
 static void guardar_pedido()
