@@ -14,6 +14,14 @@ typedef struct {
 	void* datos;
 }t_datos_interrupcion;
 
+typedef struct {
+	int id_pedido;
+	t_posicion* posicion_de_restaurante;
+	t_posicion* posicion_cliente;
+	bool resto_default;
+}t_para_crear_pedido;
+
+
 typedef void* (*t_interrupcion)(t_datos_interrupcion* datos_interrupcion);
 
 void ejecutar_interrupciones();

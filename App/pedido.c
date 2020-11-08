@@ -1,4 +1,3 @@
-#include "pedido.h"
 #include "app.h"
 
 t_dictionary_int* diccionario_acciones;
@@ -20,18 +19,21 @@ static void ciclo_pedido(t_pedido* pedido)
 		sem_wait(&(pedido->mutex));
 
 		repartidor_mover_hacia(pedido->repartidor,  pedido_destino(pedido));
-		log_info(logger, "El pedido %d se movio a (%d,%d)", pedido->id_pedido, pedido_posicion(pedido)->x, pedido_posicion(pedido)->y);
+		log_info(logger, "El pedido %d se movio a (%d,%d)", pedido->pcb_id, pedido_posicion(pedido)->x, pedido_posicion(pedido)->y);
 
 		sem_post(&(sem_ciclo));
 	}
 }
 
 //========== PEDIDO ==========//
-t_pedido* crear_pedido(int id, t_posicion* posicion_de_restaurante, t_posicion* posicion_cliente, bool resto_default)
+t_pedido* crear_pedido_para_plani(int id, t_posicion* posicion_de_restaurante, t_posicion* posicion_cliente, bool resto_default)
 {
 	t_pedido* nuevo_pedido = malloc(sizeof(t_pedido));
 
 	nuevo_pedido->id_pedido = id;
+	nuevo_pedido->pcb_id = indice_pcb_id;
+	indice_pcb_id++;
+
 	nuevo_pedido->repartidor = NULL;
 	nuevo_pedido->posicion_de_restaurante = posicion_de_restaurante;
 	nuevo_pedido->posicion_cliente = posicion_cliente;
@@ -52,29 +54,43 @@ t_pedido* crear_pedido(int id, t_posicion* posicion_de_restaurante, t_posicion* 
 	log_info(logger, "	Ubicación del cliente: (%d, %d)", nuevo_pedido->posicion_cliente->x, nuevo_pedido->posicion_cliente->y);
 	log_info(logger, "	Ubicación del restaurante: (%d, %d)", nuevo_pedido->posicion_de_restaurante->x, nuevo_pedido->posicion_de_restaurante->y);
 	*/
+
+	meter_en_cola(nuevo_pedido, NEW, A_NEW);
+
 	return nuevo_pedido;
 }
 
-//TODO estimacion pedido
-int pedido_estimacion(t_pedido* pedido)
+
+float pedido_estimacion(t_pedido* pedido)
 {
-	//char* token = config_get_string_value(config_app, "ALPHA");
-	//float valor_alpha = convertir_string_en_float(token);
-	double valor_alpha = config_get_double_value(config, "ALPHA");
+	char* token = config_get_string_value(config, "ALPHA");
+	float valor_alpha = convertir_string_en_float(token);
+	//double valor_alpha = config_get_double_value(config, "ALPHA");
 
 	return valor_alpha * pedido->repartidor->ciclos_viajando + (1 - valor_alpha) * pedido->estimacion;
 }
 
 bool pedido_es_mismo(t_pedido* pedido_A, t_pedido* pedido_B)
 {
-	return pedido_A->id_pedido == pedido_B->id_pedido;
+	return pedido_A->pcb_id == pedido_B->pcb_id;
 }
 
-t_pedido* crear_pedido_default(int id)
+void crear_pedido_default(int cantidad)
 {
 	t_posicion* posicion_de_restaurante = posicion_crear(config_get_int_value(config, "POSICION_REST_DEFAULT_X"),config_get_int_value(config, "POSICION_REST_DEFAULT_Y"));
 	t_posicion* posicion_de_cliente = posicion_crear(7,4);
 
-	return crear_pedido(id, posicion_de_restaurante, posicion_de_cliente, true);
+
+	for (int i=0; i < cantidad; i++)
+	{
+	t_para_crear_pedido* pedido = malloc(sizeof(t_para_crear_pedido));
+	pedido->id_pedido = i;
+	pedido->posicion_cliente = posicion_de_cliente;
+	pedido->posicion_de_restaurante = posicion_de_restaurante;
+	pedido->resto_default = true;
+
+	agregar_interrupcion(NUEVO_PEDIDO, pedido);
+
+	}
 }
 

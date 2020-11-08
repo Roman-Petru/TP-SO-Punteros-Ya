@@ -26,6 +26,7 @@ typedef enum {
 
 typedef struct {
 	int id_pedido;
+	int pcb_id;
 	t_repartidor* repartidor;
 	t_posicion* posicion_de_restaurante;
 	t_posicion* posicion_cliente;
@@ -44,11 +45,11 @@ typedef struct {
 
 typedef void (*t_accion)(t_pedido* pedido);
 
-t_pedido* pedido_crear(int id, t_posicion* posicion_de_restaurante, t_posicion* posicion_cliente, bool resto_default);
 bool pedido_es_mismo(t_pedido* pedido_A, t_pedido* pedido_B);
 void inicializar_diccionario_acciones();
 void descansar_repartidor(t_pedido* pedido);
-
-t_pedido* crear_pedido_default(int id);
+float pedido_estimacion(t_pedido* pedido);
+void crear_pedido_default(int cantidad);
+t_pedido* crear_pedido_para_plani(int id, t_posicion* posicion_de_restaurante, t_posicion* posicion_cliente, bool resto_default);
 
 #endif /*PEDIDO_H_*/
