@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <commons/log.h>
+#include <commons/collections/list.h>
 
 typedef enum
 {
@@ -32,8 +33,12 @@ typedef enum
 	CONFIRMAR_PEDIDO_RESPUESTA,
 	PLATO_LISTO,
 	PLATO_LISTO_RESPUESTA,
+	OBTENER_PEDIDO,
+	OBTENER_PEDIDO_RESPUESTA,
 	TERMINAR_PEDIDO,
 	TERMINAR_PEDIDO_RESPUESTA,
+	CONSULTAR_PEDIDO,
+	CONSULTAR_PEDIDO_RESPUESTA,
 	//=== ERROR ===//
 	ERROR = -1,
 	ERROR_DESERIALIZAR_BUFFER = -2
@@ -79,8 +84,25 @@ typedef struct
 	char* comida;
 } t_plato_listo;
 
+typedef struct
+{
+	bool estado;
+	t_list* platos;
+} t_estado_pedido;
+
+typedef struct
+{
+	char* restaurante;
+	bool estado;
+	t_list* platos;
+} t_consultar_pedido;
+
 t_datos_pedido* crear_datos_pedido(int id_pedido, char* restaurante);
 t_datos_seleccion_restaurante* crear_datos_seleccion_restaurante(int id_cliente, char* restaurante);
+t_guardar_plato* crear_datos_agregar_plato(int id_pedido, int cantidad, char* comida, char* restaurante);
+t_plato_listo* crear_datos_plato_listo(int id_pedido, char* comida, char* restaurante);
+t_estado_pedido* crear_datos_estado_pedido(bool estado, t_list* platos);
+t_consultar_pedido* crear_datos_consultar_pedido(char* restaurante, bool estado, t_list* platos);
 
 typedef t_respuesta* (*t_operacion_servidor)(void* datos);
 typedef t_respuesta* (*t_operacion_servidor_simple)();

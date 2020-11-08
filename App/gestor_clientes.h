@@ -20,7 +20,7 @@ void agregar_cliente(t_posicion* posicion);
 void cliente_agregar_pedido(int id_cliente, int id_pedido);
 void cliente_remover_pedido(int id_cliente, int id_pedido);
 void cliente_seleccionar_restaurante(int id_cliente, char* nombre_restaurante);
-t_posicion* cliente_posicion(int id_pedido);
+t_posicion* cliente_obtener_posicion(int id_cliente);
 void remover_cliente(int id_cliente);
 char* cliente_obtener_restaurante(int id_cliente);
 

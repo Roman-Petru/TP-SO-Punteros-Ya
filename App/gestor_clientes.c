@@ -77,7 +77,7 @@ char* cliente_obtener_restaurante(int id_cliente)
 	return restaurante;
 }
 
-t_posicion* cliente_posicion(int id_cliente)
+t_posicion* cliente_obtener_posicion(int id_cliente)
 {
 	t_posicion* posicion_cliente;
 
@@ -88,6 +88,7 @@ t_posicion* cliente_posicion(int id_cliente)
 
 	return posicion_cliente;
 }
+
 void remover_cliente(int id_cliente)
 {
 	void destruir_cliente(void* cliente_void)

@@ -27,7 +27,7 @@ static void ciclo_pedido(t_pedido* pedido)
 }
 
 //========== PEDIDO ==========//
-t_pedido* crear_pedido(int id, t_posicion* posicion_de_restaurante, t_posicion* posicion_cliente, bool resto_default)
+t_pedido* pedido_crear(int id, t_posicion* posicion_de_restaurante, t_posicion* posicion_cliente, bool resto_default)
 {
 	t_pedido* nuevo_pedido = malloc(sizeof(t_pedido));
 
@@ -70,11 +70,16 @@ bool pedido_es_mismo(t_pedido* pedido_A, t_pedido* pedido_B)
 	return pedido_A->id_pedido == pedido_B->id_pedido;
 }
 
+void pedido_actualizar_estado(int id_pedido, t_estado_pedido* estado)
+{
+	//TODO: Pedido_Actualizar_Estado
+}
+
 t_pedido* crear_pedido_default(int id)
 {
 	t_posicion* posicion_de_restaurante = posicion_crear(config_get_int_value(config, "POSICION_REST_DEFAULT_X"),config_get_int_value(config, "POSICION_REST_DEFAULT_Y"));
 	t_posicion* posicion_de_cliente = posicion_crear(7,4);
 
-	return crear_pedido(id, posicion_de_restaurante, posicion_de_cliente, true);
+	return pedido_crear(id, posicion_de_restaurante, posicion_de_cliente, true);
 }
 

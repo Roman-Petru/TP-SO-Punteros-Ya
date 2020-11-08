@@ -13,6 +13,8 @@ t_dictionary_int* diccionario_estado_string;
 t_dictionary_int* diccionario_razones;
 t_dictionary* diccionario_algoritmos;
 
+pthread_mutex_t mutex_colas;
+
 static void meter_con_FIFO(t_pedido* pedido);
 static void meter_con_SJF_SD(t_pedido* pedido);
 static bool highest_response_ratio(t_pedido* pedido1, t_pedido* pedido2);
@@ -20,6 +22,8 @@ static bool highest_response_ratio(t_pedido* pedido1, t_pedido* pedido2);
 //========== PLANIFICADOR ==========//
 void inicializar_planificador()
 {
+	pthread_mutex_init(&mutex_colas, NULL);
+
 	//===COLAS===//
 	cola_NEW = list_create();
 	cola_READY = list_create();
@@ -193,12 +197,16 @@ static void meter_en_cola_READY(t_pedido* pedido)
 
 void meter_en_cola(t_pedido* pedido, ESTADO_PCB estado, RAZON_CAMBIO_COLA razon)
 {
+	pthread_mutex_lock(&mutex_colas);
+
 	if (estado == READY)
 		meter_en_cola_READY(pedido);
 	else
 		list_add(dictionary_int_get(diccionario_colas, estado), pedido);
 	pedido->estado_pcb = estado;
 	log_info(logger, "El pedido %d paso a la cola %s por %s", pedido->id_pedido, dictionary_int_get(diccionario_estado_string, estado), dictionary_int_get(diccionario_razones, razon));
+
+	pthread_mutex_unlock(&mutex_colas);
 }
 
 void cambiar_estado_a(t_pedido* pedido, ESTADO_PCB estado, RAZON_CAMBIO_COLA razon)

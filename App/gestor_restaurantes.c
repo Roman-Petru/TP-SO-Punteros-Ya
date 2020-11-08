@@ -34,10 +34,11 @@ static int restaurante_index(char* nombre_restaurante)
 	return encontro ? index : -1;
 }
 
-void agregar_restaurante(char* nombre_restaurante, char* puerto) //char* ip
+void agregar_restaurante(char* nombre_restaurante, t_posicion* posicion, char* puerto) //char* ip
 {
 	t_restaurante_conectado* restaurante = malloc(sizeof(t_restaurante_conectado));
 	restaurante->nombre = nombre_restaurante;
+	restaurante->posicion = posicion;
 	restaurante->puerto = puerto;
 	//restaurante->ip = ip;
 
@@ -56,6 +57,18 @@ char* restaurante_obtener_puerto(char* nombre_restaurante)
 	pthread_mutex_unlock(&mutex);
 
 	return puerto;
+}
+
+t_posicion* restaurante_obtener_posicion(char* nombre_restaurante)
+{
+	t_posicion* posicion;
+
+	pthread_mutex_lock(&mutex);
+	t_restaurante_conectado* restaurante = list_get(restaurantes_conectados, restaurante_index(nombre_restaurante));
+	posicion = restaurante->posicion;
+	pthread_mutex_unlock(&mutex);
+
+	return posicion;
 }
 
 void remover_restaurante(char* nombre_restaurante)
