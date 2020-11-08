@@ -14,6 +14,7 @@ typedef struct {
 	void* datos;
 }t_datos_interrupcion;
 
+
 typedef void* (*t_interrupcion)(t_datos_interrupcion* datos_interrupcion);
 
 void ejecutar_interrupciones();

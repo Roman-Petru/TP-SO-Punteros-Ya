@@ -5,9 +5,10 @@ t_list* tabla_marcos;
 int cantidad_frames;
 t_bitarray* mapa_bits;
 
-void crear_marco()
+t_marco* crear_marco()
 {
 t_marco* marco = malloc(sizeof(t_marco));
+return marco;
 }
 
 

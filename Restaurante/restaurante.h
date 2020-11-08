@@ -7,6 +7,7 @@
 #include <semaphore.h>
 #include "../Utils/servidor_red.h"
 #include "../Utils/cliente_red.h"
+#include "../Utils/posicion.h"
 #include <stdio.h>
 #include <string.h>
 #include "planificacionR.h"
@@ -18,6 +19,8 @@ extern t_servidor_red* servidor;
 extern t_cliente_red* cliente;
 extern t_log* logger_resto;
 extern t_config* config_resto;
+extern char* nombre_restaurante;
+extern t_posicion* posicion;
 
 extern t_list* lista_afinidades;
 

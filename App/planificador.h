@@ -29,6 +29,8 @@ typedef enum
 	A_EXIT
 }RAZON_CAMBIO_COLA;
 
+extern int indice_pcb_id;
+
 typedef void* (*t_insertador)(t_pedido*);
 
 void inicializar_planificador();

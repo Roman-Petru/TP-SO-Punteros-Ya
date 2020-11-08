@@ -4,3 +4,4 @@
 
 void inicializar_servidor();
 void cargar_interfaz();
+void realizar_handshake_con_app();

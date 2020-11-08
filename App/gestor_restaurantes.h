@@ -3,6 +3,7 @@
 
 #include "../Utils/posicion.h"
 #include <commons/collections/list.h>
+#include "../Utils/posicion.h"
 #include <stdlib.h>
 #include <pthread.h>
 #include <stdbool.h>
@@ -19,6 +20,7 @@ bool hay_restaurantes_conectados();
 bool restaurante_esta_conectado(char* nombre_restaurante);
 
 t_list* obtener_restaurantes_conectados();
+
 void agregar_restaurante(char* nombre_restaurante, t_posicion* posicion, char* puerto);
 char* restaurante_obtener_puerto(char* nombre_restaurante);
 t_posicion* restaurante_obtener_posicion(char* nombre_restaurante);

@@ -14,6 +14,7 @@ t_dictionary_int* diccionario_razones;
 t_dictionary* diccionario_algoritmos;
 
 pthread_mutex_t mutex_colas;
+int indice_pcb_id;
 
 static void meter_con_FIFO(t_pedido* pedido);
 static void meter_con_SJF_SD(t_pedido* pedido);
@@ -23,6 +24,7 @@ static bool highest_response_ratio(t_pedido* pedido1, t_pedido* pedido2);
 void inicializar_planificador()
 {
 	pthread_mutex_init(&mutex_colas, NULL);
+	indice_pcb_id = 0;
 
 	//===COLAS===//
 	cola_NEW = list_create();
@@ -77,7 +79,7 @@ void planificar_corto_plazo()
 		list_sort(cola_READY, (void*) &highest_response_ratio);
 
 	while (!list_is_empty(cola_READY) && config_get_int_value(config, "GRADO_DE_MULTIPROCESAMIENTO") > list_size(cola_EXEC))
-		cambiar_estado_a(list_remove(cola_READY, 0), EXEC, A_EXEC);  //meter en cola EXEC (todavia no ejecuta)
+		cambiar_estado_a(list_remove(cola_READY, 0), EXEC, A_EXEC);
 }
 
 static void actualizar_estado_listos()
@@ -99,6 +101,7 @@ static void actualizar_estado_bloqueados()
 			{
 				cambiar_estado_a(pedido, READY, A_READY_LISTO);
 				pedido->instruccion_a_realizar = IR_A_CLIENTE;
+				//TODO y en el caso que quede esperando, descansa mientras esta en el restaurante?
 			}
 		}
 		else
@@ -120,6 +123,9 @@ static void actualizar_estado_ejecutados()
 	for (int i=0; i < list_size(cola_EXEC); i++)
 	{
 		t_pedido* pedido = list_get(cola_EXEC, i);
+		//=======ESTIMACION PARA SJF Y HRRN==========//
+		pedido->estimacion = pedido_estimacion(pedido);
+		//==========================================//
 		if (pedido->instruccion_a_realizar == IR_A_CLIENTE && posicion_es_igual(pedido->repartidor->posicion, pedido->posicion_cliente))
 		{
 			cambiar_estado_a(pedido, EXIT, A_EXIT);
@@ -137,14 +143,17 @@ static void actualizar_estado_ejecutados()
 					pedido->instruccion_a_realizar = IR_A_CLIENTE;
 				else
 				{
+					//TODO arreglar esto, si llega al mismo tiempo que se cansa no andaria bien
 					cambiar_estado_a(pedido, BLOCKED, A_BLOCKED_ESPERA);
 					i--;
 					pedido->instruccion_a_realizar = ESPERAR_EN_RESTAURANTE;
+					pedido->repartidor->ciclos_viajando = 0;
 				}
 			}
 			if (pedido->repartidor->esta_cansado)
 			{
 				cambiar_estado_a(pedido, BLOCKED, A_BLOCKED_CANSADO);
+				pedido->repartidor->ciclos_viajando = 0;
 				i--;
 			}
 		}
@@ -161,7 +170,11 @@ void ejecutar_ciclo()
 
 	sleep(1);
 	//sleep(config_get_int_value(config, "CICLO"));
-	actualizar_estado_listos();
+
+	//=====PARA HRRN=====//
+	if (strcmp(config_get_string_value(config, "ALGORITMO_DE_PLANIFICACION"), "HRRN") == 0)
+		actualizar_estado_listos();
+	//===================//
 	actualizar_estado_bloqueados();
 	actualizar_estado_ejecutados();
 }
@@ -197,16 +210,13 @@ static void meter_en_cola_READY(t_pedido* pedido)
 
 void meter_en_cola(t_pedido* pedido, ESTADO_PCB estado, RAZON_CAMBIO_COLA razon)
 {
-	pthread_mutex_lock(&mutex_colas);
-
 	if (estado == READY)
 		meter_en_cola_READY(pedido);
 	else
 		list_add(dictionary_int_get(diccionario_colas, estado), pedido);
 	pedido->estado_pcb = estado;
-	log_info(logger, "El pedido %d paso a la cola %s por %s", pedido->id_pedido, dictionary_int_get(diccionario_estado_string, estado), dictionary_int_get(diccionario_razones, razon));
 
-	pthread_mutex_unlock(&mutex_colas);
+	log_info(logger, "El pedido %d paso a la cola %s por %s", pedido->pcb_id, dictionary_int_get(diccionario_estado_string, estado), dictionary_int_get(diccionario_razones, razon));
 }
 
 void cambiar_estado_a(t_pedido* pedido, ESTADO_PCB estado, RAZON_CAMBIO_COLA razon)
@@ -242,12 +252,13 @@ static void meter_con_SJF_SD(t_pedido* pedido)
 //========== HRRN ==========//
 bool highest_response_ratio(t_pedido* pedido1, t_pedido* pedido2)
 {
-	return (pedido1->ciclos_en_ready / pedido1->estimacion + 1) > (pedido2->ciclos_en_ready / pedido2->estimacion + 1);
+	return (pedido1->ciclos_en_ready / pedido1->estimacion + 1) >= (pedido2->ciclos_en_ready / pedido2->estimacion + 1);
 }
 
 //========== PARA TEST ==========//
+/*
 void recibir_pedidos_default(int cantidad)
 {
 	for(int i=1;i<cantidad+1;i++)
 		meter_en_cola(crear_pedido_default(i), NEW, A_NEW);
-}
+}*/

@@ -84,7 +84,7 @@ void ejecutar_ciclo()
 			sem_wait (&semaforo_resto);
 		}
 
-		sleep(1);
+		sleep(config_get_int_value(config_resto, "RETARDO_CICLO_CPU"));
 
 
 		actualizar_estado_bloqueados();

@@ -10,6 +10,22 @@ static t_respuesta* conexion_cliente(t_posicion* posicion_cliente)
 }
 
 //========== INTERFAZ ==========//
+static t_respuesta* handshake_restaurante_app(t_handshake_resto_app* datos)
+{
+	char puerto[6];
+	sprintf(puerto,"%d",datos->puerto);
+
+	if (!restaurante_esta_conectado(datos->restaurante))
+		{
+		agregar_restaurante(datos->restaurante, puerto, datos->posicion);
+		log_info(logger, "Se conecto el restaurante %s con posicion X: %d, Y: %d.", datos->restaurante, datos->posicion->x, datos->posicion->y);
+		}
+
+	return respuesta_crear(HANDSHAKE_RESTO_APP_RESPUESTA, (void*) true, false);
+
+}
+
+
 static t_respuesta* consultar_restaurantes()
 {
 	log_info(logger, "Me consultaron las Restaurantes.");
@@ -125,12 +141,9 @@ static t_respuesta* confirmar_pedido(t_datos_pedido* datos)
 		return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) false, false);
 
 	t_pedido* pedido = pedido_crear(datos->id_pedido, restaurante_obtener_posicion(datos->restaurante), cliente_obtener_posicion(pedido_obtener_cliente(datos->id_pedido)), false);
-	meter_en_cola(pedido, NEW, A_NEW);
+	agregar_interrupcion(NUEVO_PEDIDO, pedido);
 
-	//ACTUALIZAR PEDIDO EN COMANDA
-	//cliente_enviar_mensaje(cliente, "COMANDA", OBTENER_PEDIDO, crear_datos_pedido(datos->id_pedido, datos->restaurante));
-
-	return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) true, false);
+	return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, cliente_enviar_mensaje(cliente, "COMANDA", CONFIRMAR_PEDIDO, datos), false);
 }
 
 static t_respuesta* consultar_pedido(uint32_t id_pedido)
@@ -151,6 +164,7 @@ void cargar_interfaz()
 {
 	servidor_agregar_operacion(servidor, TERMINAR, &operacion_terminar);
 	servidor_agregar_operacion(servidor, CONEXION_CLIENTE, &conexion_cliente);
+	servidor_agregar_operacion(servidor, HANDSHAKE_RESTO_APP, &handshake_restaurante_app);
 	servidor_agregar_operacion(servidor, CONSULTAR_RESTAURANTES, &consultar_restaurantes);
 	servidor_agregar_operacion(servidor, SELECCIONAR_RESTAURANTE, &seleccionar_restaurante);
 	servidor_agregar_operacion(servidor, CONSULTAR_PLATOS, &consultar_platos);

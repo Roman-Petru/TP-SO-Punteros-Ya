@@ -1,11 +1,14 @@
 #ifndef PROTOCOLO_H_
 #define PROTOCOLO_H_
 
+#include "posicion.h"
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
 #include <commons/log.h>
 #include <commons/collections/list.h>
+
+
 
 typedef enum
 {
@@ -13,6 +16,8 @@ typedef enum
 	TERMINAR,
 	CONEXION_CLIENTE,
 	CONEXION_CLIENTE_RESPUESTA,
+	HANDSHAKE_RESTO_APP,
+	HANDSHAKE_RESTO_APP_RESPUESTA,
 	CONSULTAR_RESTAURANTES,
 	CONSULTAR_RESTAURANTES_RESPUESTA,
 	SELECCIONAR_RESTAURANTE,
@@ -49,6 +54,14 @@ typedef struct
 	uint32_t id_cliente;
 	char* restaurante;
 } t_datos_seleccion_restaurante;
+
+typedef struct
+{
+	uint32_t puerto;
+	char* restaurante;
+	t_posicion* posicion;
+} t_handshake_resto_app;
+
 
 typedef struct
 {
@@ -103,6 +116,7 @@ t_guardar_plato* crear_datos_agregar_plato(int id_pedido, int cantidad, char* co
 t_plato_listo* crear_datos_plato_listo(int id_pedido, char* comida, char* restaurante);
 t_estado_pedido* crear_datos_estado_pedido(bool estado, t_list* platos);
 t_consultar_pedido* crear_datos_consultar_pedido(char* restaurante, bool estado, t_list* platos);
+t_handshake_resto_app* crear_datos_handshake_restaurante_app(int puerto, char* restaurante, t_posicion* posicion);
 
 typedef t_respuesta* (*t_operacion_servidor)(void* datos);
 typedef t_respuesta* (*t_operacion_servidor_simple)();
