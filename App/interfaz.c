@@ -116,7 +116,7 @@ static t_respuesta* agregar_plato(t_agregar_plato* datos)
 			return respuesta_crear(AGREGAR_PLATO_RESPUESTA, (void*) false, false);
 	}
 
-	t_guardar_plato* datos_b = crear_datos_agregar_plato(datos->id_pedido, 1, datos->plato, restaurante);// VER CANTIDAD
+	t_guardar_plato* datos_b = crear_datos_agregar_plato(datos->id_pedido, 1, datos->plato, restaurante);
 	return respuesta_crear(AGREGAR_PLATO_RESPUESTA, cliente_enviar_mensaje(cliente, "COMANDA", GUARDAR_PLATO, &datos_b), false);
 }
 

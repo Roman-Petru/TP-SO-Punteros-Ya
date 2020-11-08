@@ -44,10 +44,19 @@ typedef enum
 	TERMINAR_PEDIDO_RESPUESTA,
 	CONSULTAR_PEDIDO,
 	CONSULTAR_PEDIDO_RESPUESTA,
+	FINALIZAR_PEDIDO,
+	FINALIZAR_PEDIDO_RESPUESTA,
 	//=== ERROR ===//
 	ERROR = -1,
 	ERROR_DESERIALIZAR_BUFFER = -2
 } t_codigo_de_operacion;
+
+typedef enum{
+	CONFIRMADO,
+	PENDIENTE,
+	TERMINADO,
+	ERROR
+}t_estado_pedido;
 
 typedef struct
 {
@@ -61,7 +70,6 @@ typedef struct
 	char* restaurante;
 	t_posicion* posicion;
 } t_handshake_resto_app;
-
 
 typedef struct
 {
@@ -99,9 +107,9 @@ typedef struct
 
 typedef struct
 {
-	bool estado;
+	t_estado_pedido estado;
 	t_list* platos;
-} t_estado_pedido;
+} t_datos_estado_pedido;
 
 typedef struct
 {
@@ -110,13 +118,21 @@ typedef struct
 	t_list* platos;
 } t_consultar_pedido;
 
+typedef struct
+{
+	char* comida;
+	uint32_t cant_total;
+	uint32_t cant_lista;
+} t_datos_estado_comida;
+
 t_datos_pedido* crear_datos_pedido(int id_pedido, char* restaurante);
 t_datos_seleccion_restaurante* crear_datos_seleccion_restaurante(int id_cliente, char* restaurante);
 t_guardar_plato* crear_datos_agregar_plato(int id_pedido, int cantidad, char* comida, char* restaurante);
 t_plato_listo* crear_datos_plato_listo(int id_pedido, char* comida, char* restaurante);
-t_estado_pedido* crear_datos_estado_pedido(bool estado, t_list* platos);
-t_consultar_pedido* crear_datos_consultar_pedido(char* restaurante, bool estado, t_list* platos);
+t_datos_estado_pedido* crear_datos_estado_pedido(t_estado_pedido estado, t_list* platos);
+t_consultar_pedido* crear_datos_consultar_pedido(char* restaurante, t_estado_pedido estado, t_list* platos);
 t_handshake_resto_app* crear_datos_handshake_restaurante_app(int puerto, char* restaurante, t_posicion* posicion);
+t_datos_estado_comida* crear_datos_estado_comida(char* comida, uint32_t cant_total, uint32_t cant_lista);
 
 typedef t_respuesta* (*t_operacion_servidor)(void* datos);
 typedef t_respuesta* (*t_operacion_servidor_simple)();

@@ -1,2 +1,0 @@
-
-void cargar_interfaz();

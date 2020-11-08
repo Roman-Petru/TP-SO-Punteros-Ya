@@ -110,7 +110,7 @@ static t_buffer* serializar_agregar_plato(void* datos_void)
 
 static t_buffer* serializar_estado_pedido(void* datos_void)
 {
-	t_estado_pedido* datos = datos_void;
+	t_datos_estado_pedido* datos = datos_void;
 	uint32_t cantidad_platos = list_size(datos->platos);
 
 	t_buffer* buffer = buffer_crear(sizeof(bool) + sizeof(uint32_t) + sizeof(uint32_t)*cantidad_platos + tamanio_lista_string(datos->platos));
@@ -284,7 +284,7 @@ void destruir_agregar_plato(void* datos_void)
 
 void destruir_estado_pedido(void* datos_void)
 {
-	t_estado_pedido* datos = datos_void;
+	t_datos_estado_pedido* datos = datos_void;
 	destruir_lista_string(datos->platos);
 	free(datos);
 }

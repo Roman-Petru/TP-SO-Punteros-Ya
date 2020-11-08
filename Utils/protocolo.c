@@ -56,9 +56,9 @@ t_plato_listo* crear_datos_plato_listo(int id_pedido, char* comida, char* restau
 	return datos;
 }
 
-t_estado_pedido* crear_datos_estado_pedido(bool estado, t_list* platos)
+t_datos_estado_pedido* crear_datos_estado_pedido(bool estado, t_list* platos)
 {
-	t_estado_pedido* datos = malloc(sizeof(t_estado_pedido));
+	t_datos_estado_pedido* datos = malloc(sizeof(t_datos_estado_pedido));
 	datos->estado = estado;
 	datos->platos = platos;
 
@@ -81,6 +81,15 @@ t_handshake_resto_app* crear_datos_handshake_restaurante_app(int puerto, char* r
 	datos->puerto = puerto;
 	datos->restaurante = restaurante;
 	datos->posicion = posicion;
+	return datos;
+}
+
+t_datos_estado_comida* crear_datos_estado_comida(char* comida, uint32_t cant_total, uint32_t cant_lista)
+{
+	t_datos_estado_comida* datos = malloc(sizeof(t_datos_estado_comida));
+	datos->comida = comida;
+	datos->cant_total = cant_total;
+	datos->cant_lista = cant_lista;
 	return datos;
 }
 
