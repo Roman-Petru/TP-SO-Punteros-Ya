@@ -3,6 +3,20 @@
 
 int indice_id_pedido;
 
+void realizar_handshake_con_app()
+{
+
+	bool operacion_ok = cliente_enviar_mensaje(cliente, "APP", HANDSHAKE_RESTO_APP, crear_datos_handshake_restaurante_app(config_get_int_value(config_resto, "PUERTO_ESCUCHA"), nombre_restaurante, posicion));
+
+	if (operacion_ok)
+		log_info(logger_resto, "Abierto el restaurante %s, se hizo correctamente el handshake con la app", nombre_restaurante);
+	else
+		log_info(logger_resto, "No se logró hacer el handshake con la app");
+
+}
+
+
+
 static t_respuesta* consultar_platos(char* restaurante)
 {
 	log_info(logger_resto, "Me consultaron los platos y de paso empece 2 milanesas.");

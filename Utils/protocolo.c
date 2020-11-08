@@ -38,4 +38,13 @@ t_datos_seleccion_restaurante* crear_datos_seleccion_restaurante(int id_cliente,
 }
 
 
+t_handshake_resto_app* crear_datos_handshake_restaurante_app(int puerto, char* restaurante, t_posicion* posicion)
+{
+	t_handshake_resto_app* datos = malloc(sizeof(t_handshake_resto_app));
+	datos->puerto = puerto;
+	datos->restaurante = restaurante;
+	datos->posicion = posicion;
+	return datos;
+}
+
 

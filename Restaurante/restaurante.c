@@ -7,17 +7,23 @@ t_cliente_red* cliente;
 t_log* logger_resto;
 t_config* config_resto;
 t_list* lista_afinidades;
+char* nombre_restaurante;
+t_posicion* posicion;
 
 void inicializar_restaurante()
 {
 
 	logger_resto = log_create("resto.log", "RESTAURANTE", true, LOG_LEVEL_INFO);
 	config_resto = config_create("restaurante.config");
+	nombre_restaurante = config_get_string_value(config_resto, "NOMBRE_RESTAURANTE");
 
 	servidor = servidor_crear("127.0.0.1", config_get_string_value(config_resto, "PUERTO_ESCUCHA"));
 	cliente = cliente_crear(config_resto);
 	cargar_interfaz();
 	//obtener_metadata();
+	posicion = malloc(sizeof(t_posicion));
+	posicion->x = 5;
+	posicion->y = 10;
 
 	lista_afinidades = list_create();
 	t_afinidad* afinidad1 = malloc(sizeof(t_afinidad));
@@ -46,6 +52,9 @@ void inicializar_restaurante()
 	inicializar_planificador();
 	inicializar_interrupciones();
 	inicializar_diccionario_recetas();
+
+	realizar_handshake_con_app();
+
 
 }
 
