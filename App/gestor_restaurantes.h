@@ -3,7 +3,6 @@
 
 #include "../Utils/posicion.h"
 #include <commons/collections/list.h>
-#include "../Utils/posicion.h"
 #include <stdlib.h>
 #include <pthread.h>
 #include <stdbool.h>

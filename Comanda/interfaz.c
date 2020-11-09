@@ -6,7 +6,7 @@ static t_respuesta* guardar_pedido(t_datos_pedido* datos)
 	if(!tabla_restaurante_existe(datos->restaurante))
 		tabla_restaurante_crear(datos->restaurante); //En caso de no poder crearla, se deberá informar dicha situación.
 
-	bool ok = tabla_restaurante_agregar_tabla_paginas(datos->restaurante);
+	bool ok = tabla_restaurante_agregar_tabla_segmentos(datos);
 
 	return respuesta_crear(GUARDAR_PEDIDO_RESPUESTA, (void*) true, false);
 }
@@ -14,7 +14,7 @@ static t_respuesta* guardar_pedido(t_datos_pedido* datos)
 static t_respuesta* guardar_plato(t_guardar_plato* datos)
 {
 	//Verificar si existe la tabla de segmentos de dicho Restaurante. En caso de no existir se deberá informar dicha situación.
-	if(!restaurante_tiene_tabla_de_segmentos(datos->restaurante))
+	if(!tabla_restaurante_existe(datos->restaurante))
 		return respuesta_crear(GUARDAR_PLATO_RESPUESTA, (void*) false, false);
 
 	//Verificar que exista el segmento de dicho pedido dentro de la tabla de segmentos del Restaurante. En caso de no existir se deberá informar dicha situación.
