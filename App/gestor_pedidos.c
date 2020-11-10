@@ -25,7 +25,7 @@ static int pedido_index(int id_pedido)
 	return encontro ? index : -1;
 }
 
-void agregar_pedido(int id_pedido, int id_cliente, char* restaurante)
+void vincular_pedido(int id_pedido, char* id_cliente, char* restaurante)
 {
 	t_pedido_pendiente* pedido = malloc(sizeof(t_pedido_pendiente));
 	pedido->id = id_pedido;
@@ -35,6 +35,8 @@ void agregar_pedido(int id_pedido, int id_cliente, char* restaurante)
 	pthread_mutex_lock(&mutex);
 	list_add(pedidos_pendientes, pedido);
 	pthread_mutex_unlock(&mutex);
+
+	cliente_agregar_pedido(id_cliente, id_pedido);
 }
 
 int generar_id_pedido()
@@ -59,9 +61,9 @@ char* pedido_obtener_restaurante(int id_pedido)
 	return restaurante;
 }
 
-int pedido_obtener_cliente(int id_pedido)
+char* pedido_obtener_cliente(int id_pedido)
 {
-	int id_cliente;
+	char* id_cliente;
 
 	bool es_mismo_pedido(void* pedido) { return ((t_pedido_pendiente*) pedido)->id == id_pedido; }
 

@@ -17,7 +17,7 @@ static t_datos_interrupcion* interrupcion_crear(t_tipo_interrupcion tipo, void* 
 
 static void interrupcion_destruir(t_datos_interrupcion* interrupcion)
 {
-	free(interrupcion->datos);
+	//free(interrupcion->datos);
 	free(interrupcion);
 }
 
@@ -43,10 +43,7 @@ void ejecutar_interrupciones()
 }
 
 //========== INTERRUPCIONES ==========//
-void interrupcion_nuevo_pedido(t_pedido* pedido)
-{
-	meter_en_cola(pedido, NEW, A_NEW);
-}
+void interrupcion_nuevo_pedido(t_pedido* pedido) { meter_en_cola(pedido, NEW, A_NEW); }
 
 void interrupcion_terminar_app(void* null) { terminar(); }
 

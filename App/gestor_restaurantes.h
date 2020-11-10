@@ -4,16 +4,19 @@
 #include "../Utils/posicion.h"
 #include "../Utils/cliente_red.h"
 #include <commons/collections/list.h>
-#include <stdlib.h>
+#include <commons/config.h>
 #include <pthread.h>
 #include <stdbool.h>
 #include <string.h>
+#include <stdlib.h>
 
 typedef struct {
 	char* nombre;
 	t_posicion* posicion;
 	t_cliente_red* cliente;
 } t_restaurante_conectado;
+
+void inicializar_gestor_restaurantes();
 
 bool hay_restaurantes_conectados();
 bool restaurante_esta_conectado(char* nombre_restaurante);

@@ -61,6 +61,13 @@ void repartidor_mover_hacia(t_repartidor* repartidor, t_posicion* destino)
 }
 
 //========== REPARTIDORES LIBRES ==========//
+static t_repartidor*  repartidores_libres_remover(t_repartidor* repartidor)
+{
+	bool mismo_repartidor(t_repartidor* repartidor_comparar) { return repartidor_comparar == repartidor; }
+
+	return list_remove_by_condition(repartidores_libres, (void*) &mismo_repartidor);
+}
+
 static void cargar_repartidor(char* posicion_str, char* frecuencia_de_descanso, char* tiempo_descanso)
 {
 	char** token = string_n_split(posicion_str, 2, "|");
@@ -97,11 +104,24 @@ void cargar_repartidores()
 
 t_repartidor* repartidor_obtener_mas_cercano(t_posicion* destino)
 {
+	t_repartidor* repartidor_menor_distancia(t_repartidor* repartidor_A, t_repartidor* repartidor_B)
+	{
+		int distancia_A = posicion_distancia_entre(destino, repartidor_A->posicion);
+		int distancia_B = posicion_distancia_entre(destino, repartidor_B->posicion);
+
+		return distancia_A > distancia_B ? repartidor_B : repartidor_A;
+	}
+
+	t_repartidor* repartidor = list_fold(repartidores_libres, list_get(repartidores_libres, 0), (void*) &repartidor_menor_distancia);
+
+	return repartidores_libres_remover(repartidor);
+	/*
 	int indice_repartidor_mas_cercano = 0;
 	int indice_pivot = 0;
 
 	t_repartidor* primer_repartidor = list_get(repartidores_libres, 0);
 	int distancia_minima = posicion_distancia_entre(primer_repartidor->posicion, destino);
+
 
 	void establecer_distancia_minima(t_repartidor* repartidor)
 	{
@@ -115,6 +135,6 @@ t_repartidor* repartidor_obtener_mas_cercano(t_posicion* destino)
 	}
 	list_iterate(repartidores_libres, (void*) &establecer_distancia_minima);
 
-	return list_remove(repartidores_libres, indice_repartidor_mas_cercano);
+	return list_remove(repartidores_libres, indice_repartidor_mas_cercano);*/
 }
 

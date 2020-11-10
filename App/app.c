@@ -5,7 +5,6 @@ t_cliente_red* cliente_comanda;
 t_config* config;
 t_log* logger;
 sem_t sem_ciclo;
-t_list* restaurantes_conectados;
 
 static int cant_ciclo;
 
@@ -24,14 +23,16 @@ static void inicializar()
 	sem_init (&(sem_ciclo), 0, 0);
 	cant_ciclo = 0;
 
-	restaurantes_conectados = list_create();
-
+	inicializar_gestor_restaurantes();
 	inicializar_gestor_clientes();
+	inicializar_gestor_pedidos();
 }
 
 static void comiezo_ciclo()
 {
 	cant_ciclo++;
+	if(cant_ciclo == 100)
+		terminar();
 	//log_info(logger, "===== INSTANTE %d =====", cant_ciclo);
 }
 
@@ -46,7 +47,7 @@ void terminar()
 int main()
 {
 	inicializar();
-	//recibir_pedidos_default(3); // Para Test
+	recibir_pedidos_default(3); // Para Test
 
 	while(true)
 	{

@@ -1,4 +1,5 @@
 #include "gestor_restaurantes.h"
+#include "app.h"
 
 t_list* restaurantes_conectados;
 pthread_mutex_t mutex;
@@ -12,6 +13,7 @@ t_list* obtener_restaurantes_conectados()
 void inicializar_gestor_restaurantes()
 {
 	restaurantes_conectados = list_create();
+	agregar_restaurante("Resto_Default", posicion_crear(config_get_int_value(config, "POSICION_REST_DEFAULT_X"), config_get_int_value(config, "POSICION_REST_DEFAULT_Y")), NULL);
 	pthread_mutex_init(&mutex, NULL);
 }
 
@@ -31,15 +33,14 @@ static int restaurante_index(char* nombre_restaurante)
 	for(index = 0; !encontro && list_get(restaurantes_conectados, index) != NULL; index++)
 		encontro = es_mismo_restaurante(list_get(restaurantes_conectados, index));
 
-	return encontro ? index : -1;
+	return encontro ? index-1 : -1;
 }
 
 void agregar_restaurante(char* nombre_restaurante, t_posicion* posicion, char* puerto)
-
 {
 	t_restaurante_conectado* restaurante = malloc(sizeof(t_restaurante_conectado));
 	restaurante->nombre = nombre_restaurante;
-	restaurante->posicion = posicion_copiar(posicion);
+	restaurante->posicion = posicion; //posicion_copiar(posicion);
 	restaurante->cliente = cliente_crear("127.0.0.1", puerto);
 
 	pthread_mutex_lock(&mutex);

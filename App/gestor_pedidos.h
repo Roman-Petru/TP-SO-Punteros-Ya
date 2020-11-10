@@ -1,6 +1,7 @@
 #ifndef GESTOR_PEDIDOS_H_
 #define GESTOR_PEDIDOS_H_
 
+#include "gestor_clientes.h"
 #include <commons/collections/list.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -8,14 +9,14 @@
 
 typedef struct {
 	int id;
-	int id_cliente;
+	char* id_cliente;
 	char* restaurante;
 } t_pedido_pendiente;
 
 void inicializar_gestor_pedidos();
-void agregar_pedido(int id_pedido, int id_cliente, char* restaurante);
+void vincular_pedido(int id_pedido, char* id_cliente, char* restaurante);
 char* pedido_obtener_restaurante(int id_pedido);
-int pedido_obtener_cliente(int id_pedido);
+char* pedido_obtener_cliente(int id_pedido);
 void remover_pedido(int id_pedido);
 int generar_id_pedido();
 

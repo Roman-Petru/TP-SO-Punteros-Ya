@@ -51,7 +51,7 @@ void inicializar_planificador()
 
 	//===DICCIONARIO DE RAZONES===//
 	diccionario_razones = dictionary_int_create();
-	dictionary_int_put(diccionario_razones, A_NEW, "haber llegado un nueuvo pedido para planificar.");
+	dictionary_int_put(diccionario_razones, A_NEW, "haber llegado un nuevo pedido para planificar.");
 	dictionary_int_put(diccionario_razones, A_EXEC, "ser elegido por el planificador de corto plazo.");
 
 	/*A_READY*/
@@ -168,7 +168,7 @@ void ejecutar_ciclo()
 	void esperar_pedido(t_pedido* pedido) { sem_wait (&sem_ciclo); }
 	list_iterate(cola_EXEC, (void*) &esperar_pedido); //Espera que los pedidos en EXEC terminen de ejecutar
 
-	sleep(1);
+	//sleep(1);
 	//sleep(config_get_int_value(config, "CICLO"));
 
 	//=====PARA HRRN=====//

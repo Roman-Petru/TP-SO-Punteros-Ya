@@ -3,6 +3,9 @@
 
 #include "stddef.h"
 #include "repartidor.h"
+#include "gestor_pedidos.h"
+#include "gestor_clientes.h"
+#include "gestor_restaurantes.h"
 #include "../Utils/protocolo.h"
 #include "../Utils/dictionary_int.h"
 #include <pthread.h>
@@ -46,7 +49,7 @@ typedef struct {
 
 typedef void (*t_accion)(t_pedido* pedido);
 
-t_pedido* pedido_crear(int id_pedido, char* restaurante);
+t_pedido* pedido_crear(int id_pedido);
 void recibir_pedidos_default(int cantidad);
 
 bool pedido_es_mismo(t_pedido* pedido_A, t_pedido* pedido_B);

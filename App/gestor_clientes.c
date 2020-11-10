@@ -6,14 +6,17 @@ pthread_mutex_t mutex;
 void inicializar_gestor_clientes()
 {
 	clientes_conectados = list_create();
+
+	agregar_cliente(crear_datos_cliente("Cliente_Default", posicion_crear(4, 4)));
+
 	pthread_mutex_init(&mutex, NULL);
 }
 
-static int cliente_index(int id_cliente)
+static int cliente_index(char* id_cliente)
 {
 	int index;
 	bool encontro = false;
-	bool es_mismo_cliente(void* pedido) { return ((t_cliente_conectado*) pedido)->id == id_cliente; }
+	bool es_mismo_cliente(void* cliente) { return strcmp(((t_cliente_conectado*) cliente)->id, id_cliente)== 0; }
 
 	for(index = 0; !encontro && list_get(clientes_conectados, index) != NULL; index++)
 		encontro = es_mismo_cliente(list_get(clientes_conectados, index));
@@ -33,9 +36,11 @@ void agregar_cliente(t_datos_cliente* datos)
 	pthread_mutex_lock(&mutex);
 	list_add(clientes_conectados, cliente);
 	pthread_mutex_unlock(&mutex);
+
+	free(datos);
 }
 
-void cliente_agregar_pedido(int id_cliente, int id_pedido)
+void cliente_agregar_pedido(char* id_cliente, int id_pedido)
 {
 	pthread_mutex_lock(&mutex);
 	t_cliente_conectado* cliente = list_get(clientes_conectados, cliente_index(id_cliente));
@@ -43,7 +48,7 @@ void cliente_agregar_pedido(int id_cliente, int id_pedido)
 	pthread_mutex_unlock(&mutex);
 }
 
-void cliente_remover_pedido(int id_cliente, int id_pedido)
+void cliente_remover_pedido(char* id_cliente, int id_pedido)
 {
 	bool es_mismo_pedido(void* id) { return (int) id == id_pedido; }
 	pthread_mutex_lock(&mutex);
@@ -52,7 +57,7 @@ void cliente_remover_pedido(int id_cliente, int id_pedido)
 	pthread_mutex_unlock(&mutex);
 }
 
-void cliente_seleccionar_restaurante(int id_cliente, char* nombre_restaurante)
+void cliente_seleccionar_restaurante(char* id_cliente, char* nombre_restaurante)
 {
 	pthread_mutex_lock(&mutex);
 	t_cliente_conectado* cliente = list_get(clientes_conectados, cliente_index(id_cliente));
@@ -62,7 +67,7 @@ void cliente_seleccionar_restaurante(int id_cliente, char* nombre_restaurante)
 	pthread_mutex_unlock(&mutex);
 }
 
-char* cliente_obtener_restaurante(int id_cliente)
+char* cliente_obtener_restaurante(char* id_cliente)
 {
 	char* restaurante;
 
@@ -74,7 +79,7 @@ char* cliente_obtener_restaurante(int id_cliente)
 	return restaurante;
 }
 
-t_posicion* cliente_obtener_posicion(int id_cliente)
+t_posicion* cliente_obtener_posicion(char* id_cliente)
 {
 	t_posicion* posicion_cliente;
 
@@ -86,17 +91,20 @@ t_posicion* cliente_obtener_posicion(int id_cliente)
 	return posicion_cliente;
 }
 
-void remover_cliente(int id_cliente)
+static void destruir_cliente_conectado(t_cliente_conectado* cliente)
 {
-	void destruir_cliente(void* cliente_void)
-	{
-		t_cliente_conectado* cliente = cliente_void;
-		list_destroy(cliente->pedidos);
-		free(cliente);
-	}
+	list_destroy(cliente->pedidos);
+	free(cliente->posicion);
+	//free(cliente->id);
+	if(cliente->restaurante_seleccionado != NULL)
+		free(cliente->restaurante_seleccionado);
+	free(cliente);
+}
 
+void remover_cliente(char* id_cliente)
+{
 	pthread_mutex_lock(&mutex);
-	list_remove_and_destroy_element(clientes_conectados, cliente_index(id_cliente), &destruir_cliente);
+	list_remove_and_destroy_element(clientes_conectados, cliente_index(id_cliente), (void*) &destruir_cliente_conectado);
 	pthread_mutex_unlock(&mutex);
 }
 

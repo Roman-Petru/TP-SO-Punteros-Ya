@@ -1,3 +1,4 @@
+#include "interrupciones.h"
 #include "pedido.h"
 #include "app.h"
 
@@ -27,13 +28,14 @@ static void ciclo_pedido(t_pedido* pedido)
 }
 
 //========== PEDIDO ==========//
-t_pedido* pedido_crear(int id_pedido, char* restaurante)
+t_pedido* pedido_crear(int id_pedido)
 {
 	t_pedido* nuevo_pedido = malloc(sizeof(t_pedido));
+	char* restaurante = pedido_obtener_restaurante(id_pedido);
 
 	nuevo_pedido->id_pedido = id_pedido;
-	nuevo_pedido->pcb_id = indice_pcb_id;
 	indice_pcb_id++;
+	nuevo_pedido->pcb_id = indice_pcb_id;
 
 	nuevo_pedido->repartidor = NULL;
 	nuevo_pedido->posicion_de_restaurante = restaurante_obtener_posicion(restaurante);
@@ -75,6 +77,9 @@ void pedido_actualizar_estado(int id_pedido, t_estado_pedido estado)
 void recibir_pedidos_default(int cantidad)
 {
 	for (int i=0; i < cantidad; i++)
-		agregar_interrupcion(NUEVO_PEDIDO, pedido_crear(i, "Resto_Default"));
+	{
+		vincular_pedido(i, "Cliente_Default", "Resto_Default");
+		agregar_interrupcion(NUEVO_PEDIDO, pedido_crear(i));
+	}
 }
 

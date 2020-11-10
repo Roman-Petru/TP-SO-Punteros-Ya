@@ -80,7 +80,7 @@ static t_respuesta* consultar_platos(char* restaurante)
 }
 
 /*CREAR PEDIDO*/
-static t_respuesta* crear_pedido(int id_cliente)
+static t_respuesta* crear_pedido(char* id_cliente)
 {
 	char* restaurante = cliente_obtener_restaurante(id_cliente);
 	int id_pedido;
@@ -99,10 +99,11 @@ static t_respuesta* crear_pedido(int id_cliente)
 	bool op_ok = cliente_enviar_mensaje(cliente_comanda, GUARDAR_PEDIDO, &datos);
 
 	//Retorna el ID del pedido al Cliente que solicitó el pedido.
-	if(op_ok)
-		return respuesta_crear(CREAR_PEDIDO_RESPUESTA, (void*) id_pedido, false);
-	else
+	if(!op_ok)
 		return respuesta_crear(CREAR_PEDIDO_RESPUESTA, (void*) -1, false);
+
+	vincular_pedido(id_pedido, id_cliente, restaurante);
+	return respuesta_crear(CREAR_PEDIDO_RESPUESTA, (void*) id_pedido, false);
 }
 
 /*AGREGAR PLATO*/
@@ -152,7 +153,7 @@ static t_respuesta* confirmar_pedido(t_datos_pedido* datos)
 	if(!op_ok)
 		return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) false, false);
 
-	t_pedido* pedido = pedido_crear(datos->id_pedido, datos->restaurante);
+	t_pedido* pedido = pedido_crear(datos->id_pedido);
 	agregar_interrupcion(NUEVO_PEDIDO, pedido);
 
 	//TODO: Confirmar Pedido en Cliente

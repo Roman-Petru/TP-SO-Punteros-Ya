@@ -22,6 +22,7 @@ typedef struct {
 	int ciclos_descansados;
 
 	bool esta_cansado;
+	int index;
 } t_repartidor;
 
 t_repartidor* repartidor_crear(t_posicion* posicion, int frecuencia_descanso, int tiempo_descanso);
