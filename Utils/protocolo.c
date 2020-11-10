@@ -56,7 +56,7 @@ t_plato_listo* crear_datos_plato_listo(int id_pedido, char* comida, char* restau
 	return datos;
 }
 
-t_datos_estado_pedido* crear_datos_estado_pedido(bool estado, t_list* platos)
+t_datos_estado_pedido* crear_datos_estado_pedido(t_estado_pedido estado, t_list* platos)
 {
 	t_datos_estado_pedido* datos = malloc(sizeof(t_datos_estado_pedido));
 	datos->estado = estado;
@@ -65,7 +65,7 @@ t_datos_estado_pedido* crear_datos_estado_pedido(bool estado, t_list* platos)
 	return datos;
 }
 
-t_consultar_pedido* crear_datos_consultar_pedido(char* restaurante, bool estado, t_list* platos)
+t_consultar_pedido* crear_datos_consultar_pedido(char* restaurante, t_estado_pedido estado, t_list* platos)
 {
 	t_consultar_pedido* datos = malloc(sizeof(t_consultar_pedido));
 	datos->restaurante = restaurante;

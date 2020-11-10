@@ -246,6 +246,7 @@ static void* deserializar_consultar_pedido(t_buffer* buffer)
 		list_add(platos, buffer_deserializar_string(buffer));
 
 	return crear_datos_consultar_pedido(restaurante, estado, platos);
+}
 
 static void* deserializar_handshake_restaurante_app(t_buffer* buffer)
 {

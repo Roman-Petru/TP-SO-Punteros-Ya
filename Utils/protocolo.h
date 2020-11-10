@@ -55,7 +55,7 @@ typedef enum{
 	CONFIRMADO,
 	PENDIENTE,
 	TERMINADO,
-	ERROR
+	ERROR_PEDIDO
 }t_estado_pedido;
 
 typedef struct

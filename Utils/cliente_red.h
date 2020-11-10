@@ -7,7 +7,6 @@
 #include "protocolo.h"
 #include "serializacion.h"
 #include "dictionary_int.h"
-#include <commons/config.h>
 #include <netdb.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,11 +15,12 @@
 
 typedef struct
 {
-	t_config* config;
+	char* ip;
+	char* puerto;
 	int socket;
 }t_cliente_red;
 
-t_cliente_red* cliente_crear(t_config* config);
+t_cliente_red* cliente_crear(char* ip, char* puerto);
 void cliente_destruir(t_cliente_red* cliente);
 void cliente_cambiar_servidor(t_cliente_red* cliente, char* servidor);
 void* cliente_enviar_mensaje(t_cliente_red* cliente, char* servidor, t_codigo_de_operacion codigo_operacion, void* datos);
