@@ -9,7 +9,6 @@
 #include <stdio.h>
 
 void cargar_interfaz();
-void seleccionar_modulo();
 void handshake_con_app();
 
 #endif /*INTERFAZ_H_*/

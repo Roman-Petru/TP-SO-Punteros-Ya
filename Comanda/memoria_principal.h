@@ -1,4 +1,6 @@
-#pragma once
+#ifndef MEM_PR_H
+#define MEM_PR_H
+
 
 #include "../Utils/protocolo.h"
 #include <commons/collections/list.h>
@@ -20,3 +22,6 @@ void escribir_marco_principal_plato_listo(t_pagina* pagina);
 t_estado_pedido* leer_pedido_memoria_principal();
 bool comida_esta_lista(t_pagina* pagina);
 void vaciar_pagina_memoria_principal(t_pagina* pagina);
+
+
+#endif

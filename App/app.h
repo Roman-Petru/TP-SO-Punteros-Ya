@@ -13,7 +13,7 @@
 #include "interfaz.h"
 
 extern t_servidor_red* servidor;
-extern t_cliente_red* cliente;
+extern t_cliente_red* cliente_comanda;
 extern t_config* config;
 extern t_log* logger;
 extern sem_t sem_ciclo;

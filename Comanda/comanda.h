@@ -1,3 +1,6 @@
+#ifndef COMANDA_H_
+#define COMANDA_H_
+
 #include <commons/collections/list.h>
 #include <commons/log.h>
 #include <commons/config.h>
@@ -5,6 +8,7 @@
 #include "../Utils/protocolo.h"
 #include "interfaz.h"
 #include "memoria_principal.h"
+#include "gestor_tablas.h"
 
 extern t_servidor_red* servidor;
 extern t_log* logger;
@@ -14,6 +18,7 @@ extern t_list* tabla_restaurantes;
 typedef struct{
 	char* restaurante;
 	t_list* tabla_segmentos;
+	pthread_mutex_t mutex_tabla_segmentos;
 }t_restaurante;
 
 typedef struct{
@@ -35,5 +40,5 @@ typedef struct{
 }t_pagina;
 
 
-
+#endif
 

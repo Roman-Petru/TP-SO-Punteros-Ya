@@ -10,7 +10,6 @@
 extern t_config* config;
 extern t_consola* consola;
 extern t_cliente_red* cliente;
-extern char* servidor;
 extern int id;
 extern int id_pedido;
 extern char* restaurante_seleccionado;

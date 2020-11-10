@@ -2,13 +2,11 @@
 
 t_list* clientes_conectados;
 pthread_mutex_t mutex;
-int id_cliente;
 
 void inicializar_gestor_clientes()
 {
 	clientes_conectados = list_create();
 	pthread_mutex_init(&mutex, NULL);
-	id_cliente = 0;
 }
 
 static int cliente_index(int id_cliente)
@@ -23,14 +21,13 @@ static int cliente_index(int id_cliente)
 	return encontro ? index-1 : -1;
 }
 
-void agregar_cliente(t_posicion* posicion)
+void agregar_cliente(t_datos_cliente* datos)
 {
-	id_cliente++;
 
 	t_cliente_conectado* cliente = malloc(sizeof(t_cliente_conectado));
 	cliente->pedidos = list_create();
-	cliente->posicion = posicion;
-	cliente->id = id_cliente;
+	cliente->posicion = datos->posicion;
+	cliente->id = datos->id_cliente;
 	cliente->restaurante_seleccionado = NULL;
 
 	pthread_mutex_lock(&mutex);

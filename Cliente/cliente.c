@@ -4,8 +4,6 @@ t_config* config;
 t_consola* consola;
 t_cliente_red* cliente;
 
-char* servidor;
-int id;
 int id_pedido;
 char* restaurante_seleccionado;
 bool hay_que_leer;
@@ -22,17 +20,13 @@ static void inicializar()
 {
 	config = config_create("cliente.config");
 
-	servidor = NULL;
 	id_pedido = 0;
 	restaurante_seleccionado = NULL;
 	hay_que_leer = true;
 
 	serializacion_inicializar();
-	cliente = cliente_crear(config);
+	cliente = cliente_crear(config_get_string_value(config, "IP"), config_get_string_value(config, "PUERTO"));
 	consola = consola_crear("cliente.log", "Cliente"); //config_get_string_value(config, "ARCHIVO_LOG")
-	consola_log(consola, "Seleccione el modulo con el que se comunicara.");
-	while(servidor == NULL)
-		seleccionar_modulo();
 	cargar_interfaz();
 
 	handshake_con_app();

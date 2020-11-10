@@ -1,3 +1,4 @@
+#include "pedido.h"
 #include "app.h"
 
 t_dictionary_int* diccionario_acciones;
@@ -26,22 +27,22 @@ static void ciclo_pedido(t_pedido* pedido)
 }
 
 //========== PEDIDO ==========//
-t_pedido* pedido_crear(int id, t_posicion* posicion_de_restaurante, t_posicion* posicion_cliente, bool resto_default)
+t_pedido* pedido_crear(int id_pedido, char* restaurante)
 {
 	t_pedido* nuevo_pedido = malloc(sizeof(t_pedido));
 
-	nuevo_pedido->id_pedido = id;
+	nuevo_pedido->id_pedido = id_pedido;
 	nuevo_pedido->pcb_id = indice_pcb_id;
 	indice_pcb_id++;
 
 	nuevo_pedido->repartidor = NULL;
-	nuevo_pedido->posicion_de_restaurante = posicion_de_restaurante;
-	nuevo_pedido->posicion_cliente = posicion_cliente;
+	nuevo_pedido->posicion_de_restaurante = restaurante_obtener_posicion(restaurante);
+	nuevo_pedido->posicion_cliente = cliente_obtener_posicion(pedido_obtener_cliente(id_pedido));
 
 	nuevo_pedido->ciclos_en_ready = 0;
 	nuevo_pedido->estimacion = config_get_int_value(config, "ESTIMACION_INICIAL");
 
-	nuevo_pedido->esta_listo = resto_default ? true: false;
+	nuevo_pedido->esta_listo = strcmp(restaurante, "Resto_Default") == 0;
 	nuevo_pedido->instruccion_a_realizar = IR_A_RESTAURANTE;
 
 	sem_init(&(nuevo_pedido->mutex), 0, 0);
@@ -66,30 +67,14 @@ bool pedido_es_mismo(t_pedido* pedido_A, t_pedido* pedido_B)
 	return pedido_A->pcb_id == pedido_B->pcb_id;
 }
 
-void pedido_actualizar_estado(int id_pedido, t_estado_pedido* estado)
+void pedido_actualizar_estado(int id_pedido, t_estado_pedido estado)
 {
 	//TODO: Pedido_Actualizar_Estado
 }
 
-/*
-void crear_pedido_default(int cantidad)
+void recibir_pedidos_default(int cantidad)
 {
-	t_posicion* posicion_de_restaurante = posicion_crear(config_get_int_value(config, "POSICION_REST_DEFAULT_X"),config_get_int_value(config, "POSICION_REST_DEFAULT_Y"));
-	t_posicion* posicion_de_cliente = posicion_crear(7,4);
-
-
-	return pedido_crear(id, posicion_de_restaurante, posicion_de_cliente, true);
-
 	for (int i=0; i < cantidad; i++)
-	{
-	t_para_crear_pedido* pedido = malloc(sizeof(t_para_crear_pedido));
-	pedido->id_pedido = i;
-	pedido->posicion_cliente = posicion_de_cliente;
-	pedido->posicion_de_restaurante = posicion_de_restaurante;
-	pedido->resto_default = true;
-
-	agregar_interrupcion(NUEVO_PEDIDO, pedido);
-
-	}
-}*/
+		agregar_interrupcion(NUEVO_PEDIDO, pedido_crear(i, "Resto_Default"));
+}
 

@@ -8,8 +8,6 @@
 #include <commons/log.h>
 #include <commons/collections/list.h>
 
-
-
 typedef enum
 {
 	//=== CLIENTE/SERVIDOR ===//
@@ -55,8 +53,14 @@ typedef enum{
 	CONFIRMADO,
 	PENDIENTE,
 	TERMINADO,
-	ERROR_PEDIDO
+	ERROR_ESTADO
 }t_estado_pedido;
+
+typedef struct
+{
+	uint32_t id_cliente;
+	t_posicion* posicion;
+} t_datos_cliente;
 
 typedef struct
 {
@@ -66,8 +70,8 @@ typedef struct
 
 typedef struct
 {
-	uint32_t puerto;
 	char* restaurante;
+	uint32_t puerto;
 	t_posicion* posicion;
 } t_handshake_resto_app;
 
@@ -125,6 +129,7 @@ typedef struct
 	uint32_t cant_lista;
 } t_datos_estado_comida;
 
+t_datos_cliente* crear_datos_cliente(uint32_t id_cliente, t_posicion* posicion);
 t_datos_pedido* crear_datos_pedido(int id_pedido, char* restaurante);
 t_datos_seleccion_restaurante* crear_datos_seleccion_restaurante(int id_cliente, char* restaurante);
 t_guardar_plato* crear_datos_agregar_plato(int id_pedido, int cantidad, char* comida, char* restaurante);

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef MEM_VR_H
+#define MEM_VR_H
+
 
 #include "memoria_principal.h"
 #include <commons/collections/list.h>
@@ -14,3 +16,6 @@ typedef struct{
 
 void inicializar_memoria_virtual();
 bool cargar_desde_swap_si_es_necesario(t_pagina* pagina);
+
+
+#endif

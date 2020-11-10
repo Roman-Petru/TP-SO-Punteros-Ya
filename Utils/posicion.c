@@ -9,6 +9,15 @@ t_posicion* posicion_crear(int x, int y)
 	return posicion;
 }
 
+t_posicion* posicion_copiar(t_posicion* posicion)
+{
+	t_posicion* posicion_copia = malloc(sizeof(t_posicion));
+	posicion_copia->x = posicion->x;
+	posicion_copia->y = posicion->y;
+
+	return posicion_copia;
+}
+
 bool posicion_es_igual(t_posicion* posicion_A, t_posicion* posicion_B)
 {
 	return (posicion_A->x == posicion_B->x) && (posicion_A->y == posicion_B->y);

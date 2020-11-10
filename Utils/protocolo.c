@@ -93,5 +93,12 @@ t_datos_estado_comida* crear_datos_estado_comida(char* comida, uint32_t cant_tot
 	return datos;
 }
 
+t_datos_cliente* crear_datos_cliente(uint32_t id_cliente, t_posicion* posicion)
+{
+	t_datos_cliente* datos = malloc(sizeof(t_datos_cliente));
+	datos->id_cliente = id_cliente;
+	datos->posicion = posicion;
+	return datos;
+}
 
 

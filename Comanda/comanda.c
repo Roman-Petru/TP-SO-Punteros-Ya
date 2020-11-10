@@ -6,7 +6,7 @@ t_config* config;
 t_list* tabla_restaurantes;
 
 void inicializar_comanda(){
-	tabla_restaurantes = list_create();
+
 
 	logger = log_create("comanda.log", "COMANDA", true, LOG_LEVEL_INFO);
 	config = config_create("comanda.config");
@@ -16,6 +16,7 @@ void inicializar_comanda(){
 	cargar_interfaz();
 
 	inicializar_memoria_principal();
+	inicializar_gestor_tablas();
 }
 
 

@@ -5,8 +5,7 @@
 #include <pthread.h>
 #include <commons/collections/list.h>
 #include "../Utils/posicion.h"
-
-extern int id_cliente;
+#include "../Utils/protocolo.h"
 
 typedef struct {
 	int id;
@@ -16,7 +15,7 @@ typedef struct {
 } t_cliente_conectado;
 
 void inicializar_gestor_clientes();
-void agregar_cliente(t_posicion* posicion);
+void agregar_cliente(t_datos_cliente* datos);
 void cliente_agregar_pedido(int id_cliente, int id_pedido);
 void cliente_remover_pedido(int id_cliente, int id_pedido);
 void cliente_seleccionar_restaurante(int id_cliente, char* nombre_restaurante);

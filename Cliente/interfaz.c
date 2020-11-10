@@ -6,38 +6,6 @@
 //Obtener Receta
 
 //========== VALIDACIONES ==========//
-static char* validar_modulo(char* modulo)
-{
-	if(strcmp(modulo, "APP")==0 || strcmp(modulo, "app")==0)
-		return "APP";
-	else if(strcmp(modulo, "RESTAURANTE")==0 || strcmp(modulo, "restaurante")==0)
-		{restaurante_seleccionado = "restaurante original";
-		return "RESTAURANTE";}
-	else if(strcmp(modulo, "COMANDA")==0 || strcmp(modulo, "comanda")==0)
-		return "COMANDA";
-	else if(strcmp(modulo, "SINDICATO")==0 || strcmp(modulo, "sindicato")==0)
-		return "SINDICATO";
-	else
-		return NULL;
-}
-
-static bool validar_servidor(char* modulos[], int cant_modulos, bool log)
-{
-	bool es_valido;
-
-	for(int i=0;i<cant_modulos;i++)
-		es_valido = es_valido || strcmp(servidor, modulos[i])==0;
-
-	if(!es_valido && log)
-	{
-		consola_log(consola, "El comando solo puede mandarse a los modulos: ");
-		for(int i=0;i<cant_modulos;i++)
-			consola_log(consola, modulos[i]);
-	}
-
-	return es_valido;
-}
-
 static bool validar_restaurante()
 {
 	bool es_valido = restaurante_seleccionado == NULL;
@@ -63,34 +31,22 @@ static void desconectar() {	hay_que_leer = false; }
 static void terminar()
 {
 	hay_que_leer= false;
-	cliente_enviar_mensaje(cliente, servidor, TERMINAR, NULL);
+	cliente_enviar_mensaje(cliente, TERMINAR, NULL);
 	consola_log(consola, "El servidor se cerro correctamente.");
-}
-
-void seleccionar_modulo()
-{
-	char* modulo = consola_leer("Ingrese el nombre del modulo: ");
-	servidor = validar_modulo(modulo);
-	free(modulo);
-	if(servidor == NULL)
-		consola_log(consola, "No se reconoce el modulo.");
-	else
-		consola_log(consola, "Modulo seleccionado correctamente.");
 }
 
 //========== INTERFAZ ==========//
 void handshake_con_app()
 {
-	id = (int) cliente_enviar_mensaje(cliente, "APP", CONEXION_CLIENTE, posicion_crear(config_get_int_value(config, "POSICION_X"), config_get_int_value(config, "POSICION_Y")));
+	bool op_ok = cliente_enviar_mensaje(cliente, CONEXION_CLIENTE, posicion_crear(config_get_int_value(config, "POSICION_X"), config_get_int_value(config, "POSICION_Y")));
 
-	char mensaje[80];
-	sprintf(mensaje, "Id Cliente: %d", id);
-	consola_log(consola, mensaje);
+	if(!op_ok)
+		consola_log(consola, "Error al realizar el handshake.");
 }
 
 static void consultar_restaurantes()
 {
-	t_list* restaurantes = cliente_enviar_mensaje(cliente, "APP", CONSULTAR_RESTAURANTES, NULL);
+	t_list* restaurantes = cliente_enviar_mensaje(cliente, CONSULTAR_RESTAURANTES, NULL);
 
 	consola_log(consola, "Restaurantes: ");
 
@@ -107,7 +63,7 @@ static void seleccionar_restaurante()
 		free(restaurante_seleccionado);
 	restaurante_seleccionado = restaurante;
 
-	bool operacion_ok = cliente_enviar_mensaje(cliente, "APP", SELECCIONAR_RESTAURANTE, crear_datos_seleccion_restaurante(id, restaurante_seleccionado));
+	bool operacion_ok = cliente_enviar_mensaje(cliente, SELECCIONAR_RESTAURANTE, crear_datos_seleccion_restaurante(config_get_int_value(config, "ID_CLIENTE"), restaurante_seleccionado));
 	consola_if(consola, operacion_ok);
 }
 
@@ -117,18 +73,17 @@ static void obtener_restaurante()
 		return;
 
 	//void* restaurante = cliente_enviar_mensaje(cliente, "SINDICATO", OBTENER_RESTAURANTE, restaurante_seleccionado);
-	cliente_enviar_mensaje(cliente, "SINDICATO", OBTENER_RESTAURANTE, restaurante_seleccionado);
+	cliente_enviar_mensaje(cliente, OBTENER_RESTAURANTE, restaurante_seleccionado);
 
 	consola_log(consola, "Datos Restaurante: ");
 }
 
 static void consultar_platos()
 {
-	char* modulos[] = { "APP", "RESTAURANTE", "SINDICATO" };
-	if(validar_restaurante() && validar_servidor(modulos, 3, true))
+	if(validar_restaurante())
 		return;
 
-	t_list* platos = cliente_enviar_mensaje(cliente, servidor, CONSULTAR_PLATOS, restaurante_seleccionado);
+	t_list* platos = cliente_enviar_mensaje(cliente, CONSULTAR_PLATOS, restaurante_seleccionado);
 
 	consola_log(consola, "Platos: ");
 
@@ -139,32 +94,23 @@ static void consultar_platos()
 
 static void crear_pedido()
 {
-	char* modulos[] = { "APP", "RESTAURANTE" };
-	if(validar_servidor(modulos, 2, true))
-		return;
+	int id_nuevo_pedido = (int) cliente_enviar_mensaje(cliente, CREAR_PEDIDO, (void*) config_get_int_value(config, "ID_CLIENTE"));
 
-	int id_nuevo_pedido = (int) cliente_enviar_mensaje(cliente, servidor, CREAR_PEDIDO, (void*) id);
-
-	if(consola_if(consola, id_nuevo_pedido == -1))
+	if(!consola_if(consola, id_nuevo_pedido >= 0))
 		return;
 	id_pedido = id_nuevo_pedido;
-
-	char mensaje[80];
-	sprintf(mensaje, "Se creo el pedido con id %d", id_pedido);
-	consola_log(consola, mensaje);
 }
 
 static void guardar_pedido()
 {
-	char* modulos[] = { "APP", "RESTAURANTE" };
-	if(validar_servidor(modulos, 2, true) && validar_restaurante() && validar_pedido())
+	if(validar_restaurante() && validar_pedido())
 		return;
 
 	t_datos_pedido datos;
 	datos.restaurante = restaurante_seleccionado;
 	datos.id_pedido = id_pedido;
 
-	bool operacion_ok = cliente_enviar_mensaje(cliente, servidor, CREAR_PEDIDO, &datos);
+	bool operacion_ok = cliente_enviar_mensaje(cliente, CREAR_PEDIDO, &datos);
 	consola_if(consola, operacion_ok);
 }
 
@@ -177,15 +123,14 @@ static void agregar_plato()
 	datos.plato = consola_leer("Ingrese el nombre del plato: ");;
 	datos.id_pedido = id_pedido;
 
-	bool operacion_ok = cliente_enviar_mensaje(cliente, servidor, AGREGAR_PLATO, &datos);
+	bool operacion_ok = cliente_enviar_mensaje(cliente, AGREGAR_PLATO, &datos);
 	consola_if(consola, operacion_ok);
 	free(datos.plato);
 }
 
 static void guardar_plato()
 {
-	char* modulos[] = { "SINDICATO", "COMANDA" };
-	if(validar_servidor(modulos, 2, true) && validar_pedido() && validar_restaurante())
+	if(validar_pedido() && validar_restaurante())
 		return;
 
 	t_guardar_plato datos;
@@ -194,7 +139,7 @@ static void guardar_plato()
 	datos.comida = consola_leer("Ingrese el nombre de la comida: ");
 	datos.restaurante = consola_leer("Ingrese la cantidad: ");
 
-	bool operacion_ok = cliente_enviar_mensaje(cliente, servidor, GUARDAR_PLATO, &datos);
+	bool operacion_ok = cliente_enviar_mensaje(cliente, GUARDAR_PLATO, &datos);
 	consola_if(consola, operacion_ok);
 
 	free(datos.comida);
@@ -206,28 +151,27 @@ static void confirmar_pedido()
 	if(validar_restaurante() && validar_pedido())
 		return;
 
-	bool operacion_ok = cliente_enviar_mensaje(cliente, servidor, CONFIRMAR_PEDIDO, crear_datos_pedido(id_pedido, restaurante_seleccionado));
+	bool operacion_ok = cliente_enviar_mensaje(cliente, CONFIRMAR_PEDIDO, crear_datos_pedido(id_pedido, restaurante_seleccionado));
 	consola_if(consola, operacion_ok);
 }
 
 static void plato_listo()
 {
-	char* modulos[] = { "APP", "SINDICATO", "COMANDA" };
-	if(validar_servidor(modulos, 3, true) && validar_pedido() && validar_restaurante())
+
+	if(validar_pedido() && validar_restaurante())
 		return;
 
-	bool operacion_ok = cliente_enviar_mensaje(cliente, servidor, PLATO_LISTO, crear_datos_plato_listo(id_pedido, consola_leer("Ingrese el nombre de la comida: "), restaurante_seleccionado));
+	bool operacion_ok = cliente_enviar_mensaje(cliente, PLATO_LISTO, crear_datos_plato_listo(id_pedido, consola_leer("Ingrese el nombre de la comida: "), restaurante_seleccionado));
 	consola_if(consola, operacion_ok);
 	//QUIZAS BORRAR COMIDA QUE SE LEE X CONSOLA
 }
 
 static void consultar_pedido()
 {
-	char* modulos[] = { "APP", "RESTAURANTE" };
-	if(validar_servidor(modulos, 3, true) && validar_pedido())
+	if(validar_pedido())
 		return;
 
-	t_consultar_pedido* pedido = cliente_enviar_mensaje(cliente, servidor, CONSULTAR_PEDIDO, (void*) id_pedido);
+	t_consultar_pedido* pedido = cliente_enviar_mensaje(cliente, CONSULTAR_PEDIDO, (void*) id_pedido);
 
 	char mensaje[80];
 	sprintf(mensaje, "Pedido: %d", id_pedido);
@@ -254,7 +198,7 @@ static void terminar_pedido()
 	datos.restaurante = restaurante_seleccionado;
 	datos.id_pedido = id_pedido;
 	 */
-	bool operacion_ok = cliente_enviar_mensaje(cliente, "SINDICATO", TERMINAR_PEDIDO, crear_datos_pedido(id_pedido, restaurante_seleccionado));
+	bool operacion_ok = cliente_enviar_mensaje(cliente, TERMINAR_PEDIDO, crear_datos_pedido(id_pedido, restaurante_seleccionado));
 	consola_if(consola, operacion_ok);
 }
 
@@ -262,7 +206,6 @@ void cargar_interfaz()
 {
 	consola_agregar_comando(consola, "desconectar", &desconectar);
 	consola_agregar_comando(consola, "terminar", &terminar);
-	consola_agregar_comando(consola, "seleccionar_modulo", &seleccionar_modulo);
 
 	//=== INTERFAZ ===//
 	consola_agregar_comando(consola, "consultar restaurantes", &consultar_restaurantes);
