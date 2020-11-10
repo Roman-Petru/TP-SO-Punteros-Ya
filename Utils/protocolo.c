@@ -29,7 +29,7 @@ t_datos_pedido* crear_datos_pedido(int id_pedido, char* restaurante)
 	return datos;
 }
 
-t_datos_seleccion_restaurante* crear_datos_seleccion_restaurante(int id_cliente, char* restaurante)
+t_datos_seleccion_restaurante* crear_datos_seleccion_restaurante(char* id_cliente, char* restaurante)
 {
 	t_datos_seleccion_restaurante* datos = malloc(sizeof(t_datos_seleccion_restaurante));
 	datos->id_cliente = id_cliente;
@@ -93,7 +93,7 @@ t_datos_estado_comida* crear_datos_estado_comida(char* comida, uint32_t cant_tot
 	return datos;
 }
 
-t_datos_cliente* crear_datos_cliente(uint32_t id_cliente, t_posicion* posicion)
+t_datos_cliente* crear_datos_cliente(char* id_cliente, t_posicion* posicion)
 {
 	t_datos_cliente* datos = malloc(sizeof(t_datos_cliente));
 	datos->id_cliente = id_cliente;

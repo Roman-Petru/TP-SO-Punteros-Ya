@@ -8,6 +8,7 @@
 #include "serializacion.h"
 #include "dictionary_int.h"
 #include <commons/log.h>
+#include <commons/collections/list.h>
 #include <pthread.h>
 #include <stdbool.h>
 #include <string.h>
@@ -18,6 +19,7 @@ typedef struct
 {
 	int socket;
 	pthread_t hilo_escucha;
+	t_list* clientes;
 	t_dictionary_int* diccionario_operaciones;
 }t_servidor_red;
 

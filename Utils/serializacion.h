@@ -27,5 +27,6 @@ void destruir_datos_pedido(void* datos_void);
 void destruir_agregar_plato(void* datos_void);
 void destruir_estado_pedido(void* datos_void);
 void destruir_consultar_pedido(void* datos_void);
+void destruir_datos_cliente(void* datos_void);
 
 #endif /*SERIALIZACION_H_*/

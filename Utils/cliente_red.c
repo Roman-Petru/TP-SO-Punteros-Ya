@@ -18,8 +18,11 @@ void* cliente_enviar_mensaje(t_cliente_red* cliente, t_codigo_de_operacion codig
 {
 	cliente->socket = socket_crear(cliente->ip, cliente->puerto);
 	t_paquete* paquete = paquete_crear(codigo_operacion, buffer_crear_con_datos(codigo_operacion, datos));
-	paquete_enviar(paquete, cliente->socket);
+	bool envio_satisfactorio = paquete_enviar(paquete, cliente->socket);
 	paquete_destruir(paquete);
+
+	if(!envio_satisfactorio)
+		return NULL;
 
 	paquete = paquete_recibir(cliente->socket);
 	void* pedido = NULL;

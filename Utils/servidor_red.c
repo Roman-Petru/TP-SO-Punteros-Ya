@@ -3,9 +3,10 @@
 // ===== Cliente de Servidor =====
 static t_cliente_servidor* esperar_cliente(t_servidor_red* servidor)
 {
+	int socket = socket_escucha_esperar_mensaje(servidor->socket);
 	t_cliente_servidor* cliente= malloc(sizeof(t_cliente_servidor));
 	cliente->servidor = servidor;
-	cliente->socket = socket_escucha_esperar_mensaje(servidor->socket);
+	cliente->socket = socket;
 
 	return cliente;
 }
@@ -52,6 +53,14 @@ static void atender_cliente(t_cliente_servidor* cliente)
 	free(cliente);
 }
 
+static void servidor_atender_cliente(t_servidor_red* servidor, t_cliente_servidor* cliente)
+{
+	pthread_t* asistente_cliente = malloc(sizeof(pthread_t));
+
+	pthread_create(asistente_cliente, NULL, (void*) atender_cliente, cliente);
+	pthread_detach(*asistente_cliente);
+}
+
 static void servidor_escuchar_mensajes(t_servidor_red* servidor)
 {
 	t_cliente_servidor* cliente;
@@ -61,8 +70,7 @@ static void servidor_escuchar_mensajes(t_servidor_red* servidor)
 		if(!es_cliente_valido(cliente))
 			break;
 
-		pthread_create(&(servidor->hilo_escucha), NULL, (void*) atender_cliente, cliente);
-		pthread_detach(servidor->hilo_escucha);
+		servidor_atender_cliente(servidor, cliente);
 	}
 }
 
@@ -74,6 +82,7 @@ t_servidor_red* servidor_crear(char* ip, char* puerto)
 	t_servidor_red* servidor = malloc(sizeof(t_servidor_red));
 	servidor->socket = socket;
 	servidor->diccionario_operaciones = dictionary_int_create();
+
 	pthread_create(&(servidor->hilo_escucha), NULL, (void*) servidor_escuchar_mensajes, servidor);
 	pthread_detach(servidor->hilo_escucha);
 

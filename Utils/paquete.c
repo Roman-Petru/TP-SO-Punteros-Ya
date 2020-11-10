@@ -52,11 +52,13 @@ static void* paquete_serializar(t_paquete* paquete)
 }
 
 // ===== Enviar/Recibir Paquete =====
-void paquete_enviar(t_paquete* paquete, int socket)
+bool paquete_enviar(t_paquete* paquete, int socket)
 {
 	void* paquete_serializado = paquete_serializar(paquete);
-	send(socket, paquete_serializado, paquete_tamanio(paquete), 0);
+	int estado = send(socket, paquete_serializado, paquete_tamanio(paquete), 0);
 	free(paquete_serializado);
+
+	return estado >= 0;
 }
 
 t_paquete* paquete_recibir(int numero_socket)

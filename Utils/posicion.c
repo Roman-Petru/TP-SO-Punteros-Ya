@@ -30,3 +30,17 @@ int posicion_distancia_entre(t_posicion* posicion_A, t_posicion* posicion_B)
 
 	return distancia_x + distancia_y; // Distancia relativa
 }
+/*
+t_posicion* posicion_distancia_minima(t_posicion* posicion, t_list* posiciones)
+{
+	t_posicion* posicion_menor_distancia(t_posicion* posicion_A, t_posicion* posicion_B)
+	{
+		int distancia_A = posicion_distancia_entre(posicion, posicion_A);
+		int distancia_B = posicion_distancia_entre(posicion, posicion_A);
+
+		return distancia_A > distancia_B ? posicion_B : posicion_A;
+	}
+
+	return list_fold(posiciones, list_get(posiciones, 0), &posicion_menor_distancia);
+}*/
+
