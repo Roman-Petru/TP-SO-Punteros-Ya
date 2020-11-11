@@ -29,7 +29,7 @@ static void inicializar()
 	consola = consola_crear("cliente.log", "Cliente"); //config_get_string_value(config, "ARCHIVO_LOG")
 	cargar_interfaz();
 
-	handshake_con_app();
+	handshake();
 }
 
 int main()

@@ -1,12 +1,12 @@
 #include "servidor_red.h"
 
 // ===== Cliente de Servidor =====
-static t_cliente_servidor* esperar_cliente(t_servidor_red* servidor)
+static t_cliente_servidor esperar_cliente(t_servidor_red* servidor)
 {
 	int socket = socket_escucha_esperar_mensaje(servidor->socket);
-	t_cliente_servidor* cliente= malloc(sizeof(t_cliente_servidor));
-	cliente->servidor = servidor;
-	cliente->socket = socket;
+	t_cliente_servidor cliente;// = malloc(sizeof(t_cliente_servidor));
+	cliente.servidor = servidor;
+	cliente.socket = socket;
 
 	return cliente;
 }
@@ -49,28 +49,26 @@ static void atender_cliente(t_cliente_servidor* cliente)
 	paquete_destruir(paquete);
 	servidor_enviar_respuesta(cliente->socket, respuesta);
 	respuesta_destruir(respuesta);
-
-	free(cliente);
 }
 
 static void servidor_atender_cliente(t_servidor_red* servidor, t_cliente_servidor* cliente)
 {
-	pthread_t* asistente_cliente = malloc(sizeof(pthread_t));
+	pthread_t asistente_cliente;
 
-	pthread_create(asistente_cliente, NULL, (void*) atender_cliente, cliente);
-	pthread_detach(*asistente_cliente);
+	pthread_create(&asistente_cliente, NULL, (void*) atender_cliente, cliente);
+	pthread_detach(asistente_cliente);
 }
 
 static void servidor_escuchar_mensajes(t_servidor_red* servidor)
 {
-	t_cliente_servidor* cliente;
+	t_cliente_servidor cliente;
 	while(true)
 	{
 		cliente = esperar_cliente(servidor);
-		if(!es_cliente_valido(cliente))
+		if(!es_cliente_valido(&cliente))
 			break;
 
-		servidor_atender_cliente(servidor, cliente);
+		servidor_atender_cliente(servidor, &cliente);
 	}
 }
 
@@ -96,7 +94,6 @@ void servidor_agregar_operacion(t_servidor_red* servidor, t_codigo_de_operacion 
 
 void servidor_destruir(t_servidor_red* servidor)
 {
-	pthread_cancel(servidor->hilo_escucha);
 	socket_cerrar(servidor->socket);
 	dictionary_int_destroy(servidor->diccionario_operaciones);
 	free(servidor);

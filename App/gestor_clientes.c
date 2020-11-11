@@ -1,19 +1,43 @@
 #include "gestor_clientes.h"
+#include "app.h"
 
 t_list* clientes_conectados;
 pthread_mutex_t mutex;
 
+static void agregar_cliente_default()
+{
+	t_datos_cliente* datos_cliente_default = crear_datos_cliente("Cliente_Default", posicion_crear(4, 4));
+	agregar_cliente(datos_cliente_default);
+	free(datos_cliente_default->posicion);
+	free(datos_cliente_default);
+}
+
 void inicializar_gestor_clientes()
 {
 	clientes_conectados = list_create();
-
-	agregar_cliente(crear_datos_cliente("Cliente_Default", posicion_crear(4, 4)));
-
+	agregar_cliente_default();
 	pthread_mutex_init(&mutex, NULL);
+}
+
+static void destruir_cliente_conectado(t_cliente_conectado* cliente)
+{
+	list_destroy(cliente->pedidos);
+	free(cliente->restaurante_seleccionado);
+	free(cliente->posicion);
+	free(cliente->id);
+	free(cliente);
+}
+
+void finalizar_gestor_clientes()
+{
+	list_destroy_and_destroy_elements(clientes_conectados, (void*) &destruir_cliente_conectado);
 }
 
 static int cliente_index(char* id_cliente)
 {
+	if(id_cliente == NULL)
+		return -1;
+
 	int index;
 	bool encontro = false;
 	bool es_mismo_cliente(void* cliente) { return strcmp(((t_cliente_conectado*) cliente)->id, id_cliente)== 0; }
@@ -29,15 +53,15 @@ void agregar_cliente(t_datos_cliente* datos)
 
 	t_cliente_conectado* cliente = malloc(sizeof(t_cliente_conectado));
 	cliente->pedidos = list_create();
-	cliente->posicion = datos->posicion;
-	cliente->id = datos->id_cliente;
+	cliente->posicion = posicion_copiar(datos->posicion);
+	size_t tam = strlen(datos->id_cliente)+1;
+	cliente->id = malloc(tam);
+	memcpy(cliente->id, datos->id_cliente, tam);
 	cliente->restaurante_seleccionado = NULL;
 
 	pthread_mutex_lock(&mutex);
 	list_add(clientes_conectados, cliente);
 	pthread_mutex_unlock(&mutex);
-
-	free(datos);
 }
 
 void cliente_agregar_pedido(char* id_cliente, int id_pedido)
@@ -61,10 +85,14 @@ void cliente_seleccionar_restaurante(char* id_cliente, char* nombre_restaurante)
 {
 	pthread_mutex_lock(&mutex);
 	t_cliente_conectado* cliente = list_get(clientes_conectados, cliente_index(id_cliente));
-	if(cliente->restaurante_seleccionado != NULL)
+	if(cliente->restaurante_seleccionado)
 		free(cliente->restaurante_seleccionado);
-	cliente->restaurante_seleccionado = nombre_restaurante;
+	size_t tam = strlen(nombre_restaurante)+1;
+	cliente->restaurante_seleccionado = malloc(tam);
+	memcpy(cliente->restaurante_seleccionado, nombre_restaurante, tam);
 	pthread_mutex_unlock(&mutex);
+
+	log_info(logger, "Se asocio un cliente: %s con resto: %s", cliente->id, cliente->restaurante_seleccionado);
 }
 
 char* cliente_obtener_restaurante(char* id_cliente)
@@ -89,16 +117,6 @@ t_posicion* cliente_obtener_posicion(char* id_cliente)
 	pthread_mutex_unlock(&mutex);
 
 	return posicion_cliente;
-}
-
-static void destruir_cliente_conectado(t_cliente_conectado* cliente)
-{
-	list_destroy(cliente->pedidos);
-	free(cliente->posicion);
-	//free(cliente->id);
-	if(cliente->restaurante_seleccionado != NULL)
-		free(cliente->restaurante_seleccionado);
-	free(cliente);
 }
 
 void remover_cliente(char* id_cliente)

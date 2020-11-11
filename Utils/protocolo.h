@@ -12,6 +12,8 @@ typedef enum
 {
 	//=== CLIENTE/SERVIDOR ===//
 	TERMINAR,
+	HANDSHAKE_CLIENTE,
+	HANDSHAKE_CLIENTE_RESPUESTA,
 	CONEXION_CLIENTE,
 	CONEXION_CLIENTE_RESPUESTA,
 	HANDSHAKE_RESTO_APP,
@@ -48,6 +50,14 @@ typedef enum
 	ERROR = -1,
 	ERROR_DESERIALIZAR_BUFFER = -2
 } t_codigo_de_operacion;
+
+typedef enum{
+	MODULO_ERROR,
+	APP,
+	RESTAURANTE,
+	COMANDA,
+	SINDICATO
+}t_modulo;
 
 typedef enum{
 	CONFIRMADO,

@@ -9,6 +9,6 @@
 #include <stdio.h>
 
 void cargar_interfaz();
-void handshake_con_app();
+void handshake();
 
 #endif /*INTERFAZ_H_*/

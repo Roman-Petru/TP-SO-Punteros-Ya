@@ -31,8 +31,8 @@ static void inicializar()
 static void comiezo_ciclo()
 {
 	cant_ciclo++;
-	if(cant_ciclo == 100)
-		terminar();
+	//if(cant_ciclo == 100)
+	//	terminar();
 	//log_info(logger, "===== INSTANTE %d =====", cant_ciclo);
 }
 
@@ -40,6 +40,7 @@ void terminar()
 {
 	serializacion_finalizar();
 	servidor_destruir(servidor);
+	finalizar_gestor_clientes();
 	log_info(logger, "TERMINE");
 	exit(0);
 }
@@ -47,7 +48,7 @@ void terminar()
 int main()
 {
 	inicializar();
-	recibir_pedidos_default(3); // Para Test
+	//recibir_pedidos_default(3); // Para Test
 
 	while(true)
 	{

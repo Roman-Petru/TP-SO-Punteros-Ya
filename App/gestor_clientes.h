@@ -3,6 +3,8 @@
 
 #include <stdlib.h>
 #include <pthread.h>
+#include <string.h>
+#include <commons/log.h>
 #include <commons/collections/list.h>
 #include "../Utils/posicion.h"
 #include "../Utils/protocolo.h"
@@ -15,6 +17,7 @@ typedef struct {
 } t_cliente_conectado;
 
 void inicializar_gestor_clientes();
+void finalizar_gestor_clientes();
 
 void agregar_cliente(t_datos_cliente* datos);
 void cliente_agregar_pedido(char* id_cliente, int id_pedido);

@@ -54,6 +54,14 @@ static t_buffer* serializar_int(void* datos)
 	return buffer;
 }
 
+static t_buffer* serializar_modulo(void* datos)
+{
+	t_buffer* buffer = buffer_crear(sizeof(t_modulo));
+	buffer_serializar(buffer, &datos, sizeof(t_modulo));
+
+	return buffer;
+}
+
 /*static t_buffer* serializar_posicion(void* datos)
 {
 	t_buffer* buffer = buffer_crear(sizeof(uint32_t)*2);
@@ -67,8 +75,8 @@ static t_buffer* serializar_int(void* datos)
 
 static t_buffer* serializar_datos_cliente(void* datos_void)
 {
-	t_buffer* buffer = buffer_crear(sizeof(uint32_t)*3);
 	t_datos_cliente* datos = datos_void;
+	t_buffer* buffer = buffer_crear(sizeof(uint32_t)*3 + strlen(datos->id_cliente));
 
 	buffer_serializar_string(buffer, datos->id_cliente);
 	buffer_serializar_int(buffer, datos->posicion->x);
@@ -200,6 +208,12 @@ static int deserializar_int(t_buffer* buffer)
 	return buffer_deserializar_int(buffer);
 }
 
+static t_modulo deserializar_modulo(t_buffer* buffer)
+{
+	t_modulo* modulo = buffer_deserializar(buffer, sizeof(t_modulo));
+	return *modulo;
+}
+
 /*static void* deserializar_posicion(t_buffer* buffer)
 {
 	int x = buffer_deserializar_int(buffer);
@@ -291,7 +305,7 @@ void destruir_lista_string(void* datos) { list_destroy_and_destroy_elements(dato
 void destruir_datos_cliente(void* datos_void)
 {
 	t_datos_cliente* datos = datos_void;
-	//free(datos->id_cliente);
+	free(datos->id_cliente);
 	free(datos->posicion);
 	free(datos);
 }
@@ -348,11 +362,12 @@ void diccionario_serializaciones_inicializar()
 {
 	diccionario_serializaciones = dictionary_int_create();
 
+	dictionary_int_put(diccionario_serializaciones, HANDSHAKE_CLIENTE, &serializar_sin_datos);
+	dictionary_int_put(diccionario_serializaciones, HANDSHAKE_CLIENTE_RESPUESTA, &serializar_modulo);
 	dictionary_int_put(diccionario_serializaciones, CONEXION_CLIENTE, &serializar_datos_cliente);
 	dictionary_int_put(diccionario_serializaciones, CONEXION_CLIENTE_RESPUESTA, &serializar_bool);
 	dictionary_int_put(diccionario_serializaciones, HANDSHAKE_RESTO_APP, &serializar_handshake_restaurante_app);
 	dictionary_int_put(diccionario_serializaciones, HANDSHAKE_RESTO_APP_RESPUESTA, &serializar_bool);
-
 
 	dictionary_int_put(diccionario_serializaciones, CONSULTAR_RESTAURANTES, &serializar_sin_datos);
 	dictionary_int_put(diccionario_serializaciones, CONSULTAR_RESTAURANTES_RESPUESTA, &serializar_lista_string);
@@ -383,6 +398,8 @@ void diccionario_deserializaciones_inicializar()
 {
 	diccionario_deserializaciones = dictionary_int_create();
 
+	dictionary_int_put(diccionario_deserializaciones, HANDSHAKE_CLIENTE, &deserializar_sin_datos);
+	dictionary_int_put(diccionario_deserializaciones, HANDSHAKE_CLIENTE_RESPUESTA, &deserializar_modulo);
 	dictionary_int_put(diccionario_deserializaciones, CONEXION_CLIENTE, &deserializar_datos_cliente);
 	dictionary_int_put(diccionario_deserializaciones, CONEXION_CLIENTE_RESPUESTA, &deserializar_bool);
 	dictionary_int_put(diccionario_deserializaciones, HANDSHAKE_RESTO_APP, &deserializar_handshake_restaurante_app);
@@ -412,6 +429,8 @@ void diccionario_destrucciones_inicializar()
 {
 	diccionario_destrucciones = dictionary_int_create();
 
+	dictionary_int_put(diccionario_destrucciones, HANDSHAKE_CLIENTE, &sin_free);
+	dictionary_int_put(diccionario_destrucciones, HANDSHAKE_CLIENTE_RESPUESTA, &sin_free);
 	dictionary_int_put(diccionario_destrucciones, CONEXION_CLIENTE, &destruir_datos_cliente);
 	dictionary_int_put(diccionario_destrucciones, CONEXION_CLIENTE_RESPUESTA, &free);
 	dictionary_int_put(diccionario_destrucciones, HANDSHAKE_RESTO_APP, &destruir_handshake_restaurante_app);
@@ -424,7 +443,7 @@ void diccionario_destrucciones_inicializar()
 	dictionary_int_put(diccionario_destrucciones, CONSULTAR_PLATOS, &free);
 	dictionary_int_put(diccionario_destrucciones, CONSULTAR_PLATOS_RESPUESTA, &destruir_lista_string);
 	dictionary_int_put(diccionario_destrucciones, CREAR_PEDIDO, &free);
-	dictionary_int_put(diccionario_destrucciones, CREAR_PEDIDO_RESPUESTA, &free);
+	dictionary_int_put(diccionario_destrucciones, CREAR_PEDIDO_RESPUESTA, &sin_free);
 	dictionary_int_put(diccionario_destrucciones, AGREGAR_PLATO, &destruir_agregar_plato);
 	dictionary_int_put(diccionario_destrucciones, AGREGAR_PLATO_RESPUESTA, &sin_free);
 	dictionary_int_put(diccionario_destrucciones, PLATO_LISTO, &destruir_datos_pedido);

@@ -78,6 +78,8 @@ char* buffer_deserializar_string(t_buffer* buffer)
 
 uint32_t buffer_deserializar_int(t_buffer* buffer)
 {
-	uint32_t* integer = buffer_deserializar(buffer, sizeof(uint32_t));;
-	return *integer;
+	uint32_t* integer_p = buffer_deserializar(buffer, sizeof(uint32_t));
+	uint32_t integer = *integer_p;
+	free(integer_p);
+	return integer;
 }

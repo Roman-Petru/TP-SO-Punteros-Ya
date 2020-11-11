@@ -18,11 +18,11 @@ static bool validar_restaurante()
 
 static bool validar_pedido()
 {
-	bool es_valido = id_pedido==0;
+	bool invalido = id_pedido<0;
 
-	if(!es_valido)
+	if(invalido)
 		consola_log(consola, "No hay pedido en marcha.");
-	return es_valido;
+	return invalido;
 }
 
 //========== COMANDOS ==========//
@@ -36,11 +36,22 @@ static void terminar()
 }
 
 //========== INTERFAZ ==========//
-void handshake_con_app()
+void handshake()
 {
-	bool op_ok = cliente_enviar_mensaje(cliente, CONEXION_CLIENTE, posicion_crear(config_get_int_value(config, "POSICION_X"), config_get_int_value(config, "POSICION_Y")));
+	t_modulo modulo = (t_modulo) cliente_enviar_mensaje(cliente, HANDSHAKE_CLIENTE, NULL);
 
-	if(!op_ok)
+	bool op_ok = true;
+
+
+
+	if(modulo == APP)
+	{
+		t_datos_cliente* datos = crear_datos_cliente(config_get_string_value(config, "ID_CLIENTE"), posicion_crear(config_get_int_value(config, "POSICION_X"), config_get_int_value(config, "POSICION_Y")));
+		op_ok = cliente_enviar_mensaje(cliente, CONEXION_CLIENTE, datos);
+	}
+
+
+	if(modulo == MODULO_ERROR || !op_ok)
 		consola_log(consola, "Error al realizar el handshake.");
 }
 
@@ -63,7 +74,7 @@ static void seleccionar_restaurante()
 		free(restaurante_seleccionado);
 	restaurante_seleccionado = restaurante;
 
-	bool operacion_ok = cliente_enviar_mensaje(cliente, SELECCIONAR_RESTAURANTE, crear_datos_seleccion_restaurante(config_get_int_value(config, "ID_CLIENTE"), restaurante_seleccionado));
+	bool operacion_ok = cliente_enviar_mensaje(cliente, SELECCIONAR_RESTAURANTE, crear_datos_seleccion_restaurante(config_get_string_value(config, "ID_CLIENTE"), restaurante_seleccionado));
 	consola_if(consola, operacion_ok);
 }
 
@@ -94,11 +105,9 @@ static void consultar_platos()
 
 static void crear_pedido()
 {
-	int id_nuevo_pedido = (int) cliente_enviar_mensaje(cliente, CREAR_PEDIDO, (void*) config_get_int_value(config, "ID_CLIENTE"));
+	id_pedido = (int) cliente_enviar_mensaje(cliente, CREAR_PEDIDO, config_get_string_value(config, "ID_CLIENTE"));
 
-	if(!consola_if(consola, id_nuevo_pedido >= 0))
-		return;
-	id_pedido = id_nuevo_pedido;
+	consola_if(consola, id_pedido > 0);
 }
 
 static void guardar_pedido()
