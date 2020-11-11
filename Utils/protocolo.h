@@ -142,7 +142,8 @@ typedef struct
 t_datos_cliente* crear_datos_cliente(char* id_cliente, t_posicion* posicion);
 t_datos_pedido* crear_datos_pedido(int id_pedido, char* restaurante);
 t_datos_seleccion_restaurante* crear_datos_seleccion_restaurante(char* id_cliente, char* restaurante);
-t_guardar_plato* crear_datos_agregar_plato(int id_pedido, int cantidad, char* comida, char* restaurante);
+t_guardar_plato* crear_datos_guardar_plato(int id_pedido, int cantidad, char* comida, char* restaurante);
+t_agregar_plato* crear_datos_agregar_plato(int id_pedido, char* plato);
 t_plato_listo* crear_datos_plato_listo(int id_pedido, char* comida, char* restaurante);
 t_datos_estado_pedido* crear_datos_estado_pedido(t_estado_pedido estado, t_list* platos);
 t_consultar_pedido* crear_datos_consultar_pedido(char* restaurante, t_estado_pedido estado, t_list* platos);

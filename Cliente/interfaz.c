@@ -8,12 +8,12 @@
 //========== VALIDACIONES ==========//
 static bool validar_restaurante()
 {
-	bool es_valido = restaurante_seleccionado == NULL;
+	bool invalido = restaurante_seleccionado == NULL;
 
-	if(es_valido)
+	if(invalido)
 		consola_log(consola, "No se selecciono ningun Restaurante. ");
 
-	return es_valido;
+	return invalido;
 }
 
 static bool validar_pedido()
@@ -105,6 +105,9 @@ static void consultar_platos()
 
 static void crear_pedido()
 {
+	if(validar_restaurante())
+		return;
+
 	id_pedido = (int) cliente_enviar_mensaje(cliente, CREAR_PEDIDO, config_get_string_value(config, "ID_CLIENTE"));
 
 	consola_if(consola, id_pedido > 0);
@@ -128,13 +131,9 @@ static void agregar_plato()
 	if(validar_pedido())
 		return;
 
-	t_agregar_plato datos;
-	datos.plato = consola_leer("Ingrese el nombre del plato: ");;
-	datos.id_pedido = id_pedido;
-
-	bool operacion_ok = cliente_enviar_mensaje(cliente, AGREGAR_PLATO, &datos);
+	t_agregar_plato* datos = crear_datos_agregar_plato(id_pedido, consola_leer("Ingrese el nombre del plato: "));
+	bool operacion_ok = cliente_enviar_mensaje(cliente, AGREGAR_PLATO, datos);
 	consola_if(consola, operacion_ok);
-	free(datos.plato);
 }
 
 static void guardar_plato()

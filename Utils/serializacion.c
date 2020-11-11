@@ -111,7 +111,7 @@ static t_buffer* serializar_seleccion_restaurante(void* datos_void)
 	return buffer;
 }
 
-static t_buffer* serializar_agregar_plato(void* datos_void)
+static t_buffer* serializar_guardar_plato(void* datos_void)
 {
 	t_guardar_plato* datos = datos_void;
 
@@ -124,6 +124,17 @@ static t_buffer* serializar_agregar_plato(void* datos_void)
 	buffer_serializar_int(buffer, datos->cantidad);
 	buffer_serializar_string(buffer, datos->comida);
 	buffer_serializar_string(buffer, datos->restaurante);
+
+	return buffer;
+}
+
+static t_buffer* serializar_agregar_plato(void* datos_void)
+{
+	t_agregar_plato* datos = datos_void;
+	t_buffer* buffer = buffer_crear(sizeof(uint32_t)*2+strlen(datos->plato));
+
+	buffer_serializar_int(buffer, datos->id_pedido);
+	buffer_serializar_string(buffer, datos->plato);
 
 	return buffer;
 }
@@ -247,14 +258,22 @@ static void* deserializar_seleccion_restaurante(t_buffer* buffer)
 	return crear_datos_seleccion_restaurante(id_cliente, restaurante);
 }
 
-static void* deserializar_agregar_plato(t_buffer* buffer)
+static void* deserializar_guardar_plato(t_buffer* buffer)
 {
 	int id_pedido = buffer_deserializar_int(buffer);
 	int cantidad = buffer_deserializar_int(buffer);
 	char* comida = buffer_deserializar_string(buffer);
 	char* restaurante = buffer_deserializar_string(buffer);
 
-	return crear_datos_agregar_plato(id_pedido, cantidad, comida, restaurante);
+	return crear_datos_guardar_plato(id_pedido, cantidad, comida, restaurante);
+}
+
+static void* deserializar_agregar_plato(t_buffer* buffer)
+{
+	int id_pedido = buffer_deserializar_int(buffer);
+	char* plato = buffer_deserializar_string(buffer);
+
+	return crear_datos_agregar_plato(id_pedido, plato);
 }
 
 static void* deserializar_estado_pedido(t_buffer* buffer)
@@ -325,11 +344,18 @@ void destruir_datos_seleccion_restaurante(void* datos_void)
 	free(datos);
 }
 
-void destruir_agregar_plato(void* datos_void)
+void destruir_guardar_plato(void* datos_void)
 {
 	t_guardar_plato* datos = datos_void;
 	free(datos->comida);
 	free(datos->restaurante);
+	free(datos);
+}
+
+void destruir_agregar_plato(void* datos_void)
+{
+	t_agregar_plato* datos = datos_void;
+	free(datos->plato);
 	free(datos);
 }
 
@@ -377,8 +403,12 @@ void diccionario_serializaciones_inicializar()
 	dictionary_int_put(diccionario_serializaciones, CONSULTAR_PLATOS_RESPUESTA, &serializar_lista_string);
 	dictionary_int_put(diccionario_serializaciones, CREAR_PEDIDO, &serializar_string);
 	dictionary_int_put(diccionario_serializaciones, CREAR_PEDIDO_RESPUESTA, &serializar_int);
+	dictionary_int_put(diccionario_serializaciones, CONFIRMAR_PEDIDO, &serializar_datos_pedido);
+	dictionary_int_put(diccionario_serializaciones, CONFIRMAR_PEDIDO_RESPUESTA, &serializar_bool);
 	dictionary_int_put(diccionario_serializaciones, AGREGAR_PLATO, &serializar_agregar_plato);
 	dictionary_int_put(diccionario_serializaciones, AGREGAR_PLATO_RESPUESTA, &serializar_bool);
+	dictionary_int_put(diccionario_serializaciones, GUARDAR_PLATO, &serializar_guardar_plato);
+	dictionary_int_put(diccionario_serializaciones, GUARDAR_PLATO_RESPUESTA, &serializar_bool);
 	dictionary_int_put(diccionario_serializaciones, PLATO_LISTO, &serializar_datos_pedido);
 	dictionary_int_put(diccionario_serializaciones, PLATO_LISTO_RESPUESTA, &serializar_bool);
 
@@ -413,8 +443,12 @@ void diccionario_deserializaciones_inicializar()
 	dictionary_int_put(diccionario_deserializaciones, CONSULTAR_PLATOS_RESPUESTA, &deserializar_lista_string);
 	dictionary_int_put(diccionario_deserializaciones, CREAR_PEDIDO, &deserializar_string);
 	dictionary_int_put(diccionario_deserializaciones, CREAR_PEDIDO_RESPUESTA, &deserializar_int);
+	dictionary_int_put(diccionario_deserializaciones, CONFIRMAR_PEDIDO, &deserializar_datos_pedido);
+	dictionary_int_put(diccionario_deserializaciones, CONFIRMAR_PEDIDO_RESPUESTA, &deserializar_bool);
 	dictionary_int_put(diccionario_deserializaciones, AGREGAR_PLATO, &deserializar_agregar_plato);
 	dictionary_int_put(diccionario_deserializaciones, AGREGAR_PLATO_RESPUESTA, &deserializar_bool);
+	dictionary_int_put(diccionario_deserializaciones, GUARDAR_PLATO, &deserializar_guardar_plato);
+	dictionary_int_put(diccionario_deserializaciones, GUARDAR_PLATO_RESPUESTA, &deserializar_bool);
 	dictionary_int_put(diccionario_deserializaciones, PLATO_LISTO, &deserializar_datos_pedido);
 	dictionary_int_put(diccionario_deserializaciones, PLATO_LISTO_RESPUESTA, &deserializar_bool);
 
@@ -444,8 +478,12 @@ void diccionario_destrucciones_inicializar()
 	dictionary_int_put(diccionario_destrucciones, CONSULTAR_PLATOS_RESPUESTA, &destruir_lista_string);
 	dictionary_int_put(diccionario_destrucciones, CREAR_PEDIDO, &free);
 	dictionary_int_put(diccionario_destrucciones, CREAR_PEDIDO_RESPUESTA, &sin_free);
+	dictionary_int_put(diccionario_destrucciones, CONFIRMAR_PEDIDO, &destruir_datos_pedido);
+	dictionary_int_put(diccionario_destrucciones, CONFIRMAR_PEDIDO_RESPUESTA, &sin_free);
 	dictionary_int_put(diccionario_destrucciones, AGREGAR_PLATO, &destruir_agregar_plato);
 	dictionary_int_put(diccionario_destrucciones, AGREGAR_PLATO_RESPUESTA, &sin_free);
+	dictionary_int_put(diccionario_destrucciones, GUARDAR_PLATO, &destruir_guardar_plato);
+	dictionary_int_put(diccionario_destrucciones, GUARDAR_PLATO_RESPUESTA, &sin_free);
 	dictionary_int_put(diccionario_destrucciones, PLATO_LISTO, &destruir_datos_pedido);
 	dictionary_int_put(diccionario_destrucciones, PLATO_LISTO_RESPUESTA, &sin_free);
 	dictionary_int_put(diccionario_destrucciones, OBTENER_PEDIDO, &destruir_datos_pedido);

@@ -36,8 +36,14 @@ t_datos_seleccion_restaurante* crear_datos_seleccion_restaurante(char* id_client
 	datos->restaurante = restaurante;
 	return datos;
 }
-
-t_guardar_plato* crear_datos_agregar_plato(int id_pedido, int cantidad, char* comida, char* restaurante)
+t_agregar_plato* crear_datos_agregar_plato(int id_pedido, char* plato)
+{
+	t_agregar_plato* datos = malloc(sizeof(t_agregar_plato));
+	datos->id_pedido = id_pedido;
+	datos->plato = plato;
+	return datos;
+}
+t_guardar_plato* crear_datos_guardar_plato(int id_pedido, int cantidad, char* comida, char* restaurante)
 {
 	t_guardar_plato* datos = malloc(sizeof(t_guardar_plato));
 	datos->id_pedido = id_pedido;

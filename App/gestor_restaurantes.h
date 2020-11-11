@@ -20,6 +20,7 @@ void inicializar_gestor_restaurantes();
 
 bool hay_restaurantes_conectados();
 bool restaurante_esta_conectado(char* nombre_restaurante);
+bool es_resto_default(char* nombre_restaurante);
 
 t_list* obtener_restaurantes_conectados();
 

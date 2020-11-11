@@ -47,7 +47,7 @@ static t_respuesta* seleccionar_restaurante(t_datos_seleccion_restaurante* datos
 {
 	char* restaurante = datos->restaurante;
 
-	if(strcmp(restaurante, "Resto_Default")==0 || restaurante_esta_conectado(restaurante))
+	if(es_resto_default(restaurante) || restaurante_esta_conectado(restaurante))
 	{
 		cliente_seleccionar_restaurante(datos->id_cliente, restaurante);
 		return respuesta_crear(SELECCIONAR_RESTAURANTE_RESPUESTA, (void*) true, false);
@@ -90,7 +90,7 @@ static t_respuesta* crear_pedido(char* id_cliente)
 
 	if(restaurante_esta_conectado(restaurante))
 		id_pedido = (int) cliente_enviar_mensaje(restaurante_obtener_cliente(restaurante), CREAR_PEDIDO, NULL);
-	else if(strcmp(restaurante, "Resto_Default")==0)
+	else if(es_resto_default(restaurante))
 		id_pedido = generar_id_pedido();
 	else
 		return respuesta_crear(CREAR_PEDIDO_RESPUESTA, (void*) -1, false);
@@ -110,23 +110,35 @@ static t_respuesta* crear_pedido(char* id_cliente)
 	return respuesta_crear(CREAR_PEDIDO_RESPUESTA, (void*) id_pedido, false);
 }
 
+static bool es_plato_default(char* plato)
+{
+	t_list* platos = platos_default();
+	bool es_mismo_plato(void* plato_default) { return strcmp(plato_default, plato)==0; }
+	bool es_default = list_any_satisfy(platos, (void*) &es_mismo_plato);
+	destruir_lista_string(platos);
+
+	return  es_default;
+}
+
 /*AGREGAR PLATO*/
 static t_respuesta* agregar_plato(t_agregar_plato* datos)
 {
 	char* restaurante = pedido_obtener_restaurante(datos->id_pedido);
+	bool op_ok = false;
 
 	if(restaurante_esta_conectado(restaurante))
-	{
-		bool op_ok = cliente_enviar_mensaje(restaurante_obtener_cliente(restaurante), AGREGAR_PLATO, &datos);
+		op_ok = cliente_enviar_mensaje(restaurante_obtener_cliente(restaurante), AGREGAR_PLATO, &datos);
 
-		if(!op_ok)
-			return respuesta_crear(AGREGAR_PLATO_RESPUESTA, (void*) false, false);
-	}
+	if(es_resto_default(restaurante))
+		op_ok = es_plato_default(datos->plato);
+
+	if(!op_ok)
+		return respuesta_crear(AGREGAR_PLATO_RESPUESTA, (void*) false, false);
 
 	//t_guardar_plato* datos_comanda = crear_datos_agregar_plato(datos->id_pedido, 1, datos->plato, restaurante);
-	bool op_ok = true;// cliente_enviar_mensaje(cliente_comanda, GUARDAR_PLATO, &datos_comanda);
+	//op_ok = cliente_enviar_mensaje(cliente_comanda, GUARDAR_PLATO, &datos_comanda);
 
-	return respuesta_crear(AGREGAR_PLATO_RESPUESTA, &op_ok, false);
+	return respuesta_crear(AGREGAR_PLATO_RESPUESTA, (void*) op_ok, false);
 }
 
 /*PLATO LISTO*/
@@ -162,7 +174,9 @@ static t_respuesta* confirmar_pedido(t_datos_pedido* datos)
 
 	//TODO: Enviar mensaje Confirmar Pedido a Cliente
 
-	return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, cliente_enviar_mensaje(cliente_comanda, CONFIRMAR_PEDIDO, datos), false);
+	//op_ok = cliente_enviar_mensaje(cliente_comanda, CONFIRMAR_PEDIDO, datos)
+
+	return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) op_ok , false);
 }
 
 /*CONSULTAR PEDIDO*/

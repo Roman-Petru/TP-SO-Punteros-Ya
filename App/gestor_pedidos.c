@@ -1,4 +1,5 @@
 #include "gestor_pedidos.h"
+#include "app.h"
 
 t_list* pedidos_pendientes;
 pthread_mutex_t mutex;
@@ -11,6 +12,19 @@ void inicializar_gestor_pedidos()
 	pthread_mutex_init(&mutex, NULL);
 	id_pedido = 770000;
 	pthread_mutex_init(&mutex_id, NULL);
+}
+
+static void destruir_pedido(void* pedido_void)
+{
+	t_pedido_pendiente* pedido = pedido_void;
+	free(pedido->restaurante);
+	free(pedido->id_cliente);
+	free(pedido);
+}
+
+void finalizar_gestor_pedidos()
+{
+	list_destroy_and_destroy_elements(pedidos_pendientes, &destruir_pedido);
 }
 
 static int pedido_index(int id_pedido)
@@ -32,9 +46,16 @@ void vincular_pedido(int id_pedido, char* id_cliente, char* restaurante)
 	pedido->restaurante = restaurante;
 	pedido->id_cliente = id_cliente;
 
+	size_t tam = strlen(id_cliente)+1;
+	pedido->id_cliente  = malloc(tam);
+	memcpy(pedido->id_cliente , id_cliente, tam);
+
 	pthread_mutex_lock(&mutex);
 	list_add(pedidos_pendientes, pedido);
 	pthread_mutex_unlock(&mutex);
+
+	log_info(logger, "Se vinculo al Pedido %d con cliente: %s y resto: %s", pedido->id, pedido->id_cliente, pedido->restaurante);
+
 
 	cliente_agregar_pedido(id_cliente, id_pedido);
 }
@@ -77,13 +98,6 @@ char* pedido_obtener_cliente(int id_pedido)
 
 void remover_pedido(int id_pedido)
 {
-	void destruir_pedido(void* pedido_void)
-	{
-		t_pedido_pendiente* pedido = pedido_void;
-		free(pedido->restaurante);
-		free(pedido);
-	}
-
 	pthread_mutex_lock(&mutex);
 	list_remove_and_destroy_element(pedidos_pendientes, pedido_index(id_pedido), &destruir_pedido);
 	pthread_mutex_unlock(&mutex);

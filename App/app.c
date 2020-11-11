@@ -41,6 +41,7 @@ void terminar()
 	serializacion_finalizar();
 	servidor_destruir(servidor);
 	finalizar_gestor_clientes();
+	finalizar_gestor_pedidos();
 	log_info(logger, "TERMINE");
 	exit(0);
 }

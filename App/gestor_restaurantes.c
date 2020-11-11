@@ -24,6 +24,8 @@ bool restaurante_esta_conectado(char* nombre_restaurante)
 	return list_any_satisfy(restaurantes_conectados, &es_mismo_restaurante);
 }
 
+bool es_resto_default(char* nombre_restaurante) { return strcmp(nombre_restaurante, "Resto_Default")==0; }
+
 static int restaurante_index(char* nombre_restaurante)
 {
 	int index;
