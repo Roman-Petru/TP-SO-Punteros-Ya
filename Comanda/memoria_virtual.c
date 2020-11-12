@@ -80,8 +80,10 @@ void inicializar_memoria_virtual()
 
 bool cargar_desde_swap_si_es_necesario(t_pagina* pagina)
 {
-	if(pagina->validacion_principal)
-		{	mover_al_final(pagina);		return true;}
+	if(pagina->validacion_principal){
+		if (strcmp(config_get_string_value(config, "ALGORITMO_REEMPLAZO"), "LRU")==0)
+			mover_al_final(pagina);
+		return true;}
 
 	if(!pagina->validacion_virtual)
 	{
