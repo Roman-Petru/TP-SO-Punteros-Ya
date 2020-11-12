@@ -164,13 +164,13 @@ static void obtener_pedido()
 
 	void logear_platos(void* plato)
 		{t_datos_estado_comida* plato_a_logear = plato;
-
-		sprintf(mensaje, "Comida: %s, cantidad lista: %d, cantidad total %d", plato_a_logear->comida, plato_a_logear->cant_lista, plato_a_logear->cant_total);
-		consola_log(consola, mensaje);
+		char* mensaje2 = malloc(100);
+		sprintf(mensaje2, "Comida: %s, cantidad lista: %d, cantidad total %d", plato_a_logear->comida, plato_a_logear->cant_lista, plato_a_logear->cant_total);
+		consola_log(consola, mensaje2);
+		free(mensaje2);
 		}
 
 	list_iterate(datos_pedido->platos, &logear_platos);
-
 }
 
 
