@@ -7,7 +7,7 @@ t_bitarray* mapa_bits_virtual;
 pthread_mutex_t mutex;
 pthread_mutex_t mutex_mapa_bit;
 
-t_marco* crear_marco()
+static t_marco* crear_marco()
 {
 	t_marco* marco = malloc(sizeof(t_marco));
 	return marco;
@@ -40,19 +40,21 @@ t_marco* obtener_marco_virtual(int index)
 void cargar_marco_virtual(int index, t_pagina* pagina)
 {
 	t_marco* marco = obtener_marco_virtual(index);
-	marco->nombre_plato = pagina->comida;
+	strcpy (marco->nombre_plato, pagina->comida);
 	marco->cantidad_total = 0;
 	marco->cantidad_lista = 0;
 
 	pagina->marco_virtual = index;
 	pagina->validacion_virtual = true;
+
+	log_info(logger, "Se cargo el marco de memoria virtual de posicion %d con nombre de plato %s, cantidad lista %d y cantidad total %d", index, marco->nombre_plato, marco->cantidad_lista, marco->cantidad_total);
 }
 
 void escribir_marco_virtual(t_pagina* pagina)
 {
 	t_marco* marco_virtual = obtener_marco_virtual(pagina->marco_virtual);
 	t_marco* marco_principal = obtener_marco_principal(pagina->marco_principal);
-	marco_virtual->nombre_plato = marco_principal->nombre_plato;
+	strcpy(marco_virtual->nombre_plato, marco_principal->nombre_plato);
 	marco_virtual->cantidad_total = marco_principal->cantidad_total;
 	marco_virtual->cantidad_lista = marco_principal->cantidad_lista;
 }
@@ -64,6 +66,7 @@ void inicializar_memoria_virtual()
 	tabla_marcos_virtual = list_create();
 	pthread_mutex_init(&mutex, NULL);
 	pthread_mutex_init(&mutex_mapa_bit, NULL);
+	pthread_mutex_init(&mutex_algoritmos, NULL);
 
 	void* mentira = malloc(cantidad_frames_virtual / 8);
 	mapa_bits_virtual = bitarray_create_with_mode(mentira, cantidad_frames_virtual / 8, MSB_FIRST);
@@ -75,28 +78,18 @@ void inicializar_memoria_virtual()
 	}
 }
 
-int algoritmo_reemplazo(t_pagina* pagina)
-{
-	int index = primer_marco_principal_libre();
-
-	if(index == -1)
-		index = algoritmo_reemplazo(pagina);
-
-	return index;
-}
-
 bool cargar_desde_swap_si_es_necesario(t_pagina* pagina)
 {
 	if(pagina->validacion_principal)
-		return true;
+		{	mover_al_final(pagina);		return true;}
 
 	if(!pagina->validacion_virtual)
 	{
-		int index = primer_marco_libre();
+		int index = primer_marco_virtual_libre();
 		if(index == -1)
 			return false; // LOGGEAR NO ESPACIO EN MEMORIA
 
-		cargar_marco(index, pagina);
+		cargar_marco_virtual(index, pagina);
 	}
 
 	int index = primer_marco_principal_libre();
@@ -104,21 +97,18 @@ bool cargar_desde_swap_si_es_necesario(t_pagina* pagina)
 		index = algoritmo_reemplazo(pagina);
 
 	mover_al_final(pagina);
-	pagina->validacion_principal = true;
+
 	pagina->marco_principal = index;
+	cargar_marco_principal(pagina);
 
 	return true;
 }
 
-void vaciar_segmento_memoria_virtual(t_segmento* segmento)
-{
-	segmento->tabla_paginas;
-}
-
-
 void vaciar_pagina_memoria_virtual(t_pagina* pagina)
 {
 	bitarray_set_bit(mapa_bits_virtual, pagina->marco_virtual);
+	log_info(logger, "Se elimina la particion del marco de memoria virtual de posicion %d", pagina->marco_virtual);
+
 }
 
 

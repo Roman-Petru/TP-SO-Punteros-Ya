@@ -7,7 +7,7 @@ t_bitarray* mapa_bits_principal;
 pthread_mutex_t mutex;
 pthread_mutex_t mutex_mapa_bit;
 
-t_marco* crear_marco()
+static t_marco* crear_marco()
 {
 	t_marco* marco = malloc(sizeof(t_marco));
 	return marco;
@@ -37,46 +37,57 @@ int primer_marco_principal_libre()
 	return encontro ? index-1 : -1;
 }
 
-void pagina_modificada(t_pagina* pagina)
+void cargar_marco_principal(t_pagina* pagina)
+{
+	t_marco* marco_virtual = obtener_marco_virtual(pagina->marco_virtual);
+	t_marco* marco_principal = obtener_marco_principal(pagina->marco_principal);
+
+	strcpy (marco_principal->nombre_plato, marco_virtual->nombre_plato);
+	marco_principal->cantidad_total = marco_virtual->cantidad_total;
+	marco_principal->cantidad_lista = marco_virtual->cantidad_lista;
+
+	pagina->validacion_principal = true;
+
+	log_info(logger, "Se cargo el marco de memoria principal de posicion %d con nombre de plato %s, cantidad lista %d y cantidad total %d", pagina->marco_principal, marco_principal->nombre_plato, marco_principal->cantidad_lista, marco_principal->cantidad_total);
+
+}
+
+static void pagina_modificada(t_pagina* pagina, t_marco* marco_principal)
 {
 	pagina->uso = true;
 	pagina->modificado = true;
+	log_info(logger, "Se escribio el marco de memoria principal de posicion %d con nombre de plato %s, ahora tiene cantidad lista %d y cantidad total %d", pagina->marco_principal, marco_principal->nombre_plato, marco_principal->cantidad_lista, marco_principal->cantidad_total);
 }
 
 void escribir_marco_principal_guardar_plato(t_pagina* pagina, int cantidad_comida)
 {
-	t_marco* marco_virtual = obtener_marco_virtual(pagina->marco_virtual);
 	t_marco* marco_principal = obtener_marco_principal(pagina->marco_principal);
-	marco_principal->nombre_plato = marco_virtual->nombre_plato;
-	marco_principal->cantidad_total = marco_virtual->cantidad_total + cantidad_comida;
-	marco_principal->cantidad_lista = marco_virtual->cantidad_lista;
-	pagina_modificada(pagina);
+	marco_principal->cantidad_total = marco_principal->cantidad_total + cantidad_comida;
+	pagina_modificada(pagina, marco_principal);
 }
 
 void escribir_marco_principal_plato_listo(t_pagina* pagina)
 {
-	t_marco* marco_virtual = obtener_marco_virtual(pagina->marco_virtual);
 	t_marco* marco_principal = obtener_marco_principal(pagina->marco_principal);
-	marco_principal->nombre_plato = marco_virtual->nombre_plato;
-	marco_principal->cantidad_total = marco_virtual->cantidad_total;
-	marco_principal->cantidad_lista = marco_virtual->cantidad_lista + 1;
-	pagina->esta_lista = marco_principal->cantidad_lista == marco_principal->cantidad_total;
-
-	pagina_modificada(pagina);
+	marco_principal->cantidad_lista = marco_principal->cantidad_lista + 1;
+	pagina->comida_esta_lista = marco_principal->cantidad_lista == marco_principal->cantidad_total;
+	pagina_modificada(pagina, marco_principal);
 }
 
 bool comida_esta_lista(t_pagina* pagina)
 {
-	return pagina->esta_lista;
+	return pagina->comida_esta_lista;
 }
 
-t_estado_pedido* leer_pedido_memoria_principal(t_segmento* segmento_pedido)
+t_datos_estado_pedido* leer_pedido_memoria_principal(t_segmento* segmento_pedido)
 {
-	void* transfomer(void* plato_void)
+	void* transfomer(void* pagina_void)
 	{
-		t_pagina* plato = plato_void;
-		t_marco* marco_principal = obtener_marco_principal(plato->marco_principal);
-		plato->uso = true;
+		t_pagina* pagina = pagina_void;
+		t_marco* marco_principal = obtener_marco_principal(pagina->marco_principal);
+		pagina->uso = true;
+
+		log_info(logger, "Se leyo el marco de memoria principal de posicion %d con nombre de plato %s, cantidad lista %d y cantidad total %d", pagina->marco_principal, marco_principal->nombre_plato, marco_principal->cantidad_lista, marco_principal->cantidad_total);
 
 		return crear_datos_estado_comida(marco_principal->nombre_plato, marco_principal->cantidad_total, marco_principal->cantidad_lista);
 	}
@@ -108,9 +119,8 @@ void vaciar_pagina_memoria_principal(t_pagina* pagina)
 {
 	sacar_de_paginas_en_memoria(pagina);
 	bitarray_set_bit(mapa_bits_principal, pagina->marco_principal);
+	log_info(logger, "Se elimina la particion del marco de memoria principal de posicion %d", pagina->marco_principal);
 }
-
-
 
 
 

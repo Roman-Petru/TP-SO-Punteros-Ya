@@ -15,29 +15,7 @@ extern t_log* logger;
 extern t_config* config;
 extern t_list* tabla_restaurantes;
 
-typedef struct{
-	char* restaurante;
-	t_list* tabla_segmentos;
-	pthread_mutex_t mutex_tabla_segmentos;
-}t_restaurante;
 
-typedef struct{
-	int id_pedido;
-	t_estado_pedido estado;
-	t_list* tabla_paginas;
-}t_segmento;
-
-typedef struct{
-	int id;
-	char* comida;
-	int marco_principal;
-	int marco_virtual;
-	bool esta_lista;
-	bool uso;
-	bool modificado;
-	bool validacion_principal;
-	bool validacion_virtual;
-}t_pagina;
 
 
 #endif

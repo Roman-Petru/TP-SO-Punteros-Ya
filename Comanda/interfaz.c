@@ -3,18 +3,20 @@
 
 static t_respuesta* guardar_pedido(t_datos_pedido* datos)
 {
-	if(!tabla_restaurante_existe(datos->restaurante))
+	if(!tabla_segmento_restaurante_existe(datos->restaurante))
 		tabla_restaurante_crear(datos->restaurante); //En caso de no poder crearla, se deberá informar dicha situación.
 
-	bool ok = tabla_restaurante_agregar_tabla_segmentos(datos);
+	if(tabla_restaurante_agregar_segmento(datos))
+		return respuesta_crear(GUARDAR_PEDIDO_RESPUESTA, (void*) true, false);
+	else
+		return respuesta_crear(GUARDAR_PEDIDO_RESPUESTA, (void*) false, false);
 
-	return respuesta_crear(GUARDAR_PEDIDO_RESPUESTA, (void*) true, false);
 }
 
 static t_respuesta* guardar_plato(t_guardar_plato* datos)
 {
 	//Verificar si existe la tabla de segmentos de dicho Restaurante. En caso de no existir se deberá informar dicha situación.
-	if(!tabla_restaurante_existe(datos->restaurante))
+	if(!tabla_segmento_restaurante_existe(datos->restaurante))
 		return respuesta_crear(GUARDAR_PLATO_RESPUESTA, (void*) false, false);
 
 	//Verificar que exista el segmento de dicho pedido dentro de la tabla de segmentos del Restaurante. En caso de no existir se deberá informar dicha situación.
@@ -27,7 +29,7 @@ static t_respuesta* guardar_plato(t_guardar_plato* datos)
 		return respuesta_crear(PLATO_LISTO_RESPUESTA, (void*) false, false);
 
 	//Verificar si existe el plato dentro de la tabla de páginas del pedido. En caso contrario, se deberá asignar una nueva página al segmento.
-	if(!pagina_existe_plato(segmento, datos->comida))
+	if(!pagina_existe(segmento, datos->comida))
 		asignar_nueva_pagina(segmento, datos->comida);
 
 	t_pagina* pagina = obtener_pagina(segmento, datos->comida);
@@ -48,7 +50,7 @@ static t_respuesta* guardar_plato(t_guardar_plato* datos)
 static t_respuesta* obtener_pedido(t_datos_pedido* datos)
 {
 	//Verificar si existe la tabla de segmentos de dicho Restaurante. En caso de no existir se deberá informar dicha situación.
-	if(!restaurante_tiene_tabla_de_segmentos(datos->restaurante))
+	if(!tabla_segmento_restaurante_existe(datos->restaurante))
 		return respuesta_crear(OBTENER_PEDIDO_RESPUESTA, (void*) false, false);
 
 	//Verificar que exista el segmento de dicho pedido dentro de la tabla de segmentos del Restaurante. En caso de no existir se deberá informar dicha situación.
@@ -65,7 +67,7 @@ static t_respuesta* obtener_pedido(t_datos_pedido* datos)
 		return respuesta_crear(OBTENER_PEDIDO_RESPUESTA, crear_datos_estado_pedido(ERROR, NULL), false);
 
 	//Responder el mensaje indicando si se pudo realizar en conjunto con la información del pedido si correspondiera.
-	t_estado_pedido* datos_respuesta = leer_pedido_memoria_principal(segmento);
+	t_datos_estado_pedido* datos_respuesta = leer_pedido_memoria_principal(segmento);
 
 	return respuesta_crear(OBTENER_PEDIDO_RESPUESTA, (void*) datos_respuesta, false);
 }
@@ -73,7 +75,7 @@ static t_respuesta* obtener_pedido(t_datos_pedido* datos)
 static t_respuesta* confirmar_pedido(t_datos_pedido* datos)
 {
 	//Verificar si existe la tabla de segmentos de dicho Restaurante. En caso de no existir se deberá informar dicha situación.
-	if(!restaurante_tiene_tabla_de_segmentos(datos->restaurante))
+	if(!tabla_segmento_restaurante_existe(datos->restaurante))
 		return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) false, false);
 
 	//Verificar que exista el segmento de dicho pedido dentro de la tabla de segmentos del Restaurante. En caso de no existir se deberá informar dicha situación.
@@ -95,7 +97,7 @@ static t_respuesta* confirmar_pedido(t_datos_pedido* datos)
 static t_respuesta* plato_listo(t_plato_listo* datos)
 {
 	//Verificar si existe la tabla de segmentos de dicho Restaurante. En caso de no existir se deberá informar dicha situación.
-	if(!restaurante_tiene_tabla_de_segmentos(datos->restaurante))
+	if(!tabla_segmento_restaurante_existe(datos->restaurante))
 		return respuesta_crear(PLATO_LISTO_RESPUESTA, (void*) false, false);
 
 	//Verificar que exista el segmento de dicho pedido dentro de la tabla de segmentos del Restaurante. En caso de no existir se deberá informar dicha situación.
@@ -105,7 +107,7 @@ static t_respuesta* plato_listo(t_plato_listo* datos)
 	t_segmento* segmento = obtener_segmento(datos->restaurante, datos->id_pedido);
 
 	//Verificar si existe el plato dentro de la tabla de páginas del pedido. En caso contrario, se deberá informar dicha situación.
-	if(!pagina_existe_plato(segmento, datos->comida))
+	if(!pagina_existe(segmento, datos->comida))
 		return respuesta_crear(PLATO_LISTO_RESPUESTA, (void*) false, false);
 
 	t_pagina* pagina = obtener_pagina(segmento, datos->comida);
@@ -133,7 +135,7 @@ static t_respuesta* plato_listo(t_plato_listo* datos)
 static t_respuesta* finalizar_pedido(t_datos_pedido* datos)
 {
 	//Verificar si existe la tabla de segmentos de dicho Restaurante. En caso de no existir se deberá informar dicha situación.
-	if(!restaurante_tiene_tabla_de_segmentos(datos->restaurante))
+	if(!tabla_segmento_restaurante_existe(datos->restaurante))
 			return respuesta_crear(FINALIZAR_PEDIDO_RESPUESTA, (void*) false, false);
 
 	//Verificar que exista el segmento de dicho pedido dentro de la tabla de segmentos del Restaurante. En caso de no existir se deberá informar dicha situación.
@@ -143,20 +145,12 @@ static t_respuesta* finalizar_pedido(t_datos_pedido* datos)
 	t_segmento* segmento = obtener_segmento(datos->restaurante, datos->id_pedido);
 
 	//Se deberá proceder a eliminar las páginas correspondientes a dicho segmento.
-	void destruir_pagina(void* pagina_void)
-	{
-		t_pagina* pagina = pagina_void;
-		if(pagina->validacion_principal)
-			vaciar_pagina_memoria_principal(pagina);
-		vaciar_pagina_memoria_virtual(pagina);
-		free(pagina->comida);
-		free(pagina);
-	}
 
-	list_iterate(segmento->tabla_paginas, &destruir_pagina);
+	eliminar_paginas(segmento);
 
 	//Por último, se procederá a eliminar el segmento correspondiente.
-	eliminar_segmento(segmento);
+
+	tabla_restaurante_eliminar_segmento(segmento);
 
 	//Responder el mensaje indicando si se pudo realizar la operación correctamente (Ok/Fail).
 	return respuesta_crear(PLATO_LISTO_RESPUESTA, (void*) true, false);
@@ -170,5 +164,4 @@ void cargar_interfaz()
 	servidor_agregar_operacion(servidor, CONFIRMAR_PEDIDO, &confirmar_pedido);
 	servidor_agregar_operacion(servidor, PLATO_LISTO, &plato_listo);
 	servidor_agregar_operacion(servidor, FINALIZAR_PEDIDO, &finalizar_pedido);
-
 }

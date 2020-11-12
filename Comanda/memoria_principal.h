@@ -6,6 +6,7 @@
 #include <commons/collections/list.h>
 #include <commons/bitarray.h>
 #include <stdint.h>
+#include "gestor_tablas.h"
 
 typedef struct{
 	uint32_t cantidad_total;
@@ -15,11 +16,12 @@ typedef struct{
 
 
 void inicializar_memoria_principal();
+void cargar_marco_principal(t_pagina* pagina);
 int primer_marco_principal_libre();
 t_marco* obtener_marco_principal(int index);
 void escribir_marco_principal_guardar_plato(t_pagina* pagina, int cantidad_comida);
 void escribir_marco_principal_plato_listo(t_pagina* pagina);
-t_estado_pedido* leer_pedido_memoria_principal();
+t_datos_estado_pedido* leer_pedido_memoria_principal(t_segmento* segmento_pedido);
 bool comida_esta_lista(t_pagina* pagina);
 void vaciar_pagina_memoria_principal(t_pagina* pagina);
 

@@ -5,7 +5,9 @@ pthread_mutex_t mutex_algoritmos;
 
 static int algoritmo_LRU(t_pagina* pagina)
 {
+	pthread_mutex_lock(&mutex_algoritmos);
 	t_pagina* pagina_victima = list_remove(paginas_en_memoria, 0);
+	pthread_mutex_unlock(&mutex_algoritmos);
 	int index = pagina_victima->marco_principal;
 
 	if(pagina_victima->modificado)
@@ -13,6 +15,8 @@ static int algoritmo_LRU(t_pagina* pagina)
 
 	pagina_victima->validacion_principal = false;
 	pagina_victima->modificado = false;
+
+	log_info(logger, "Se selecciono la pagina que estaba en el marco %d como victima para reemplazar", pagina_victima->marco_principal);
 
 	return index;
 }
