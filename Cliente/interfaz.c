@@ -22,6 +22,7 @@ static bool validar_pedido()
 
 	if(invalido)
 		consola_log(consola, "No hay pedido en marcha.");
+
 	return invalido;
 }
 
@@ -39,17 +40,13 @@ static void terminar()
 void handshake()
 {
 	t_modulo modulo = (t_modulo) cliente_enviar_mensaje(cliente, HANDSHAKE_CLIENTE, NULL);
-
 	bool op_ok = true;
-
-
 
 	if(modulo == APP)
 	{
 		t_datos_cliente* datos = crear_datos_cliente(config_get_string_value(config, "ID_CLIENTE"), posicion_crear(config_get_int_value(config, "POSICION_X"), config_get_int_value(config, "POSICION_Y")));
 		op_ok = cliente_enviar_mensaje(cliente, CONEXION_CLIENTE, datos);
 	}
-
 
 	if(modulo == MODULO_ERROR || !op_ok)
 		consola_log(consola, "Error al realizar el handshake.");
@@ -118,14 +115,13 @@ static void guardar_pedido()
 	if(validar_restaurante() && validar_pedido())
 		return;
 
-	t_datos_pedido datos;
-	datos.restaurante = restaurante_seleccionado;
-	datos.id_pedido = id_pedido;
+	t_datos_pedido* datos = crear_datos_pedido(id_pedido, restaurante_seleccionado);
 
-	bool operacion_ok = cliente_enviar_mensaje(cliente, CREAR_PEDIDO, &datos);
+	bool operacion_ok = cliente_enviar_mensaje(cliente, GUARDAR_PEDIDO, datos);
 	consola_if(consola, operacion_ok);
 }
 
+/*AGREGAR PLATO*/
 static void agregar_plato()
 {
 	if(validar_pedido())
@@ -136,22 +132,20 @@ static void agregar_plato()
 	consola_if(consola, operacion_ok);
 }
 
+/*GUARDAR PLATO*/
 static void guardar_plato()
 {
 	if(validar_pedido() && validar_restaurante())
 		return;
 
-	t_guardar_plato datos;
-	datos.restaurante = restaurante_seleccionado;
-	datos.id_pedido = id_pedido;
-	datos.comida = consola_leer("Ingrese el nombre de la comida: ");
-	datos.restaurante = consola_leer("Ingrese la cantidad: ");
+	char* plato = consola_leer("Ingrese el nombre de la comida: ");
+	char* cant_s = consola_leer("Ingrese la cantidad: ");
+	int cant = strtol(cant_s, NULL, 10);
 
-	bool operacion_ok = cliente_enviar_mensaje(cliente, GUARDAR_PLATO, &datos);
+	t_guardar_plato* datos = crear_datos_guardar_plato(id_pedido,cant ,plato , restaurante_seleccionado);
+
+	bool operacion_ok = cliente_enviar_mensaje(cliente, GUARDAR_PLATO, datos);
 	consola_if(consola, operacion_ok);
-
-	free(datos.comida);
-	free(datos.restaurante);
 }
 
 static void confirmar_pedido()

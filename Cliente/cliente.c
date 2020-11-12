@@ -20,8 +20,8 @@ static void inicializar()
 {
 	config = config_create("cliente.config");
 
-	id_pedido = 0;
-	restaurante_seleccionado = NULL;
+	id_pedido = 10;
+	restaurante_seleccionado = "Resto_Default";
 	hay_que_leer = true;
 
 	serializacion_inicializar();

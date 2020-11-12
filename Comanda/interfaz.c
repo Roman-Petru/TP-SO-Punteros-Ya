@@ -1,16 +1,17 @@
 #include "interfaz.h"
 #include "comanda.h"
 
+static t_respuesta* handshake_cliente()
+{
+	return respuesta_crear(HANDSHAKE_CLIENTE_RESPUESTA, (void*) COMANDA, false);
+}
+
 static t_respuesta* guardar_pedido(t_datos_pedido* datos)
 {
 	if(!tabla_segmento_restaurante_existe(datos->restaurante))
 		tabla_restaurante_crear(datos->restaurante); //En caso de no poder crearla, se deberá informar dicha situación.
 
-	if(tabla_restaurante_agregar_segmento(datos))
-		return respuesta_crear(GUARDAR_PEDIDO_RESPUESTA, (void*) true, false);
-	else
-		return respuesta_crear(GUARDAR_PEDIDO_RESPUESTA, (void*) false, false);
-
+	return respuesta_crear(GUARDAR_PEDIDO_RESPUESTA, (void*) tabla_restaurante_agregar_segmento(datos), false);
 }
 
 static t_respuesta* guardar_plato(t_guardar_plato* datos)
@@ -158,6 +159,7 @@ static t_respuesta* finalizar_pedido(t_datos_pedido* datos)
 
 void cargar_interfaz()
 {
+	servidor_agregar_operacion(servidor, HANDSHAKE_CLIENTE, &handshake_cliente);
 	servidor_agregar_operacion(servidor, GUARDAR_PEDIDO, &guardar_pedido);
 	servidor_agregar_operacion(servidor, GUARDAR_PLATO, &guardar_plato);
 	servidor_agregar_operacion(servidor, OBTENER_PEDIDO, &obtener_pedido);

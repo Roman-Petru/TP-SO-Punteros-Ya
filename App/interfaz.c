@@ -95,12 +95,8 @@ static t_respuesta* crear_pedido(char* id_cliente)
 	else
 		return respuesta_crear(CREAR_PEDIDO_RESPUESTA, (void*) -1, false);
 
-	/*
-	t_datos_pedido datos;
-	datos.restaurante = restaurante;
-	datos.id_pedido = id_pedido;
-	*/
-	bool op_ok = true;//cliente_enviar_mensaje(cliente_comanda, GUARDAR_PEDIDO, &datos);
+	t_datos_pedido* datos = crear_datos_pedido(id_pedido, restaurante);
+	bool op_ok = cliente_enviar_mensaje(cliente_comanda, GUARDAR_PEDIDO, datos);
 
 	//Retorna el ID del pedido al Cliente que solicitó el pedido.
 	if(!op_ok)
@@ -135,8 +131,8 @@ static t_respuesta* agregar_plato(t_agregar_plato* datos)
 	if(!op_ok)
 		return respuesta_crear(AGREGAR_PLATO_RESPUESTA, (void*) false, false);
 
-	//t_guardar_plato* datos_comanda = crear_datos_agregar_plato(datos->id_pedido, 1, datos->plato, restaurante);
-	//op_ok = cliente_enviar_mensaje(cliente_comanda, GUARDAR_PLATO, &datos_comanda);
+	t_guardar_plato* datos_comanda = crear_datos_guardar_plato(datos->id_pedido, 1, datos->plato, restaurante);
+	op_ok = cliente_enviar_mensaje(cliente_comanda, GUARDAR_PLATO, datos_comanda);
 
 	return respuesta_crear(AGREGAR_PLATO_RESPUESTA, (void*) op_ok, false);
 }
@@ -200,7 +196,6 @@ void cargar_interfaz()
 	servidor_agregar_operacion(servidor, HANDSHAKE_CLIENTE, &handshake_cliente);
 	servidor_agregar_operacion(servidor, CONEXION_CLIENTE, &conexion_cliente);
 	servidor_agregar_operacion(servidor, HANDSHAKE_RESTO_APP, &handshake_restaurante_app);
-
 
 	servidor_agregar_operacion(servidor, CONSULTAR_RESTAURANTES, &consultar_restaurantes);
 	servidor_agregar_operacion(servidor, SELECCIONAR_RESTAURANTE, &seleccionar_restaurante);

@@ -8,15 +8,13 @@
 #include "../Utils/protocolo.h"
 #include "interfaz.h"
 #include "memoria_principal.h"
+#include "memoria_virtual.h"
 #include "gestor_tablas.h"
 
 extern t_servidor_red* servidor;
 extern t_log* logger;
 extern t_config* config;
 extern t_list* tabla_restaurantes;
-
-
-
 
 #endif
 

@@ -5,7 +5,6 @@ pthread_mutex_t mutex_tablas;
 
 int id_para_algoritmos;
 
-
 void inicializar_gestor_tablas()
 {
 	tabla_restaurantes = list_create();
@@ -14,20 +13,17 @@ void inicializar_gestor_tablas()
 	id_para_algoritmos = 0;
 }
 
-
 bool tabla_segmento_restaurante_existe(char* restaurante)
 {
 	bool es_mismo_restaurante(void* resto) { return strcmp(restaurante, resto)==0; }
 	return list_any_satisfy(tabla_restaurantes, &es_mismo_restaurante);
 }
 
-
-
 bool segmento_existe(char* restaurante, int id_pedido)
 {
 	t_restaurante* restaurante_buscado = obtener_tabla_restaurante(restaurante);
 
-	bool es_mismo_segmento(void* segmento) { return strcmp(((t_segmento*)segmento)->id_pedido, id_pedido)==0; }  //NO ESTOY SEGURO COMO HACER ESTO
+	bool es_mismo_segmento(void* segmento) { return ((t_segmento*) segmento)->id_pedido == id_pedido; }
 	return list_any_satisfy(restaurante_buscado->tabla_segmentos, &es_mismo_segmento);
 }
 
@@ -54,7 +50,7 @@ static int segmento_index(t_restaurante* restaurante_buscado, int id_pedido)
 {
 	int index;
 	bool encontro = false;
-	bool es_mismo_segmento(void* id) { return strcmp(((t_segmento*) id)->id_pedido, id_pedido) == 0; }
+	bool es_mismo_segmento(void* id) { return ((t_segmento*) id)->id_pedido == id_pedido; }
 
 	for(index = 0; !encontro && list_get(restaurante_buscado->tabla_segmentos, index) != NULL; index++)
 		encontro = es_mismo_segmento(list_get(restaurante_buscado->tabla_segmentos, index));
@@ -119,6 +115,8 @@ void tabla_restaurante_crear(char* nombre_restaurante)
 	pthread_mutex_lock(&mutex_tablas);
 	list_add(tabla_restaurantes, restaurante);
 	pthread_mutex_unlock(&mutex_tablas);
+
+	log_info(logger, "Se creo tabla de segmenstos para nuevo restaurante %s", nombre_restaurante);
 }
 
 bool tabla_restaurante_agregar_segmento(t_datos_pedido* datos)
@@ -137,6 +135,8 @@ bool tabla_restaurante_agregar_segmento(t_datos_pedido* datos)
 	pthread_mutex_lock(&(restaurante->mutex_tabla_segmentos));
 	list_add(restaurante->tabla_segmentos, segmento);
 	pthread_mutex_unlock(&(restaurante->mutex_tabla_segmentos));
+
+	log_info(logger, "Se creo tabla de paginas para nuevo pedido %d", segmento->id_pedido);
 
 	return true;
 }
@@ -166,11 +166,9 @@ bool asignar_nueva_pagina(t_segmento* segmento, char* comida)
 
 void tabla_restaurante_eliminar_segmento(t_segmento* segmento)
 {
-	list_destroy(segmento->tabla_paginas);
 	pthread_mutex_destroy(&(segmento->mutex_tabla_paginas));
 	free(segmento);
 }
-
 
 void eliminar_paginas(t_segmento* segmento)
 {
@@ -182,11 +180,9 @@ void eliminar_paginas(t_segmento* segmento)
 		vaciar_pagina_memoria_virtual(pagina);
 		free(pagina->comida);
 		free(pagina);
-		//TODO: sacarlos de la lista segmento->tabla_paginas??
 	}
 
-	list_iterate(segmento->tabla_paginas, &destruir_pagina);
-
+	list_destroy_and_destroy_elements(segmento->tabla_paginas, &destruir_pagina);
 }
 
 
