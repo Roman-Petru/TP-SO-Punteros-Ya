@@ -64,6 +64,8 @@ void inicializar_memoria_virtual()
 {
 	cantidad_frames_virtual = (config_get_int_value(config, "TAMANIO_SWAP") / 32 );
 	tabla_marcos_virtual = list_create();
+	paginas_en_memoria = list_create();
+
 	pthread_mutex_init(&mutex, NULL);
 	pthread_mutex_init(&mutex_mapa_bit, NULL);
 	pthread_mutex_init(&mutex_algoritmos, NULL);

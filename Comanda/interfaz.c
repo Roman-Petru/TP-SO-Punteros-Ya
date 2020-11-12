@@ -52,11 +52,11 @@ static t_respuesta* obtener_pedido(t_datos_pedido* datos)
 {
 	//Verificar si existe la tabla de segmentos de dicho Restaurante. En caso de no existir se deberá informar dicha situación.
 	if(!tabla_segmento_restaurante_existe(datos->restaurante))
-		return respuesta_crear(OBTENER_PEDIDO_RESPUESTA, (void*) false, false);
+		return respuesta_crear(OBTENER_PEDIDO_RESPUESTA, NULL, false);
 
 	//Verificar que exista el segmento de dicho pedido dentro de la tabla de segmentos del Restaurante. En caso de no existir se deberá informar dicha situación.
 	if(!segmento_existe(datos->restaurante, datos->id_pedido))
-		return respuesta_crear(OBTENER_PEDIDO_RESPUESTA, (void*) false, false);
+		return respuesta_crear(OBTENER_PEDIDO_RESPUESTA, NULL, false);
 
 	t_segmento* segmento = obtener_segmento(datos->restaurante, datos->id_pedido);
 

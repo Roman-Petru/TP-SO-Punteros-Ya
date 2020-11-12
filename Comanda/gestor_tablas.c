@@ -15,8 +15,16 @@ void inicializar_gestor_tablas()
 
 bool tabla_segmento_restaurante_existe(char* restaurante)
 {
-	bool es_mismo_restaurante(void* resto) { return strcmp(restaurante, resto)==0; }
-	return list_any_satisfy(tabla_restaurantes, &es_mismo_restaurante);
+	/*bool es_mismo_restaurante(void* resto) { return strcmp(restaurante, resto)==0; }
+	return list_any_satisfy(tabla_restaurantes, &es_mismo_restaurante);*/
+
+	for(int i=0; i < list_size(tabla_restaurantes);i++)
+		{
+			t_restaurante* resto_pivot = list_get(tabla_restaurantes, i);
+			if (strcmp(restaurante, resto_pivot->restaurante)==0)
+				return true;
+		}
+	return false;
 }
 
 bool segmento_existe(char* restaurante, int id_pedido)
@@ -108,7 +116,14 @@ t_pagina* obtener_pagina(t_segmento* segmento, char* comida)
 void tabla_restaurante_crear(char* nombre_restaurante)
 {
 	t_restaurante* restaurante = malloc(sizeof(t_restaurante));
-	restaurante->restaurante = nombre_restaurante;
+
+	size_t tam = strlen(nombre_restaurante)+1;
+	restaurante->restaurante = malloc(tam);
+	memcpy(restaurante->restaurante, nombre_restaurante, tam);
+
+	//restaurante->restaurante = malloc(strlen(nombre_restaurante)+1);
+	//strcpy(restaurante->restaurante, nombre_restaurante);
+
 	restaurante->tabla_segmentos = list_create();
 	pthread_mutex_init(&(restaurante->mutex_tabla_segmentos), NULL);
 
@@ -150,7 +165,10 @@ bool asignar_nueva_pagina(t_segmento* segmento, char* comida)
 	pagina->id = id_para_algoritmos;
 	id_para_algoritmos++;
 
-	pagina->comida = comida;
+	size_t tam = strlen(comida)+1;
+	pagina->comida = malloc(tam);
+	memcpy(pagina->comida, comida, tam);
+
 	pagina->validacion_principal = 0;
 	pagina->validacion_virtual= 0;
 	pagina->uso = 0;
@@ -160,6 +178,8 @@ bool asignar_nueva_pagina(t_segmento* segmento, char* comida)
 	pthread_mutex_lock(&(segmento->mutex_tabla_paginas));
 	list_add(segmento->tabla_paginas, pagina);
 	pthread_mutex_unlock(&(segmento->mutex_tabla_paginas));
+
+	log_info(logger, "Se creo una nueva pagina con el plato %s para el pedido %d", pagina->comida, segmento->id_pedido);
 
 	return true;
 }

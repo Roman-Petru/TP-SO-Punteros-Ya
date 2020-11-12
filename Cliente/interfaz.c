@@ -148,6 +148,32 @@ static void guardar_plato()
 	consola_if(consola, operacion_ok);
 }
 
+/*OBTENER PEDIDO*/
+static void obtener_pedido()
+{
+	if(validar_pedido() && validar_restaurante())
+		return;
+
+	t_datos_pedido* datos = crear_datos_pedido(id_pedido, restaurante_seleccionado);
+
+	t_datos_estado_pedido* datos_pedido = cliente_enviar_mensaje(cliente, OBTENER_PEDIDO, datos);
+
+	char mensaje[40];
+	sprintf(mensaje, "El estado del pedido es: %d, y contiene: ", datos_pedido->estado);
+	consola_log(consola, mensaje);
+
+	void logear_platos(void* plato)
+		{t_datos_estado_comida* plato_a_logear = plato;
+
+		sprintf(mensaje, "Comida: %s, cantidad lista: %d, cantidad total %d", plato_a_logear->comida, plato_a_logear->cant_lista, plato_a_logear->cant_total);
+		consola_log(consola, mensaje);
+		}
+
+	list_iterate(datos_pedido->platos, &logear_platos);
+
+}
+
+
 static void confirmar_pedido()
 {
 	if(validar_restaurante() && validar_pedido())
@@ -216,6 +242,7 @@ void cargar_interfaz()
 	consola_agregar_comando(consola, "consultar platos", &consultar_platos);
 	consola_agregar_comando(consola, "crear pedido", &crear_pedido);
 	consola_agregar_comando(consola, "guardar pedido", &guardar_pedido);
+	consola_agregar_comando(consola, "obtener pedido", &obtener_pedido);
 	consola_agregar_comando(consola, "agregar plato", &agregar_plato);
 	consola_agregar_comando(consola, "guardar plato", &guardar_plato);
 	consola_agregar_comando(consola, "confirmar pedido", &confirmar_pedido);

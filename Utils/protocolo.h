@@ -127,17 +127,19 @@ typedef struct
 
 typedef struct
 {
+	char* comida;
+	uint32_t cant_total;
+	uint32_t cant_lista;
+} t_datos_estado_comida;
+
+typedef struct
+{
 	char* restaurante;
 	bool estado;
 	t_list* platos;
 } t_consultar_pedido;
 
-typedef struct
-{
-	char* comida;
-	uint32_t cant_total;
-	uint32_t cant_lista;
-} t_datos_estado_comida;
+
 
 t_datos_cliente* crear_datos_cliente(char* id_cliente, t_posicion* posicion);
 t_datos_pedido* crear_datos_pedido(int id_pedido, char* restaurante);

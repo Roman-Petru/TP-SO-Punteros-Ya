@@ -4,6 +4,7 @@ t_servidor_red* servidor;
 t_log* logger;
 t_config* config;
 t_list* tabla_restaurantes;
+t_list* paginas_en_memoria;
 
 void inicializar_comanda(){
 	logger = log_create("comanda.log", "COMANDA", true, LOG_LEVEL_INFO);

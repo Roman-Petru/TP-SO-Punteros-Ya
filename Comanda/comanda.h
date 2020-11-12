@@ -15,6 +15,7 @@ extern t_servidor_red* servidor;
 extern t_log* logger;
 extern t_config* config;
 extern t_list* tabla_restaurantes;
+extern t_list* paginas_en_memoria;
 
 #endif
 
