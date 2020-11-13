@@ -436,9 +436,11 @@ void diccionario_serializaciones_inicializar()
 	dictionary_int_put(diccionario_serializaciones, AGREGAR_PLATO_RESPUESTA, &serializar_bool);
 	dictionary_int_put(diccionario_serializaciones, GUARDAR_PLATO, &serializar_guardar_plato);
 	dictionary_int_put(diccionario_serializaciones, GUARDAR_PLATO_RESPUESTA, &serializar_bool);
-	dictionary_int_put(diccionario_serializaciones, PLATO_LISTO, &serializar_datos_pedido);
+	dictionary_int_put(diccionario_serializaciones, PLATO_LISTO, &serializar_guardar_plato);
 	dictionary_int_put(diccionario_serializaciones, PLATO_LISTO_RESPUESTA, &serializar_bool);
 
+	dictionary_int_put(diccionario_serializaciones, FINALIZAR_PEDIDO, &serializar_datos_pedido);
+	dictionary_int_put(diccionario_serializaciones, FINALIZAR_PEDIDO_RESPUESTA, &serializar_bool);
 	dictionary_int_put(diccionario_serializaciones, OBTENER_PEDIDO, &serializar_datos_pedido);
 	dictionary_int_put(diccionario_serializaciones, OBTENER_PEDIDO_RESPUESTA, &serializar_estado_pedido);
 	dictionary_int_put(diccionario_serializaciones, CONSULTAR_PEDIDO, &serializar_int);
@@ -478,9 +480,11 @@ void diccionario_deserializaciones_inicializar()
 	dictionary_int_put(diccionario_deserializaciones, AGREGAR_PLATO_RESPUESTA, &deserializar_bool);
 	dictionary_int_put(diccionario_deserializaciones, GUARDAR_PLATO, &deserializar_guardar_plato);
 	dictionary_int_put(diccionario_deserializaciones, GUARDAR_PLATO_RESPUESTA, &deserializar_bool);
-	dictionary_int_put(diccionario_deserializaciones, PLATO_LISTO, &deserializar_datos_pedido);
+	dictionary_int_put(diccionario_deserializaciones, PLATO_LISTO, &deserializar_guardar_plato);
 	dictionary_int_put(diccionario_deserializaciones, PLATO_LISTO_RESPUESTA, &deserializar_bool);
 
+	dictionary_int_put(diccionario_deserializaciones, FINALIZAR_PEDIDO, &deserializar_datos_pedido);
+	dictionary_int_put(diccionario_deserializaciones, FINALIZAR_PEDIDO_RESPUESTA, &deserializar_bool);
 	dictionary_int_put(diccionario_deserializaciones, OBTENER_PEDIDO, &deserializar_datos_pedido);
 	dictionary_int_put(diccionario_deserializaciones, OBTENER_PEDIDO_RESPUESTA, &deserializar_estado_pedido);
 	dictionary_int_put(diccionario_deserializaciones, CONSULTAR_PEDIDO, &deserializar_int);
@@ -515,8 +519,11 @@ void diccionario_destrucciones_inicializar()
 	dictionary_int_put(diccionario_destrucciones, AGREGAR_PLATO_RESPUESTA, &sin_free);
 	dictionary_int_put(diccionario_destrucciones, GUARDAR_PLATO, &destruir_guardar_plato);
 	dictionary_int_put(diccionario_destrucciones, GUARDAR_PLATO_RESPUESTA, &sin_free);
-	dictionary_int_put(diccionario_destrucciones, PLATO_LISTO, &destruir_datos_pedido);
+	dictionary_int_put(diccionario_destrucciones, PLATO_LISTO, &destruir_guardar_plato);
 	dictionary_int_put(diccionario_destrucciones, PLATO_LISTO_RESPUESTA, &sin_free);
+
+	dictionary_int_put(diccionario_destrucciones, FINALIZAR_PEDIDO, &destruir_datos_pedido);
+	dictionary_int_put(diccionario_destrucciones, FINALIZAR_PEDIDO_RESPUESTA, &sin_free);
 	dictionary_int_put(diccionario_destrucciones, OBTENER_PEDIDO, &destruir_datos_pedido);
 	dictionary_int_put(diccionario_destrucciones, OBTENER_PEDIDO_RESPUESTA, &sin_free); //ver free
 	dictionary_int_put(diccionario_destrucciones, CONSULTAR_PEDIDO, &free);

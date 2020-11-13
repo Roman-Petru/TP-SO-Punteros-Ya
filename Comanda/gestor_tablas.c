@@ -184,8 +184,13 @@ bool asignar_nueva_pagina(t_segmento* segmento, char* comida)
 	return true;
 }
 
-void tabla_restaurante_eliminar_segmento(t_segmento* segmento)
+void tabla_restaurante_eliminar_segmento(char* restaurante, t_segmento* segmento)
 {
+	t_restaurante* resto = obtener_tabla_restaurante(restaurante);
+	pthread_mutex_lock(&(resto->mutex_tabla_segmentos));
+	list_remove(resto->tabla_segmentos, segmento_index(resto, segmento->id_pedido));
+	pthread_mutex_unlock(&(resto->mutex_tabla_segmentos));
+
 	pthread_mutex_destroy(&(segmento->mutex_tabla_paginas));
 	free(segmento);
 }
@@ -205,4 +210,14 @@ void eliminar_paginas(t_segmento* segmento)
 	list_destroy_and_destroy_elements(segmento->tabla_paginas, &destruir_pagina);
 }
 
+void eliminar_pagina_falta_memoria(t_segmento* segmento,t_pagina* pagina)
+{
+	pthread_mutex_lock(&(segmento->mutex_tabla_paginas));
+	list_remove(segmento->tabla_paginas, pagina_index(segmento, pagina->comida));
+	pthread_mutex_unlock(&(segmento->mutex_tabla_paginas));
 
+	log_info(logger, "Se elimino la pagina con el plato %s para el pedido %d por insuficiente espacio en memoria virtual", pagina->comida, segmento->id_pedido);
+
+	free(pagina->comida);
+	free(pagina);
+}

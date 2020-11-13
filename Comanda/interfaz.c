@@ -42,7 +42,7 @@ static t_respuesta* guardar_plato(t_guardar_plato* datos)
 	if(op_ok)
 		escribir_marco_principal_guardar_plato(pagina, datos->cantidad);
 	else
-		return respuesta_crear(GUARDAR_PLATO_RESPUESTA, (void*) false, false);
+		{eliminar_pagina_falta_memoria(segmento, pagina);return respuesta_crear(GUARDAR_PLATO_RESPUESTA, (void*) false, false);}
 
 	//Responder el mensaje indicando si se pudo realizar la operación correctamente (Ok/Fail).
 	return respuesta_crear(GUARDAR_PLATO_RESPUESTA, (void*) op_ok, false);
@@ -95,7 +95,7 @@ static t_respuesta* confirmar_pedido(t_datos_pedido* datos)
 	return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) true, false);
 }
 
-static t_respuesta* plato_listo(t_plato_listo* datos)
+static t_respuesta* plato_listo(t_guardar_plato* datos)
 {
 	//Verificar si existe la tabla de segmentos de dicho Restaurante. En caso de no existir se deberá informar dicha situación.
 	if(!tabla_segmento_restaurante_existe(datos->restaurante))
@@ -151,7 +151,7 @@ static t_respuesta* finalizar_pedido(t_datos_pedido* datos)
 
 	//Por último, se procederá a eliminar el segmento correspondiente.
 
-	tabla_restaurante_eliminar_segmento(segmento);
+	tabla_restaurante_eliminar_segmento(datos->restaurante, segmento);
 
 	//Responder el mensaje indicando si se pudo realizar la operación correctamente (Ok/Fail).
 	return respuesta_crear(PLATO_LISTO_RESPUESTA, (void*) true, false);

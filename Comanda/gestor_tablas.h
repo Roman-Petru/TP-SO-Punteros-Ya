@@ -46,6 +46,7 @@ void tabla_restaurante_crear(char* nombre_restaurante);
 bool tabla_restaurante_agregar_segmento(t_datos_pedido* datos);
 bool asignar_nueva_pagina(t_segmento* segmento, char* comida);
 
-void tabla_restaurante_eliminar_segmento(t_segmento* segmento);
+void tabla_restaurante_eliminar_segmento(char* restaurante, t_segmento* segmento);
 void eliminar_paginas(t_segmento* segmento);
+void eliminar_pagina_falta_memoria(t_segmento* segmento,t_pagina* pagina);
 #endif

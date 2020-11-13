@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include "algoritmos_reemplazo.h"
 
+extern t_bitarray* mapa_bits_virtual;
 
 void inicializar_memoria_virtual();
 int primer_marco_virtual_libre();

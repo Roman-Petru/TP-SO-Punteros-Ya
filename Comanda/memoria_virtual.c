@@ -20,9 +20,11 @@ int primer_marco_virtual_libre()
 
 	pthread_mutex_lock(&mutex_mapa_bit);
 	for(index=0;!encontro && index<cantidad_frames_virtual;index++)
+	{
 		encontro = bitarray_test_bit(mapa_bits_virtual, index);
-	if (encontro)
-		bitarray_clean_bit(mapa_bits_virtual, index);
+		if (encontro)
+			bitarray_clean_bit(mapa_bits_virtual, index);
+	}
 	pthread_mutex_unlock(&mutex_mapa_bit);
 
 	return encontro ? index-1 : -1;
@@ -57,6 +59,7 @@ void escribir_marco_virtual(t_pagina* pagina)
 	strcpy(marco_virtual->nombre_plato, marco_principal->nombre_plato);
 	marco_virtual->cantidad_total = marco_principal->cantidad_total;
 	marco_virtual->cantidad_lista = marco_principal->cantidad_lista;
+	log_info(logger, "Se escribio el marco de memoria virtual de posicion %d con nombre de plato %s, ahora tiene cantidad lista %d y cantidad total %d", pagina->marco_virtual, marco_virtual->nombre_plato, marco_virtual->cantidad_lista, marco_virtual->cantidad_total);
 }
 
 
@@ -64,19 +67,26 @@ void inicializar_memoria_virtual()
 {
 	cantidad_frames_virtual = (config_get_int_value(config, "TAMANIO_SWAP") / 32 );
 	tabla_marcos_virtual = list_create();
+
 	paginas_en_memoria = list_create();
+	puntero_a_paginas = 0;
 
 	pthread_mutex_init(&mutex, NULL);
 	pthread_mutex_init(&mutex_mapa_bit, NULL);
 	pthread_mutex_init(&mutex_algoritmos, NULL);
 
-	void* mentira = malloc(cantidad_frames_virtual / 8);
-	mapa_bits_virtual = bitarray_create_with_mode(mentira, cantidad_frames_virtual / 8, MSB_FIRST);
-
-	for (int i=0; i < bitarray_get_max_bit(mapa_bits_virtual); i++)
+	int num_bytes = numero_bytes_para_mapa(cantidad_frames_virtual);
+	void* mentira = malloc(num_bytes);
+	mapa_bits_virtual = bitarray_create_with_mode(mentira, num_bytes / 8, MSB_FIRST);
+	int i;
+	for (i=0; i < cantidad_frames_virtual; i++)
 	{
 		bitarray_set_bit(mapa_bits_virtual, i);
 		list_add(tabla_marcos_virtual, crear_marco());
+	}
+	for (i = cantidad_frames_virtual; i < bitarray_get_max_bit(mapa_bits_virtual); i++)
+	{
+		bitarray_clean_bit(mapa_bits_virtual, i);
 	}
 }
 
@@ -93,7 +103,7 @@ bool cargar_desde_swap_si_es_necesario(t_pagina* pagina)
 	{
 		int index = primer_marco_virtual_libre();
 		if(index == -1)
-			return false; // LOGGEAR NO ESPACIO EN MEMORIA
+			return false;
 
 		cargar_marco_virtual(index, pagina);
 	}

@@ -29,9 +29,11 @@ int primer_marco_principal_libre()
 
 	pthread_mutex_lock(&mutex_mapa_bit);
 	for(index=0;!encontro && index<cantidad_frames_principal;index++)
+	{
 		encontro = bitarray_test_bit(mapa_bits_principal, index);
-	if (encontro)
-		bitarray_clean_bit(mapa_bits_principal, index);
+		if (encontro)
+			bitarray_clean_bit(mapa_bits_principal, index);
+	}
 	pthread_mutex_unlock(&mutex_mapa_bit);
 
 	return encontro ? index-1 : -1;
@@ -98,6 +100,16 @@ t_datos_estado_pedido* leer_pedido_memoria_principal(t_segmento* segmento_pedido
 	return crear_datos_estado_pedido(estado, platos);
 }
 
+int numero_bytes_para_mapa(int cantidad_frames)
+{
+	float f = cantidad_frames/8;
+	float prueba = cantidad_frames/8;
+	f = roundf(f);
+	if (f < prueba)
+		return f+1;
+	else return f;
+}
+
 void inicializar_memoria_principal()
 {
 	cantidad_frames_principal = (config_get_int_value(config, "TAMANIO_MEMORIA") / 32 );
@@ -105,13 +117,18 @@ void inicializar_memoria_principal()
 	pthread_mutex_init(&mutex, NULL);
 	pthread_mutex_init(&mutex_mapa_bit, NULL);
 
-	void* mentira = malloc(cantidad_frames_principal / 8);
-	mapa_bits_principal = bitarray_create_with_mode(mentira, cantidad_frames_principal / 8, MSB_FIRST);
-
-	for (int i=0; i < bitarray_get_max_bit(mapa_bits_principal); i++)
+	int num_bytes = numero_bytes_para_mapa(cantidad_frames_principal);
+	void* mentira = malloc(num_bytes);
+	mapa_bits_principal = bitarray_create_with_mode(mentira, num_bytes, MSB_FIRST);
+	int i;
+	for (i=0; i < cantidad_frames_principal; i++)
 	{
 		bitarray_set_bit(mapa_bits_principal, i);
 		list_add(tabla_marcos_principal, crear_marco());
+	}
+	for (i = cantidad_frames_principal; i < bitarray_get_max_bit(mapa_bits_principal); i++)
+	{
+		bitarray_clean_bit(mapa_bits_principal, i);
 	}
 }
 

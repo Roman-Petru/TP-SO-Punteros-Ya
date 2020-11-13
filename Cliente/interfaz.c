@@ -1,8 +1,6 @@
 #include "interfaz.h"
 
 //Consultar Pedido
-//Obtener Pedido
-//Finalizar Pedido
 //Obtener Receta
 
 //========== VALIDACIONES ==========//
@@ -115,6 +113,10 @@ static void guardar_pedido()
 	if(validar_restaurante() && validar_pedido())
 		return;
 
+	restaurante_seleccionado = consola_leer("Ingrese el nombre del restaurante: ");
+	char* id = consola_leer("Ingrese el id: ");
+	id_pedido = strtol(id, NULL, 10);
+
 	t_datos_pedido* datos = crear_datos_pedido(id_pedido, restaurante_seleccionado);
 
 	bool operacion_ok = cliente_enviar_mensaje(cliente, GUARDAR_PEDIDO, datos);
@@ -189,9 +191,13 @@ static void plato_listo()
 	if(validar_pedido() && validar_restaurante())
 		return;
 
-	bool operacion_ok = cliente_enviar_mensaje(cliente, PLATO_LISTO, crear_datos_plato_listo(id_pedido, consola_leer("Ingrese el nombre de la comida: "), restaurante_seleccionado));
+
+	char* plato = consola_leer("Ingrese el nombre del plato listo: ");
+	int cant = 1;
+	t_guardar_plato* datos = crear_datos_guardar_plato(id_pedido, cant, plato, restaurante_seleccionado);
+
+	bool operacion_ok = cliente_enviar_mensaje(cliente, PLATO_LISTO, datos);
 	consola_if(consola, operacion_ok);
-	//QUIZAS BORRAR COMIDA QUE SE LEE X CONSOLA
 }
 
 static void consultar_pedido()
@@ -230,6 +236,21 @@ static void terminar_pedido()
 	consola_if(consola, operacion_ok);
 }
 
+
+//========== FINALIZAR PEDIDO ==========//
+
+static void finalizar_pedido()
+{
+	if(validar_pedido() && validar_restaurante())
+		return;
+
+	t_datos_pedido* datos = crear_datos_pedido(id_pedido, restaurante_seleccionado);
+
+	bool operacion_ok = cliente_enviar_mensaje(cliente, FINALIZAR_PEDIDO, datos);
+	consola_if(consola, operacion_ok);
+
+}
+
 void cargar_interfaz()
 {
 	consola_agregar_comando(consola, "desconectar", &desconectar);
@@ -248,6 +269,7 @@ void cargar_interfaz()
 	consola_agregar_comando(consola, "confirmar pedido", &confirmar_pedido);
 	consola_agregar_comando(consola, "plato listo", &plato_listo);
 	consola_agregar_comando(consola, "terminar pedido", &terminar_pedido);
+	consola_agregar_comando(consola, "finalizar pedido", &finalizar_pedido);
 	consola_agregar_comando(consola, "consultar pedido", &consultar_pedido);
 }
 
