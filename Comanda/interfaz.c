@@ -89,6 +89,8 @@ static t_respuesta* confirmar_pedido(t_datos_pedido* datos)
 	if(segmento->estado != PENDIENTE)
 		return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) false, false);
 
+	if (strcmp (datos->restaurante, "Resto_Default") == 0)
+		{	segmento->estado = TERMINADO; return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) true, false);}
 	//Cambiar el estado del pedido de “Pendiente” a “Confirmado”.
 	segmento->estado = CONFIRMADO;
 

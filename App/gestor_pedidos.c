@@ -77,7 +77,7 @@ char* pedido_obtener_restaurante(int id_pedido)
 	pthread_mutex_lock(&mutex);
 	t_pedido_pendiente* pedido = list_find(pedidos_pendientes, &es_mismo_pedido);
 	if (pedido == NULL)
-		return NULL;
+		{	pthread_mutex_unlock(&mutex);return NULL;}
 	restaurante = pedido->restaurante;
 	pthread_mutex_unlock(&mutex);
 

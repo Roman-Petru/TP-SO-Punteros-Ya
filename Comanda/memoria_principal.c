@@ -94,8 +94,9 @@ t_datos_estado_pedido* leer_pedido_memoria_principal(t_segmento* segmento_pedido
 
 		log_info(logger, "Se leyo el marco de memoria principal de posicion %d con nombre de plato %s, cantidad lista %d y cantidad total %d", pagina->marco_principal, marco_principal->nombre_plato, marco_principal->cantidad_lista, marco_principal->cantidad_total);
 
-		return crear_datos_estado_comida(marco_principal->nombre_plato, marco_principal->cantidad_total, marco_principal->cantidad_lista);
-	}
+		t_datos_estado_comida* estado_comida = crear_datos_estado_comida(pagina->comida, marco_principal->cantidad_total, marco_principal->cantidad_lista);
+
+		return 	estado_comida;}
 
 	t_list* platos = list_map(segmento_pedido->tabla_paginas, &transfomer);
 	t_estado_pedido estado = segmento_pedido->estado;

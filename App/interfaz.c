@@ -187,10 +187,11 @@ static t_respuesta* confirmar_pedido(t_datos_pedido* datos)
 static t_respuesta* consultar_pedido(uint32_t id_pedido)
 {
 	char* restaurante = pedido_obtener_restaurante(id_pedido);
+
 	t_datos_estado_pedido* estado = cliente_enviar_mensaje(cliente_comanda, OBTENER_PEDIDO, crear_datos_pedido(id_pedido, restaurante));
 
 
-	return respuesta_crear(CONSULTAR_PEDIDO_RESPUESTA, crear_datos_consultar_pedido(restaurante, estado->estado, estado->platos), true);
+	return respuesta_crear(CONSULTAR_PEDIDO_RESPUESTA, crear_datos_consultar_pedido(restaurante, estado->estado, estado->platos), false);
 }
 
 static t_respuesta* operacion_terminar()

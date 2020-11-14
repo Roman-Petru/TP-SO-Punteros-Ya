@@ -135,7 +135,7 @@ typedef struct
 typedef struct
 {
 	char* restaurante;
-	bool estado;
+	t_estado_pedido estado;
 	t_list* platos;
 } t_consultar_pedido;
 

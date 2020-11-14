@@ -149,7 +149,7 @@ static t_buffer* serializar_consultar_pedido(void* datos_void)
 	char* nombre_plato(void* plato) { return ((t_datos_estado_comida*)plato)->comida;}
 	t_list* lista_mapeada = list_map(datos->platos, (void*) &nombre_plato);
 
-	t_buffer* buffer = buffer_crear(strlen(datos->restaurante)+sizeof(t_estado_pedido)*2 + sizeof(uint32_t) + sizeof(uint32_t)*cantidad_platos*3 + tamanio_lista_string(lista_mapeada));
+	t_buffer* buffer = buffer_crear(strlen(datos->restaurante)+sizeof(uint32_t)+sizeof(t_estado_pedido) + sizeof(uint32_t) + sizeof(uint32_t)*cantidad_platos*3 + tamanio_lista_string(lista_mapeada));
 	//destruir_lista_string(lista_mapeada);
 
 	buffer_serializar_string(buffer, datos->restaurante);
