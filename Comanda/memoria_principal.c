@@ -86,6 +86,9 @@ t_datos_estado_pedido* leer_pedido_memoria_principal(t_segmento* segmento_pedido
 	void* transfomer(void* pagina_void)
 	{
 		t_pagina* pagina = pagina_void;
+
+		cargar_desde_swap_si_es_necesario(pagina);
+
 		t_marco* marco_principal = obtener_marco_principal(pagina->marco_principal);
 		pagina->uso = true;
 

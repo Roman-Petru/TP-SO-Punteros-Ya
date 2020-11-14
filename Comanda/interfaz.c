@@ -61,13 +61,14 @@ static t_respuesta* obtener_pedido(t_datos_pedido* datos)
 	t_segmento* segmento = obtener_segmento(datos->restaurante, datos->id_pedido);
 
 	//En caso de que las páginas que corresponden al pedido no se encuentren cargadas en memoria principal, se deberán cargar las mismas desde swap (iniciando la elección de víctimas de ser necesario). En caso contrario, proceder al paso  número 4.
-	bool op_ok = list_all_satisfy(segmento->tabla_paginas, (void*) cargar_desde_swap_si_es_necesario);
+//	bool op_ok = list_all_satisfy(segmento->tabla_paginas, (void*) cargar_desde_swap_si_es_necesario);
 	//list_iterate(segmento->tabla_paginas, (void*) cargar_desde_swap);
 
-	if(!op_ok)
-		return respuesta_crear(OBTENER_PEDIDO_RESPUESTA, crear_datos_estado_pedido(ERROR, NULL), false);
+//	if(!op_ok)
+//		return respuesta_crear(OBTENER_PEDIDO_RESPUESTA, crear_datos_estado_pedido(ERROR, NULL), false);
 
 	//Responder el mensaje indicando si se pudo realizar en conjunto con la información del pedido si correspondiera.
+
 	t_datos_estado_pedido* datos_respuesta = leer_pedido_memoria_principal(segmento);
 
 	return respuesta_crear(OBTENER_PEDIDO_RESPUESTA, (void*) datos_respuesta, false);

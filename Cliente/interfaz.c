@@ -205,22 +205,21 @@ static void consultar_pedido()
 	if(validar_pedido())
 		return;
 
-	t_consultar_pedido* pedido = cliente_enviar_mensaje(cliente, CONSULTAR_PEDIDO, (void*) id_pedido);
+	t_consultar_pedido* datos_pedido = cliente_enviar_mensaje(cliente, CONSULTAR_PEDIDO, (void*) id_pedido);
 
 	char mensaje[80];
-	sprintf(mensaje, "Pedido: %d", id_pedido);
+	sprintf(mensaje, "El estado del pedido es: %d, pertenece al restaurante %s, y contiene: ", datos_pedido->estado, datos_pedido->restaurante);
 	consola_log(consola, mensaje);
 
-	sprintf(mensaje, "Estado: %s", pedido->estado ? "Listo" : "En Produccion");
-	consola_log(consola, mensaje);
+	void logear_platos(void* plato)
+		{t_datos_estado_comida* plato_a_logear = plato;
+		char* mensaje2 = malloc(100);
+		sprintf(mensaje2, "Comida: %s, cantidad lista: %d, cantidad total %d", plato_a_logear->comida, plato_a_logear->cant_lista, plato_a_logear->cant_total);
+		consola_log(consola, mensaje2);
+		free(mensaje2);
+		}
 
-	sprintf(mensaje, "Plaso:");
-	consola_log(consola, mensaje);
-
-	void logguear_plato(void* plato) { consola_log(consola, plato); };
-	list_iterate(pedido->platos, &logguear_plato);
-
-	destruir_consultar_pedido(pedido);
+	list_iterate(datos_pedido->platos, &logear_platos);
 }
 
 static void terminar_pedido()

@@ -6,7 +6,8 @@
 
 typedef enum {
 	TERMINAR_APP,
-	NUEVO_PEDIDO
+	NUEVO_PEDIDO,
+	PASAR_A_LISTO
 }t_tipo_interrupcion;
 
 typedef struct {

@@ -145,13 +145,25 @@ static t_buffer* serializar_consultar_pedido(void* datos_void)
 	t_consultar_pedido* datos = datos_void;
 	uint32_t cantidad_platos = list_size(datos->platos);
 
-	t_buffer* buffer = buffer_crear(sizeof(bool) + sizeof(uint32_t) + sizeof(uint32_t)*cantidad_platos + tamanio_lista_string(datos->platos));
 
-	buffer_serializar(buffer, &datos->estado, sizeof(bool));
+	char* nombre_plato(void* plato) { return ((t_datos_estado_comida*)plato)->comida;}
+	t_list* lista_mapeada = list_map(datos->platos, (void*) &nombre_plato);
+
+	t_buffer* buffer = buffer_crear(strlen(datos->restaurante)+sizeof(t_estado_pedido)*2 + sizeof(uint32_t) + sizeof(uint32_t)*cantidad_platos*3 + tamanio_lista_string(lista_mapeada));
+	//destruir_lista_string(lista_mapeada);
+
 	buffer_serializar_string(buffer, datos->restaurante);
+	buffer_serializar(buffer, &datos->estado, sizeof(t_estado_pedido));
 	buffer_serializar_int(buffer, cantidad_platos);
-	void serializar_string(void* string) { buffer_serializar_string(buffer, string); }
-	list_iterate(datos->platos, &serializar_string);
+
+	for (int i=0; i<cantidad_platos; i++)
+		{
+		t_datos_estado_comida* datos_estado_comida =  list_get(datos->platos, i);
+		buffer_serializar_int(buffer, datos_estado_comida->cant_lista);
+		buffer_serializar_int(buffer, datos_estado_comida->cant_total);
+
+		buffer_serializar_string(buffer, datos_estado_comida->comida);
+		}
 
 	return buffer;
 }
@@ -311,15 +323,22 @@ static void* deserializar_estado_pedido(t_buffer* buffer)
 
 static void* deserializar_consultar_pedido(t_buffer* buffer)
 {
-	bool estado = buffer_deserializar(buffer, sizeof(bool));
 	char* restaurante = buffer_deserializar_string(buffer);
-	uint32_t cantidad_platos = buffer_deserializar_int(buffer);
+	t_estado_pedido* estado_pedido = buffer_deserializar(buffer, sizeof(t_estado_pedido));
 
+	int cantidad_platos = buffer_deserializar_int(buffer);
 	t_list* platos = list_create();
-	for(int i=0;i<cantidad_platos;i++)
-		list_add(platos, buffer_deserializar_string(buffer));
 
-	return crear_datos_consultar_pedido(restaurante, estado, platos);
+	for (int i=0; i<cantidad_platos; i++)
+		{
+		int lista = buffer_deserializar_int(buffer);
+		int total = buffer_deserializar_int(buffer);
+		char* comida = buffer_deserializar_string(buffer);
+
+		list_add(platos, crear_datos_estado_comida(comida, total, lista));
+		}
+
+	return crear_datos_consultar_pedido(restaurante, *estado_pedido, platos);
 }
 
 static void* deserializar_handshake_restaurante_app(t_buffer* buffer)
@@ -526,8 +545,8 @@ void diccionario_destrucciones_inicializar()
 	dictionary_int_put(diccionario_destrucciones, FINALIZAR_PEDIDO_RESPUESTA, &sin_free);
 	dictionary_int_put(diccionario_destrucciones, OBTENER_PEDIDO, &destruir_datos_pedido);
 	dictionary_int_put(diccionario_destrucciones, OBTENER_PEDIDO_RESPUESTA, &sin_free); //ver free
-	dictionary_int_put(diccionario_destrucciones, CONSULTAR_PEDIDO, &free);
-	dictionary_int_put(diccionario_destrucciones, CONSULTAR_PEDIDO_RESPUESTA, &destruir_consultar_pedido);
+	dictionary_int_put(diccionario_destrucciones, CONSULTAR_PEDIDO, &sin_free);
+	dictionary_int_put(diccionario_destrucciones, CONSULTAR_PEDIDO_RESPUESTA, &sin_free);//ver free
 }
 
 void destruir(t_codigo_de_operacion codigo_de_operacion, void* datos)

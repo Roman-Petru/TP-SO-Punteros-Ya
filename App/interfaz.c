@@ -120,6 +120,8 @@ static bool es_plato_default(char* plato)
 static t_respuesta* agregar_plato(t_agregar_plato* datos)
 {
 	char* restaurante = pedido_obtener_restaurante(datos->id_pedido);
+	if (restaurante == NULL)
+		return respuesta_crear(AGREGAR_PLATO_RESPUESTA, (void*) false, false);
 	bool op_ok = false;
 
 	if(restaurante_esta_conectado(restaurante))
@@ -138,7 +140,7 @@ static t_respuesta* agregar_plato(t_agregar_plato* datos)
 }
 
 /*PLATO LISTO*/
-static t_respuesta* plato_listo(t_plato_listo* datos)
+static t_respuesta* plato_listo(t_guardar_plato* datos)
 {
 	bool op_ok = cliente_enviar_mensaje(cliente_comanda, PLATO_LISTO, datos);
 
@@ -148,7 +150,10 @@ static t_respuesta* plato_listo(t_plato_listo* datos)
 
 	if(pedido->estado == ERROR_ESTADO)
 		return respuesta_crear(PLATO_LISTO_RESPUESTA, (void*) false, false);
-	pedido_actualizar_estado(datos->id_pedido, pedido->estado);
+	//pedido_actualizar_estado(datos->id_pedido, pedido->estado);
+
+	if(pedido->estado == TERMINADO)
+		agregar_interrupcion(PASAR_A_LISTO, (int*) datos->id_pedido);
 
 	return respuesta_crear(PLATO_LISTO_RESPUESTA, (void*) true, false);
 }
@@ -166,11 +171,14 @@ static t_respuesta* confirmar_pedido(t_datos_pedido* datos)
 		return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) false, false);
 
 	t_pedido* pedido = pedido_crear(datos->id_pedido);
-	agregar_interrupcion(NUEVO_PEDIDO, pedido);
 
 	//TODO: Enviar mensaje Confirmar Pedido a Cliente
 
-	//op_ok = cliente_enviar_mensaje(cliente_comanda, CONFIRMAR_PEDIDO, datos)
+	op_ok = cliente_enviar_mensaje(cliente_comanda, CONFIRMAR_PEDIDO, datos);
+
+	if (op_ok)
+		agregar_interrupcion(NUEVO_PEDIDO, pedido);
+
 
 	return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) op_ok , false);
 }
@@ -180,6 +188,7 @@ static t_respuesta* consultar_pedido(uint32_t id_pedido)
 {
 	char* restaurante = pedido_obtener_restaurante(id_pedido);
 	t_datos_estado_pedido* estado = cliente_enviar_mensaje(cliente_comanda, OBTENER_PEDIDO, crear_datos_pedido(id_pedido, restaurante));
+
 
 	return respuesta_crear(CONSULTAR_PEDIDO_RESPUESTA, crear_datos_consultar_pedido(restaurante, estado->estado, estado->platos), true);
 }

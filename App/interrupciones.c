@@ -47,6 +47,18 @@ void interrupcion_nuevo_pedido(t_pedido* pedido) { meter_en_cola(pedido, NEW, A_
 
 void interrupcion_terminar_app(void* null) { terminar(); }
 
+void interrupcion_pasar_pedido_a_listo (int id_pedido) {
+
+	void pasar_a_listo(t_pedido* pedido)
+		{ if(pedido->id_pedido ==id_pedido)
+			pedido->esta_listo = true; }
+
+	list_iterate(cola_EXEC, (void*) &pasar_a_listo);
+	list_iterate(cola_READY, (void*) &pasar_a_listo);
+	list_iterate(cola_BLOCKED, (void*) &pasar_a_listo);
+	list_iterate(cola_NEW, (void*) &pasar_a_listo);
+}
+
 //========== DICCIONARIO INTERRUPCIONES ==========//
 void inicializar_interrupciones()
 {
@@ -56,4 +68,5 @@ void inicializar_interrupciones()
 	diccionario_interrupciones = dictionary_int_create();
 	dictionary_int_put(diccionario_interrupciones, NUEVO_PEDIDO, &interrupcion_nuevo_pedido);
 	dictionary_int_put(diccionario_interrupciones, TERMINAR_APP, &interrupcion_terminar_app);
+	dictionary_int_put(diccionario_interrupciones, PASAR_A_LISTO, &interrupcion_pasar_pedido_a_listo);
 }

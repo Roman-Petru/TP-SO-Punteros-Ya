@@ -31,6 +31,12 @@ typedef enum
 
 extern int indice_pcb_id;
 
+extern t_list* cola_NEW;
+extern t_list* cola_READY;
+extern t_list* cola_BLOCKED;
+extern t_list* cola_EXEC;
+extern t_list* cola_EXIT;
+
 typedef void* (*t_insertador)(t_pedido*);
 
 void inicializar_planificador();
