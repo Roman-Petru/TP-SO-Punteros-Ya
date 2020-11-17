@@ -1,16 +1,18 @@
 #include "sindicato.h"
-
-/*#include <commons/collections/dictionary.h>
+#include <stdio.h>
+/*
+#include <commons/collections/dictionary.h>
 #include <commons/string.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <stdio.h>
+
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <string.h>
 */
+#include <fcntl.h>
 
 t_servidor_red* servidor;
 t_log* logger;
@@ -23,34 +25,38 @@ void inicializar_sindicato()
 
 	serializacion_inicializar();
 	servidor = servidor_crear("127.0.0.1", config_get_string_value(config, "PUERTO_ESCUCHA"));
-	//cargar_interfaz();
+	cargar_interfaz();
 
 	inicializar_metadata();
 	inicializar_bloques();
 	inicializar_archivos();
-
 }
 
 
 int main()
 {
 	inicializar_sindicato();
-	int sumar_extra = 0;
 
-    if (3%4 != 0)
-    	sumar_extra = 1;
+	log_info(logger, "Sindicato inicializado");
 
-	int i = 3/4 + sumar_extra;
+/*	char* prueba = "/home/utnso/Escritorio/afip/prueba.txt";
+	char* texto = "BLABLABLA";
 
-	printf("%d", i);
+	int fd = open(prueba, O_RDWR | O_CREAT, S_IRWXU | S_IRWXG);
 
-	sumar_extra = 0;
+	posix_fallocate(fd, 0, strlen(texto));
+	char* archivo_en_memoria2 = mmap(NULL, strlen(texto), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	perror("error: ");
 
-    if (8%4 != 0)
-    	sumar_extra = 1;
 
-	int j = 8/4 + sumar_extra;
-	printf("%d", j);
+
+	memcpy(archivo_en_memoria2, texto, strlen(texto));
+
+	munmap(archivo_en_memoria2, strlen(texto));
+	close(fd);*/
+
+	while(true)
+		sleep(10000);
 }
 
 

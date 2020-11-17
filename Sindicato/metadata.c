@@ -3,6 +3,7 @@
 t_nodo_arbol* raiz;
 t_metadata* metadata;
 t_bitarray* mapa_bits;
+pthread_mutex_t mutex_mapa_bit;
 
 void inicializar_metadata()
 {
@@ -49,30 +50,66 @@ void inicializar_metadata()
 
 //===============================BITMAP=================================//
 
+	pthread_mutex_init(&mutex_mapa_bit, NULL);
 	if (!existe_archivo(bitm)) crear_bitmap(bitm);
 	else {
 
-		FILE* bm = fopen(bitm,"rb");
+		int fd = open(obtener_path_bitmap(), O_RDONLY, S_IRUSR | S_IWUSR);
+			char* bit_array_aux = mmap(NULL, metadata->blocks/8, PROT_READ, MAP_PRIVATE, fd, 0);
 
-		char* bitarray = calloc(1,metadata->blocks/8);
-		fread(bitarray, metadata->blocks/8, 1, bm);
-		mapa_bits = bitarray_create_with_mode(bitarray, metadata->blocks/8, LSB_FIRST);
-		fclose(bm);
-	}
+			char* para_mapa = calloc(1,metadata->blocks/8);
+
+			memcpy(para_mapa, bit_array_aux, metadata->blocks/8);
+			munmap(bit_array_aux, metadata->blocks/8);
+			close(fd);
+
+			mapa_bits = bitarray_create_with_mode(para_mapa, metadata->blocks/8, LSB_FIRST);
+
+
+		}
+
+
+	/*				FILE* bm = fopen(bitm,"rb");
+
+				char* bitarray = calloc(1,metadata->blocks/8);
+				fread(bitarray, metadata->blocks/8, 1, bm);
+				mapa_bits = bitarray_create_with_mode(bitarray, metadata->blocks/8, LSB_FIRST);
+				fclose(bm);*/
+
 }
 
 
 void crear_bitmap(char* bitm)
 {
-	mapa_bits = bitarray_create_with_mode(string_repeat('\0',metadata->blocks), metadata->blocks/8, LSB_FIRST);
+
+/*	void* para_mapa = malloc(metadata->blocks/8);
+	//memset(para_mapa, 255, metadata->blocks/8);
+	mapa_bits = bitarray_create_with_mode(para_mapa, metadata->blocks/8, MSB_FIRST);
+	for (int i=0; i < metadata->blocks/8; i++)
+		bitarray_set_bit(mapa_bits, i);*/
+
+
 	FILE* fBitmap = fopen(bitm,"wb+");
 
 	if(fBitmap==NULL)
 		{log_info(logger, "No se pudo crear bit map"); exit(-1);}
 
+	mapa_bits = bitarray_create_with_mode(string_repeat('\0',metadata->blocks), metadata->blocks/8, LSB_FIRST);
 	fwrite(mapa_bits->bitarray,mapa_bits->size,1,fBitmap);
 	fclose(fBitmap);
+
+/*	int fd = open(obtener_path_bitmap(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+	posix_fallocate(fd, 0, mapa_bits->size);
+	char* bit_array_aux = mmap(NULL, mapa_bits->size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+
+	memcpy(bit_array_aux, mapa_bits, mapa_bits->size);
+	printf("%s", bit_array_aux);
+	munmap(bit_array_aux, mapa_bits->size);
+	close(fd);
+	printf("\n");*/
+	//free(para_mapa);
 }
+
 
 bool existe_archivo(char *path)
 {

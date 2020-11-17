@@ -8,8 +8,11 @@
 #include "metadata.h"
 #include "bloques.h"
 #include "archivos.h"
+#include "interfaz.h"
+
 
 extern t_log* logger;
 extern t_config* config;
+extern t_servidor_red* servidor;
 
 #endif

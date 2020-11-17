@@ -19,7 +19,7 @@ typedef struct {
 extern t_nodo_arbol* raiz;
 extern t_metadata* metadata;
 extern t_bitarray* mapa_bits;
-
+extern pthread_mutex_t mutex_mapa_bit;
 
 
 bool existe_directorio(char* path);
