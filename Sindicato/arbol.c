@@ -32,6 +32,7 @@ char* obtener_path_bloque(int numero_bloque)
 	string_append(&nodo, string_numero);
 	string_append(&nodo,".AFIP");
 
+	free (string_numero);
 	return nodo;
 }
 
@@ -55,9 +56,18 @@ char* obtener_nodo_restaurante_especifico(char* nodo_restaurantes, char* restaur
 	return nodo;
 }
 
+char* obtener_path_pedido(char* nodo_restaurante, int id_pedido)
+{
+	char* nodo = string_new();
+	string_append(&nodo, nodo_restaurante);
+	string_append(&nodo,"/Pedido");
+	char* aux = string_itoa(id_pedido);
+	string_append(&nodo, aux);
+	string_append(&nodo,".AFIP");
 
-
-
+	free(aux);
+	return nodo;
+}
 /*
 char* obtener_nodo(char* nodo_buscado)
 {

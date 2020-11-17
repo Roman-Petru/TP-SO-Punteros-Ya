@@ -68,6 +68,7 @@ string_append(&nombre_arch_pedido, "Pedido");
 string_append(&nombre_arch_pedido, numero_pedido);
 string_append(&nombre_arch_pedido, ".AFIP");
 
+free(numero_pedido);
 return nombre_arch_pedido;
 }
 
@@ -103,6 +104,7 @@ char* crear_string_archivo_info(int size_arch, uint32_t bloque_inicial)
 	char* string_bloque = string_itoa(bloque_inicial);
 	string_append(&datos_archivo_info, string_bloque);
 
+	free (size);
 	return datos_archivo_info;
 }
 
@@ -134,6 +136,31 @@ bool crear_archivo_pedido(char* nodo_resto, int id_pedido)
 	guardar_data_en_bloques(datos_archivo_a_bloques, bloque_inicial, bloques_siguientes);
 
 	return true;
+}
 
+uint32_t obtener_bloque_inicial(char* info_bloque)
+{
+	char* aux = strstr(info_bloque, "CK=");
+	aux = aux+3;
+	return strtol(aux+3, NULL, 10);
+}
+
+void modificar_tamanio_real(char* path_archivo, int tamanio)
+{
+	int fd = open(path_archivo, O_RDWR, S_IRWXU | S_IRWXG);
+
+	struct stat sb;
+	fstat(fd, &sb);
+
+	char* archivo_en_memoria = mmap(NULL, sb.st_size+3, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+
+	uint32_t bloque = obtener_bloque_inicial(archivo_en_memoria);
+	char* datos_archivo_info = crear_string_archivo_info(tamanio, bloque);
+
+	posix_fallocate(fd, 0, strlen(datos_archivo_info));
+	memcpy(archivo_en_memoria, datos_archivo_info, strlen(datos_archivo_info));
+	free(datos_archivo_info);
+	munmap(archivo_en_memoria, sb.st_size+3);
+	close(fd);
 }
 

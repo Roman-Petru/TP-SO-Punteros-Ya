@@ -5,7 +5,7 @@
 #include "../Utils/protocolo.h"
 #include "sindicato.h"
 
-void cargar_interfaz();
 
+void cargar_interfaz();
 
 #endif

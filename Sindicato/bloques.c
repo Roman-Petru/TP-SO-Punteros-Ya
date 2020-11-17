@@ -100,7 +100,8 @@ void guardar_data_en_bloques(char* data, uint32_t bloque_inicial, t_list* bloque
 			{data = data + metadata->block_size-4;
 //======================BUSCO BLOQUE SIGUIENTE O RESERVO NUEVO SI NO HAY==========================//
 			if (!list_is_empty(bloques_siguientes))
-				numero_bloque_sig = (uint32_t) list_remove(bloques_siguientes, 0);
+				{int* aux = list_remove(bloques_siguientes, 0);
+				numero_bloque_sig = *aux;}
 			else numero_bloque_sig = reservar_bloque();
 
 //======================GUARDO PUNTERO AL SIG BLOQUE EN EL BLOQUE==========================//
@@ -119,3 +120,55 @@ void guardar_data_en_bloques(char* data, uint32_t bloque_inicial, t_list* bloque
 
 	//free(data);
 }
+
+
+t_datos_para_guardar* leer_de_bloques(char* path)
+{
+	int fd = open(path, O_RDONLY, S_IRUSR | S_IWUSR);
+	char* archivo_en_memoria = mmap(NULL, 200, PROT_READ, MAP_PRIVATE, fd, 0);
+
+	char** aux = string_n_split(archivo_en_memoria, 2, "\n");
+
+	int bloque_extra = 0;
+	if (strtol(aux[0]+5, NULL, 10)%(metadata->block_size-4) != 0)
+		bloque_extra = 1;
+	int bloques_a_leer = strtol(aux[0]+5, NULL, 10)/(metadata->block_size-4) + bloque_extra;
+	t_datos_para_guardar* datos_para_guardar = malloc(sizeof(t_datos_para_guardar));
+	datos_para_guardar->bloque_inicial = strtol(aux[1]+14, NULL, 10);
+	free(aux[0]); free(aux[1]); free(aux);
+	munmap(archivo_en_memoria, 200);
+	close(fd);
+
+	int numero_bloque_sig = datos_para_guardar->bloque_inicial;
+	datos_para_guardar->data = string_new();
+	datos_para_guardar->bloques_siguientes = list_create();
+
+	for (int i=0; i<bloques_a_leer; i++)
+	{
+		char* path_bloque = obtener_path_bloque(numero_bloque_sig);
+		int arch_bloque = open(path_bloque, O_RDONLY, S_IRWXU | S_IRWXG);
+		void* archivo_en_memoria = mmap(NULL, metadata->block_size, PROT_READ, MAP_SHARED, arch_bloque, 0);
+		char aux[metadata->block_size-4];
+		memcpy(aux, archivo_en_memoria, metadata->block_size-4);
+		string_append(&(datos_para_guardar->data), aux);
+
+		if (bloques_a_leer > i+1)
+			{uint32_t* puntero_a_numero = archivo_en_memoria + metadata->block_size - 4;
+			//memcpy(&numero_bloque_sig, puntero_a_numero, 4);
+			int* numero_bloque_sig = malloc(sizeof(int));
+			*numero_bloque_sig = *puntero_a_numero;
+			list_add(datos_para_guardar->bloques_siguientes, numero_bloque_sig);	}
+
+		munmap(archivo_en_memoria, metadata->block_size);
+		close(arch_bloque);
+
+	}
+
+	return datos_para_guardar;
+}
+
+
+
+
+
+

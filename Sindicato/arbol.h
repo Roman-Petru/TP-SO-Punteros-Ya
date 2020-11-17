@@ -19,6 +19,6 @@ char* obtener_path_bitmap();
 char* obtener_path_bloque(int numero_bloque);
 char* obtener_nodo_restaurantes();
 char* obtener_nodo_restaurante_especifico(char* nodo_restaurantes, char* restaurante);
-
+char* obtener_path_pedido(char* nodo_restaurante, int id_pedido);
 
 #endif

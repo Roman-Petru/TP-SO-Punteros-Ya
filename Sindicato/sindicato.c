@@ -54,11 +54,25 @@ int main()
 
 	munmap(archivo_en_memoria2, strlen(texto));
 	close(fd);*/
-
 	while(true)
-		sleep(10000);
-}
+		{
+		t_list* lista_numeros;
+		lista_numeros = list_create();
 
+		int* numero_bloque = malloc(sizeof(int));
+
+		*numero_bloque = 5;
+
+
+		list_add(lista_numeros, numero_bloque);
+
+		int* numero = list_remove(lista_numeros, 0);
+
+		log_info(logger, "%d", *numero);
+
+		sleep(10000);}
+}
+/**/
 
 //	int fd = open("./prueba.txt", O_RDWR, S_IRUSR | S_IWUSR);
 //munmap(archivo_en_memoria, sb.st_size);
