@@ -18,7 +18,7 @@ static t_respuesta* guardar_pedido(t_datos_pedido* datos)
 	//Verificar que el ID de pedido no exista para dicho restaurante. 	En caso de existir se deberá informar sobre dicha situación.
 	//En caso de que no exista, se deberá crear el archivo.
 
-	char* nodo_resto = obtener_nodo_restaurante_especifico(obtener_nodo_restaurantes(), datos->restaurante);
+	char* nodo_resto = obtener_nodo_restaurante_especifico(datos->restaurante);
 
 	if (pedido_existe(nodo_resto, datos->id_pedido))
 		{log_info(logger, "No se pudo guardar pedido ya que ya existia");
@@ -35,7 +35,7 @@ static t_respuesta* guardar_plato(t_guardar_plato* datos)
 	if (!restaurante_existe(datos->restaurante))
 		return respuesta_crear(GUARDAR_PLATO_RESPUESTA, (void*) false, false);
 
-	char* nodo_resto = obtener_nodo_restaurante_especifico(obtener_nodo_restaurantes(), datos->restaurante);
+	char* nodo_resto = obtener_nodo_restaurante_especifico(datos->restaurante);
 
 	if (!pedido_existe(nodo_resto, datos->id_pedido))
 		{log_info(logger, "No se pudo guardar plato ya que no existe el pedido");
@@ -62,3 +62,6 @@ void cargar_interfaz()
 	servidor_agregar_operacion(servidor, GUARDAR_PEDIDO, &guardar_pedido);
 	servidor_agregar_operacion(servidor, GUARDAR_PLATO, &guardar_plato);
 }
+
+
+

@@ -36,6 +36,16 @@ char* obtener_path_bloque(int numero_bloque)
 	return nodo;
 }
 
+char* obtener_nodo_recetas()
+{
+	char* nodo = string_new();
+	string_append(&nodo, raiz->nombre);
+	string_append(&nodo,"/Files");
+	string_append(&nodo,"/Recetas");
+
+	return nodo;
+}
+
 char* obtener_nodo_restaurantes()
 {
 	char* nodo = string_new();
@@ -46,10 +56,10 @@ char* obtener_nodo_restaurantes()
 	return nodo;
 }
 
-char* obtener_nodo_restaurante_especifico(char* nodo_restaurantes, char* restaurante)
+char* obtener_nodo_restaurante_especifico(char* restaurante)
 {
 	char* nodo = string_new();
-	string_append(&nodo, nodo_restaurantes);
+	string_append(&nodo, obtener_nodo_restaurantes());
 	string_append(&nodo,"/");
 	string_append(&nodo,restaurante);
 

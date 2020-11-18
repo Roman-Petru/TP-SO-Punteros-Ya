@@ -16,5 +16,7 @@ bool restaurante_existe(char* restaurante);
 bool pedido_existe(char* nodo_resto, int id_pedido);
 
 bool crear_archivo_pedido(char* nodo_resto, int id_pedido);
+void crear_receta(char* data);
+void crear_restaurante (char* data);
 
 #endif

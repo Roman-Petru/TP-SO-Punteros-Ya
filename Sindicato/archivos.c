@@ -164,3 +164,89 @@ void modificar_tamanio_real(char* path_archivo, int tamanio)
 	close(fd);
 }
 
+
+void crear_receta(char* data)
+{
+	int bloque_inicial = reservar_bloque();
+	if (bloque_inicial < 0)
+		{log_info(logger, "No se pudo crear archivo de pedido por falta de espacio en disco"); return;}
+
+	char** aux = string_n_split(data, 3, " ");
+
+	char* datos_receta = string_new();
+	string_append(&datos_receta, "PASOS=");
+	string_append(&datos_receta, aux[1]);
+	string_append(&datos_receta, "\nTIEMPO_PASOS=");
+	string_append(&datos_receta, aux[2]);
+
+	char* datos_archivo_info = crear_string_archivo_info(strlen(datos_receta), bloque_inicial);
+
+	char* nombre_arch_recetas = string_new();
+	string_append(&nombre_arch_recetas, obtener_nodo_recetas());
+	string_append(&nombre_arch_recetas, "/");
+	string_append(&nombre_arch_recetas, aux[0]);
+	string_append(&nombre_arch_recetas, ".AFIP");
+
+
+	int fd = open(nombre_arch_recetas, O_RDWR | O_CREAT, S_IRWXU | S_IRWXG);
+	posix_fallocate(fd, 0, strlen(datos_archivo_info));
+	char* archivo_en_memoria = mmap(NULL, strlen(datos_archivo_info), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	memcpy(archivo_en_memoria, datos_archivo_info, strlen(datos_archivo_info));
+
+	munmap(archivo_en_memoria, strlen(datos_archivo_info));
+	close(fd);
+	free(datos_archivo_info); free(nombre_arch_recetas);
+	free(aux[0]); free(aux[1]); free(aux[2]); free(aux);
+
+
+	t_list* bloques_siguientes = list_create();
+	guardar_data_en_bloques(datos_receta, bloque_inicial, bloques_siguientes);
+}
+
+
+void crear_restaurante (char* data)
+{
+	int bloque_inicial = reservar_bloque();
+	if (bloque_inicial < 0)
+		{log_info(logger, "No se pudo crear archivo de pedido por falta de espacio en disco"); return;}
+
+	char** aux = string_n_split(data, 7, " ");
+
+	char* datos_restaurante = string_new();
+	string_append(&datos_restaurante, "CANTIDAD_COCINEROS=");
+	string_append(&datos_restaurante, aux[1]);
+	string_append(&datos_restaurante, "\nPOSICION=");
+	string_append(&datos_restaurante, aux[2]);
+	string_append(&datos_restaurante, "\nAFINIDAD_COCINEROS=");
+	string_append(&datos_restaurante, aux[3]);
+	string_append(&datos_restaurante, "\nPLATOS=");
+	string_append(&datos_restaurante, aux[4]);
+	string_append(&datos_restaurante, "\nPRECIO_PLATOS=");
+	string_append(&datos_restaurante, aux[5]);
+	string_append(&datos_restaurante, "\nCANTIDAD_HORNOS=");
+	string_append(&datos_restaurante, aux[6]);
+
+	char* datos_archivo_info = crear_string_archivo_info(strlen(datos_restaurante), bloque_inicial);
+
+	char* nombre_arch_recestaurante = string_new();
+	string_append(&nombre_arch_recestaurante, obtener_nodo_restaurante_especifico(aux[0]));
+	mkdir(nombre_arch_recestaurante, 0700);
+	string_append(&nombre_arch_recestaurante, "/Info.AFIP");
+
+
+	int fd = open(nombre_arch_recestaurante, O_RDWR | O_CREAT, S_IRWXU | S_IRWXG);
+	posix_fallocate(fd, 0, strlen(datos_archivo_info));
+	char* archivo_en_memoria = mmap(NULL, strlen(datos_archivo_info), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	memcpy(archivo_en_memoria, datos_archivo_info, strlen(datos_archivo_info));
+
+	munmap(archivo_en_memoria, strlen(datos_archivo_info));
+	close(fd);
+	free(datos_archivo_info); free(nombre_arch_recestaurante);
+	for (int i=0; i<7;i++)
+		free(aux[i]);
+	free(aux);
+
+
+	t_list* bloques_siguientes = list_create();
+	guardar_data_en_bloques(datos_restaurante, bloque_inicial, bloques_siguientes);
+}

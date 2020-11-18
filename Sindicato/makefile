@@ -1,5 +1,5 @@
 TARGET = sindicato
-LIBS = -L./../Utils -lutils -lcommons -lpthread
+LIBS = -L./../Utils -lutils -lcommons -lpthread -lreadline
 CC = gcc
 CFLAGS = -g -Wall
 
