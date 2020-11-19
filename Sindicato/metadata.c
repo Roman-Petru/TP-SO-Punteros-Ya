@@ -31,18 +31,23 @@ void inicializar_metadata()
 	if(!existe_archivo(meta)) {
 		FILE* metadata = fopen(meta,"wb+");
 		fprintf(metadata,"BLOCK_SIZE=64\n");
-		fprintf(metadata,"BLOCKS=5192\n");
-		fprintf(metadata,"MAGIC_NUMBER=AFIP\n");
+		fprintf(metadata,"BLOCKS=8\n");
+		fprintf(metadata,"MAGIC_NUMBER=AFIP");
 		fclose(metadata);
 	}
 	int fd = open(meta, O_RDONLY, S_IRUSR | S_IWUSR);
 	char* metadata_char = mmap(NULL, 200, PROT_READ, MAP_PRIVATE, fd, 0);
 
-	char** aux = string_n_split(metadata_char, 2, "\n");
+	char** aux = string_n_split(metadata_char, 3, "\n");
 
 	metadata = malloc(sizeof(t_metadata));
 	metadata->block_size = strtol(aux[0]+11, NULL, 10);
 	metadata->blocks = strtol(aux[1]+7, NULL, 10);
+	metadata->magic_number = aux[2]+13;
+
+	if (strcmp(metadata->magic_number, "AFIP") != 0)
+		{log_info(logger, "Se detecto un MAGIC NUMBER que no es AFIP, cerrando sindicato");
+		exit(0);}
 
 	free(aux[0]); free(aux[1]); free(aux);
 	munmap(metadata_char, 200);
@@ -68,26 +73,11 @@ void inicializar_metadata()
 
 		}
 
-
-	/*				FILE* bm = fopen(bitm,"rb");
-
-				char* bitarray = calloc(1,metadata->blocks/8);
-				fread(bitarray, metadata->blocks/8, 1, bm);
-				mapa_bits = bitarray_create_with_mode(bitarray, metadata->blocks/8, LSB_FIRST);
-				fclose(bm);*/
-
 }
 
 
 void crear_bitmap(char* bitm)
 {
-
-/*	void* para_mapa = malloc(metadata->blocks/8);
-	//memset(para_mapa, 255, metadata->blocks/8);
-	mapa_bits = bitarray_create_with_mode(para_mapa, metadata->blocks/8, MSB_FIRST);
-	for (int i=0; i < metadata->blocks/8; i++)
-		bitarray_set_bit(mapa_bits, i);*/
-
 
 	FILE* fBitmap = fopen(bitm,"wb+");
 
@@ -95,19 +85,9 @@ void crear_bitmap(char* bitm)
 		{log_info(logger, "No se pudo crear bit map"); exit(-1);}
 
 	mapa_bits = bitarray_create_with_mode(string_repeat('\0',metadata->blocks), metadata->blocks/8, LSB_FIRST);
+
 	fwrite(mapa_bits->bitarray,mapa_bits->size,1,fBitmap);
 	fclose(fBitmap);
-
-/*	int fd = open(obtener_path_bitmap(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-	posix_fallocate(fd, 0, mapa_bits->size);
-	char* bit_array_aux = mmap(NULL, mapa_bits->size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-
-	memcpy(bit_array_aux, mapa_bits, mapa_bits->size);
-	printf("%s", bit_array_aux);
-	munmap(bit_array_aux, mapa_bits->size);
-	close(fd);
-	printf("\n");*/
-	//free(para_mapa);
 }
 
 

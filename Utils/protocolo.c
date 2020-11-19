@@ -1,6 +1,7 @@
 #include "protocolo.h"
 #include "buffer.h"
 #include "serializacion.h"
+#include "receta.h"
 
 // ===== Respuesta =====
 t_respuesta* respuesta_crear(t_codigo_de_operacion codigo_operacion, void* datos, bool destruir_datos)
@@ -105,6 +106,14 @@ t_datos_cliente* crear_datos_cliente(char* id_cliente, t_posicion* posicion)
 	datos->id_cliente = id_cliente;
 	datos->posicion = posicion;
 	return datos;
+}
+
+t_paso* crear_paso(char* operacion, int tiempo)
+{
+	t_paso* paso = malloc(sizeof(t_paso));
+	paso->operacion = operacion;
+	paso->ciclos = tiempo;
+	return paso;
 }
 
 

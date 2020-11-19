@@ -1,7 +1,7 @@
 #include "receta.h"
 
 t_dictionary* diccionario_recetas;
-
+/*
 t_receta* crear_receta(Paso* pasos, int* tiempos)
 {
 	t_receta* receta = malloc(sizeof(t_receta));
@@ -27,3 +27,4 @@ void destruit_diccionario_recetas()
 	dictionary_destroy_and_destroy_elements(diccionario_recetas, (void*) &destruir_receta);
 }
 
+*/

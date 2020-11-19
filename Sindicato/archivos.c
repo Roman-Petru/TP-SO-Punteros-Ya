@@ -40,7 +40,6 @@ bool restaurante_existe(char* restaurante)
 {
 
 	char* nodo = obtener_nodo_restaurantes();
-	//obtener nodo?
 
 	DIR* dir = opendir(nodo);
 	struct dirent* entry;
@@ -55,6 +54,30 @@ bool restaurante_existe(char* restaurante)
 		}}
 
 	free(nodo);
+	closedir(dir);
+
+	return encontro;
+}
+
+bool receta_existe(char* receta)
+{
+	char* nodo = obtener_nodo_recetas();
+
+	char* dupli = string_duplicate(receta);
+	string_append(&dupli, ".AFIP");
+
+	DIR* dir = opendir(nodo);
+	struct dirent* entry;
+	bool encontro = false;
+	if (dir == NULL) {
+		log_error(logger,"No se pudo abrir correctamente el directorio Recetas");
+	} else {
+		while((entry = readdir(dir)) && !encontro) {
+			log_info(logger,"prueba dir name: %s", entry->d_name);
+			if (string_equals_ignore_case(entry->d_name, dupli))
+				encontro = true;
+		}}
+	free(nodo); //free(dup);
 	closedir(dir);
 
 	return encontro;
@@ -110,18 +133,26 @@ char* crear_string_archivo_info(int size_arch, uint32_t bloque_inicial)
 
 bool crear_archivo_pedido(char* nodo_resto, int id_pedido)
 {
-	int bloque_inicial = reservar_bloque();
-	if (bloque_inicial < 0)
-		{log_info(logger, "No se pudo crear archivo de pedido por falta de espacio en disco"); return false;}
-
-	char* datos_archivo_a_bloques = "ESTADO_PEDIDO=Pendiente\nLISTA_PLATOS=[]\nCANTIDAD_PLATOS=[]\nCANTIDAD_LISTA=[]\nPRECIO_TOTAL=0";
-
-	char* datos_archivo_info = crear_string_archivo_info(strlen(datos_archivo_a_bloques), bloque_inicial);
-
 	char* nombre_arch_pedido = string_new();
 	string_append(&nombre_arch_pedido, nodo_resto);
 	string_append(&nombre_arch_pedido, "/");
 	string_append(&nombre_arch_pedido, armar_string_arch_pedido(id_pedido));
+
+
+
+
+
+	char* datos_archivo_a_bloques = "ESTADO_PEDIDO=Pendiente\nLISTA_PLATOS=[]\nCANTIDAD_PLATOS=[]\nCANTIDAD_LISTA=[]\nPRECIO_TOTAL=0";
+
+	bool op_ok = (cantidad_bloques_libres()>=(strlen(datos_archivo_a_bloques)/(metadata->block_size-4)));
+		if (!op_ok)
+			{log_info(logger, "No se pudo continuar la operacion ya que no hay mas bloques disponibles");
+			return false;}
+
+	int bloque_inicial = reservar_bloque(nombre_arch_pedido);
+
+	char* datos_archivo_info = crear_string_archivo_info(strlen(datos_archivo_a_bloques), bloque_inicial);
+
 
 	int fd = open(nombre_arch_pedido, O_RDWR | O_CREAT, S_IRWXU | S_IRWXG);
 	posix_fallocate(fd, 0, strlen(datos_archivo_info));
@@ -130,7 +161,7 @@ bool crear_archivo_pedido(char* nodo_resto, int id_pedido)
 
 	munmap(archivo_en_memoria, strlen(datos_archivo_info));
 	close(fd);
-	free(datos_archivo_info); free(nombre_arch_pedido);
+	free(datos_archivo_info);
 
 
 	t_datos_para_guardar* datos = malloc(sizeof(t_datos_para_guardar));
@@ -139,7 +170,8 @@ bool crear_archivo_pedido(char* nodo_resto, int id_pedido)
 	datos->bloques_siguientes = list_create();
 
 	guardar_data_en_bloques(datos, nombre_arch_pedido);
-
+	free(nombre_arch_pedido);
+	log_info(logger, "Se creo un nuevo archivo de pedido");
 	return true;
 }
 
@@ -172,11 +204,14 @@ void modificar_tamanio_real(char* path_archivo, int tamanio)
 
 void crear_receta(char* data)
 {
-	int bloque_inicial = reservar_bloque();
-	if (bloque_inicial < 0)
-		{log_info(logger, "No se pudo crear archivo de pedido por falta de espacio en disco"); return;}
-
 	char** aux = string_n_split(data, 3, " ");
+	char* nombre_arch_recetas = string_new();
+	string_append(&nombre_arch_recetas, obtener_nodo_recetas());
+	string_append(&nombre_arch_recetas, "/");
+	string_append(&nombre_arch_recetas, aux[0]);
+	string_append(&nombre_arch_recetas, ".AFIP");
+
+
 
 	char* datos_receta = string_new();
 	string_append(&datos_receta, "PASOS=");
@@ -184,13 +219,22 @@ void crear_receta(char* data)
 	string_append(&datos_receta, "\nTIEMPO_PASOS=");
 	string_append(&datos_receta, aux[2]);
 
+
+	bool op_ok = (cantidad_bloques_libres()>=(strlen(datos_receta)/(metadata->block_size-4)));
+		if (!op_ok)
+			{log_info(logger, "No se pudo continuar la operacion ya que no hay mas bloques disponibles");
+			return;}
+
+
+	int bloque_inicial = reservar_bloque(nombre_arch_recetas);
+	if (bloque_inicial < 0)
+		{log_info(logger, "No se pudo crear archivo de pedido por falta de espacio en disco"); return;}
+
+
+
 	char* datos_archivo_info = crear_string_archivo_info(strlen(datos_receta), bloque_inicial);
 
-	char* nombre_arch_recetas = string_new();
-	string_append(&nombre_arch_recetas, obtener_nodo_recetas());
-	string_append(&nombre_arch_recetas, "/");
-	string_append(&nombre_arch_recetas, aux[0]);
-	string_append(&nombre_arch_recetas, ".AFIP");
+
 
 
 	int fd = open(nombre_arch_recetas, O_RDWR | O_CREAT, S_IRWXU | S_IRWXG);
@@ -200,7 +244,7 @@ void crear_receta(char* data)
 
 	munmap(archivo_en_memoria, strlen(datos_archivo_info));
 	close(fd);
-	free(datos_archivo_info); free(nombre_arch_recetas);
+	free(datos_archivo_info);
 	free(aux[0]); free(aux[1]); free(aux[2]); free(aux);
 
 	t_datos_para_guardar* datos = malloc(sizeof(t_datos_para_guardar));
@@ -208,17 +252,26 @@ void crear_receta(char* data)
 	datos->bloque_inicial = bloque_inicial;
 	datos->bloques_siguientes = list_create();
 
+	log_info(logger, "Se creo un nuevo archivo de receta");
 	guardar_data_en_bloques(datos, nombre_arch_recetas);
+	free(nombre_arch_recetas);
 }
 
 
 void crear_restaurante (char* data)
 {
-	int bloque_inicial = reservar_bloque();
-	if (bloque_inicial < 0)
-		{log_info(logger, "No se pudo crear archivo de pedido por falta de espacio en disco"); return;}
+
 
 	char** aux = string_n_split(data, 7, " ");
+
+	char* nombre_arch_recestaurante = string_new();
+	string_append(&nombre_arch_recestaurante, obtener_nodo_restaurante_especifico(aux[0]));
+	mkdir(nombre_arch_recestaurante, 0700);
+
+
+	string_append(&nombre_arch_recestaurante, "/Info.AFIP");
+
+
 
 	char* datos_restaurante = string_new();
 	string_append(&datos_restaurante, "CANTIDAD_COCINEROS=");
@@ -234,13 +287,18 @@ void crear_restaurante (char* data)
 	string_append(&datos_restaurante, "\nCANTIDAD_HORNOS=");
 	string_append(&datos_restaurante, aux[6]);
 
+	bool op_ok = (cantidad_bloques_libres()>=(strlen(datos_restaurante)/(metadata->block_size-4)));
+		if (!op_ok)
+			{log_info(logger, "No se pudo continuar la operacion ya que no hay mas bloques disponibles");
+			return;}
+
+	int bloque_inicial = reservar_bloque(nombre_arch_recestaurante);
+	if (bloque_inicial < 0)
+		{log_info(logger, "No se pudo crear archivo de pedido por falta de espacio en disco"); return;}
+
+
+
 	char* datos_archivo_info = crear_string_archivo_info(strlen(datos_restaurante), bloque_inicial);
-
-	char* nombre_arch_recestaurante = string_new();
-	string_append(&nombre_arch_recestaurante, obtener_nodo_restaurante_especifico(aux[0]));
-	mkdir(nombre_arch_recestaurante, 0700);
-	string_append(&nombre_arch_recestaurante, "/Info.AFIP");
-
 
 	int fd = open(nombre_arch_recestaurante, O_RDWR | O_CREAT, S_IRWXU | S_IRWXG);
 	posix_fallocate(fd, 0, strlen(datos_archivo_info));
@@ -249,7 +307,7 @@ void crear_restaurante (char* data)
 
 	munmap(archivo_en_memoria, strlen(datos_archivo_info));
 	close(fd);
-	free(datos_archivo_info); free(nombre_arch_recestaurante);
+	free(datos_archivo_info);
 	for (int i=0; i<7;i++)
 		free(aux[i]);
 	free(aux);
@@ -260,5 +318,7 @@ void crear_restaurante (char* data)
 	datos->bloque_inicial = bloque_inicial;
 	datos->bloques_siguientes = list_create();
 
+	log_info(logger, "Se creo un nuevo archivo de restaurante");
 	guardar_data_en_bloques(datos, nombre_arch_recestaurante);
+	free(nombre_arch_recestaurante);
 }

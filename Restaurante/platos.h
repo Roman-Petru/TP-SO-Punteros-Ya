@@ -7,7 +7,7 @@
 #include <stdbool.h>
 #include <commons/collections/list.h>
 #include <commons/collections/dictionary.h>
-
+#include "../Utils/receta.h"
 
 typedef enum{
 	NEW = 0,
@@ -35,15 +35,6 @@ typedef struct {
 }t_platos_PCB;
 
 
-typedef struct {
-	char* operacion;
-	int ciclos;
-}t_paso;
-
-typedef struct {
-	char* nombre_plato;
-	t_list* pasos_receta;
-}t_receta;
 
 typedef void* (*t_insertador_platos)(char*, int);
 

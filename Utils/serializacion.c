@@ -194,6 +194,29 @@ static t_buffer* serializar_estado_pedido(void* datos_void)
 	return buffer;
 }
 
+static t_buffer* serializar_obtener_receta(void* datos_void)
+{
+	t_obtener_receta* datos = datos_void;
+	uint32_t cantidad_pasos = list_size(datos->pasos);
+
+	char* nombre_paso(void* paso) { return ((t_paso*)paso)->operacion;}
+	t_list* lista_mapeada = list_map(datos->pasos, (void*) &nombre_paso);
+
+	t_buffer* buffer = buffer_crear(sizeof(uint32_t) + sizeof(uint32_t)*cantidad_pasos*2 + tamanio_lista_string(lista_mapeada));
+	//destruir_lista_string(lista_mapeada);
+
+	buffer_serializar_int(buffer, cantidad_pasos);
+
+	for (int i=0; i<cantidad_pasos; i++)
+		{
+		t_paso* datos_paso =  list_get(datos->pasos, i);
+		buffer_serializar_string(buffer, datos_paso->operacion);
+		buffer_serializar_int(buffer, datos_paso->ciclos);
+		}
+
+	return buffer;
+}
+
 static t_buffer* serializar_handshake_restaurante_app(void* datos_void)
 {
 	t_handshake_resto_app* datos = datos_void;
@@ -298,6 +321,25 @@ static void* deserializar_agregar_plato(t_buffer* buffer)
 	char* plato = buffer_deserializar_string(buffer);
 
 	return crear_datos_agregar_plato(id_pedido, plato);
+}
+
+
+static void* deserializar_obtener_receta(t_buffer* buffer)
+{
+	int cantidad_pasos = buffer_deserializar_int(buffer);
+	t_list* pasos = list_create();
+
+	for (int i=0; i<cantidad_pasos; i++)
+		{
+		char* operacion = buffer_deserializar_string(buffer);
+		int tiempo = buffer_deserializar_int(buffer);
+
+		list_add(pasos, crear_paso(operacion, tiempo));
+		}
+
+	t_obtener_receta* datos = malloc(sizeof(t_obtener_receta));
+	datos->pasos = pasos;
+	return datos;
 }
 
 
@@ -458,8 +500,12 @@ void diccionario_serializaciones_inicializar()
 	dictionary_int_put(diccionario_serializaciones, PLATO_LISTO, &serializar_guardar_plato);
 	dictionary_int_put(diccionario_serializaciones, PLATO_LISTO_RESPUESTA, &serializar_bool);
 
+	dictionary_int_put(diccionario_serializaciones, OBTENER_RECETA, &serializar_string);
+	dictionary_int_put(diccionario_serializaciones, OBTENER_RECETA_RESPUESTA, &serializar_obtener_receta);
 	dictionary_int_put(diccionario_serializaciones, FINALIZAR_PEDIDO, &serializar_datos_pedido);
 	dictionary_int_put(diccionario_serializaciones, FINALIZAR_PEDIDO_RESPUESTA, &serializar_bool);
+	dictionary_int_put(diccionario_serializaciones, TERMINAR_PEDIDO, &serializar_datos_pedido);
+	dictionary_int_put(diccionario_serializaciones, TERMINAR_PEDIDO_RESPUESTA, &serializar_bool);
 	dictionary_int_put(diccionario_serializaciones, OBTENER_PEDIDO, &serializar_datos_pedido);
 	dictionary_int_put(diccionario_serializaciones, OBTENER_PEDIDO_RESPUESTA, &serializar_estado_pedido);
 	dictionary_int_put(diccionario_serializaciones, CONSULTAR_PEDIDO, &serializar_int);
@@ -502,8 +548,12 @@ void diccionario_deserializaciones_inicializar()
 	dictionary_int_put(diccionario_deserializaciones, PLATO_LISTO, &deserializar_guardar_plato);
 	dictionary_int_put(diccionario_deserializaciones, PLATO_LISTO_RESPUESTA, &deserializar_bool);
 
+	dictionary_int_put(diccionario_deserializaciones, OBTENER_RECETA, &deserializar_string);
+	dictionary_int_put(diccionario_deserializaciones, OBTENER_RECETA_RESPUESTA, &deserializar_obtener_receta);
 	dictionary_int_put(diccionario_deserializaciones, FINALIZAR_PEDIDO, &deserializar_datos_pedido);
 	dictionary_int_put(diccionario_deserializaciones, FINALIZAR_PEDIDO_RESPUESTA, &deserializar_bool);
+	dictionary_int_put(diccionario_deserializaciones, TERMINAR_PEDIDO, &deserializar_datos_pedido);
+	dictionary_int_put(diccionario_deserializaciones, TERMINAR_PEDIDO_RESPUESTA, &deserializar_bool);
 	dictionary_int_put(diccionario_deserializaciones, OBTENER_PEDIDO, &deserializar_datos_pedido);
 	dictionary_int_put(diccionario_deserializaciones, OBTENER_PEDIDO_RESPUESTA, &deserializar_estado_pedido);
 	dictionary_int_put(diccionario_deserializaciones, CONSULTAR_PEDIDO, &deserializar_int);
@@ -541,8 +591,12 @@ void diccionario_destrucciones_inicializar()
 	dictionary_int_put(diccionario_destrucciones, PLATO_LISTO, &destruir_guardar_plato);
 	dictionary_int_put(diccionario_destrucciones, PLATO_LISTO_RESPUESTA, &sin_free);
 
+	dictionary_int_put(diccionario_destrucciones, OBTENER_RECETA, &free);
+	dictionary_int_put(diccionario_destrucciones, OBTENER_RECETA_RESPUESTA, &sin_free);//ver free
 	dictionary_int_put(diccionario_destrucciones, FINALIZAR_PEDIDO, &destruir_datos_pedido);
 	dictionary_int_put(diccionario_destrucciones, FINALIZAR_PEDIDO_RESPUESTA, &sin_free);
+	dictionary_int_put(diccionario_destrucciones, TERMINAR_PEDIDO, &destruir_datos_pedido);
+	dictionary_int_put(diccionario_destrucciones, TERMINAR_PEDIDO_RESPUESTA, &sin_free);
 	dictionary_int_put(diccionario_destrucciones, OBTENER_PEDIDO, &destruir_datos_pedido);
 	dictionary_int_put(diccionario_destrucciones, OBTENER_PEDIDO_RESPUESTA, &sin_free); //ver free
 	dictionary_int_put(diccionario_destrucciones, CONSULTAR_PEDIDO, &sin_free);

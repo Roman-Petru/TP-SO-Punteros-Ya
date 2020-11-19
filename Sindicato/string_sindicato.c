@@ -52,8 +52,44 @@ t_pedido_sind* desglosar_pedido (char* pedido_en_string)
 	config_string_destroy(string_config);
 
 	return pedido_sind;
-
 }
+
+static t_paso* cargar_pasito(char* operacion, char* tiempo)
+{
+
+	t_paso* paso = crear_paso(operacion, strtol(tiempo, NULL, 10));
+
+	free(tiempo);
+
+	return paso;
+}
+
+
+t_obtener_receta* desglosar_receta (char* receta_en_string)
+
+{
+	t_config_string* string_config = config_string_create(receta_en_string);
+
+	t_obtener_receta* receta = malloc(sizeof(t_pedido_sind));
+	receta->pasos = list_create();
+
+	char** operacion = config_string_get_array_value(string_config, "PASOS");
+	char** tiempo_operacion = config_string_get_array_value(string_config, "TIEMPO_PASOS");
+
+
+	for (int i=0; operacion[i] != NULL; i++)
+		{t_paso* paso = cargar_pasito(string_duplicate(operacion[i]), tiempo_operacion[i]);
+		list_add(receta->pasos, paso);
+		}
+
+	free(operacion);
+	free(tiempo_operacion);
+
+	config_string_destroy(string_config);
+	return receta;
+}
+
+
 
 bool string_confirmar_pedido(t_pedido_sind* pedido_sind)
 {
@@ -62,9 +98,17 @@ bool string_confirmar_pedido(t_pedido_sind* pedido_sind)
 			return false;	}
 
 	pedido_sind->estado = "Confirmado";
-
 	return true;
+}
 
+bool string_terminar_pedido(t_pedido_sind* pedido_sind)
+{
+	if (strcmp(pedido_sind->estado, "Confirmado") != 0)
+			{log_info(logger, "No se pudo terminar el pedido ya que no estaba en estado confirmado");
+			return false;	}
+
+	pedido_sind->estado = "Terminado";
+	return true;
 }
 
 bool string_guardar_plato(t_pedido_sind* pedido_sind, t_guardar_plato* datos_a_guardar)
@@ -90,9 +134,43 @@ bool string_guardar_plato(t_pedido_sind* pedido_sind, t_guardar_plato* datos_a_g
 		list_add(pedido_sind->platos, estado_comida);
 		}
 
+	//TODO sumar precio
+
 	return true;
 }
 
+
+
+bool string_plato_listo(t_pedido_sind* pedido_sind, t_guardar_plato* datos_a_guardar)
+{
+	if (strcmp(pedido_sind->estado, "Confirmado") != 0)
+			{log_info(logger, "No se pudo pasar a plato listo porque el pedido no estaba en estado pendiente");
+			return false;	}
+
+	bool encontro = false;
+	bool platos_al_mango = false;
+	void encontrar_y_agregar_plato (void* estado_comida) {
+		t_datos_estado_comida* pedido_pivot = estado_comida;
+		if (strcmp(pedido_pivot->comida,datos_a_guardar->comida) == 0)
+			{if (pedido_pivot->cant_lista < pedido_pivot->cant_total)
+			{pedido_pivot->cant_lista = pedido_pivot->cant_lista + datos_a_guardar->cantidad;
+			encontro = true;	}
+			else
+			{log_info(logger, "No se pudo pasar plato listo porque ya estan todos los platos de esa comida");
+			platos_al_mango = true;}}
+		}
+
+	if (!list_is_empty(pedido_sind->platos))
+		list_iterate(pedido_sind->platos, &encontrar_y_agregar_plato);
+
+	if (platos_al_mango)
+		return false;
+
+	if (!encontro)
+		{log_info(logger, "No se pudo pasar a plato listo porque el plato no existe en el pedido"); return false;}
+
+	return true;
+}
 
 char* armar_string_pedido(t_pedido_sind* pedido_sind)
 {
@@ -146,9 +224,17 @@ bool mod_string_guardar_plato(t_datos_para_guardar* datos_para_bloques, t_guarda
 		if (!op_ok)
 			return false;
 
-	datos_para_bloques->data = armar_string_pedido(pedido_sind);
-	return true;
 
+	datos_para_bloques->data = armar_string_pedido(pedido_sind);
+
+
+	int bloques_extra = (strlen(datos_para_bloques->data)/(metadata->block_size-4)-list_size(datos_para_bloques->bloques_siguientes));
+
+	op_ok = (cantidad_bloques_libres()>=bloques_extra);
+		if (!op_ok)
+			log_info(logger, "No se pudo continuar la operacion ya que no hay mas bloques disponibles");
+
+	return op_ok;
 }
 
 bool mod_string_confirmar_pedido(t_datos_para_guardar* datos_para_bloques)
@@ -159,7 +245,56 @@ bool mod_string_confirmar_pedido(t_datos_para_guardar* datos_para_bloques)
 		if (!op_ok)
 			return false;
 
+
+
 	datos_para_bloques->data = armar_string_pedido(pedido_sind);
+
+	op_ok = (cantidad_bloques_libres()>=(strlen(datos_para_bloques->data)/(metadata->block_size-4)-list_size(datos_para_bloques->bloques_siguientes)));
+		if (!op_ok)
+			{log_info(logger, "No se pudo continuar la operacion ya que no hay mas bloques disponibles");
+			return false;}
+
+	return true;
+}
+
+
+bool mod_string_plato_listo(t_datos_para_guardar* datos_para_bloques, t_guardar_plato* datos_a_guardar)
+{
+	t_pedido_sind* pedido_sind = desglosar_pedido (datos_para_bloques->data);
+
+	bool op_ok = string_plato_listo(pedido_sind, datos_a_guardar);
+		if (!op_ok)
+			return false;
+
+
+
+	datos_para_bloques->data = armar_string_pedido(pedido_sind);
+
+	op_ok = (cantidad_bloques_libres()>=(strlen(datos_para_bloques->data)/(metadata->block_size-4)-list_size(datos_para_bloques->bloques_siguientes)));
+		if (!op_ok)
+			{log_info(logger, "No se pudo continuar la operacion ya que no hay mas bloques disponibles");
+			return false;}
+
+	return true;
+}
+
+bool mod_string_terminar_pedido(t_datos_para_guardar* datos_para_bloques)
+{
+	t_pedido_sind* pedido_sind = desglosar_pedido (datos_para_bloques->data);
+
+	bool op_ok = string_terminar_pedido(pedido_sind);
+		if (!op_ok)		return false;
+
+
+
+	datos_para_bloques->data = armar_string_pedido(pedido_sind);
+
+
+	op_ok = (cantidad_bloques_libres()>=(strlen(datos_para_bloques->data)/(metadata->block_size-4)-list_size(datos_para_bloques->bloques_siguientes)));
+		if (!op_ok)
+			{log_info(logger, "No se puede continuar la operacion ya que no hay mas bloques disponibles");
+			return false;}
+
 	return true;
 }
 

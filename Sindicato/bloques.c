@@ -34,26 +34,40 @@ void inicializar_bloques()
 	}
 }
 
+int cantidad_bloques_libres()
+{
+
+	pthread_mutex_lock(&mutex_mapa_bit);
+
+	int cont = 0;
+	bool no_libre = true;
+
+	for(int index=0;index<metadata->blocks;index++)
+	{
+		no_libre = bitarray_test_bit(mapa_bits, index);
+		if (!no_libre)
+			cont++;
+	}
+	pthread_mutex_unlock(&mutex_mapa_bit);
+
+	return cont;
+}
+
 //=================================="SOLICITAR ESPACIO EN DISCO"==================================//
 
-int reservar_bloque()
+int reservar_bloque(char* path_archivo)
 {
 
 	int index;
 	bool encontro = true;
 
 	pthread_mutex_lock(&mutex_mapa_bit);
-	for(index=0;encontro && index<mapa_bits->size;index++)
+	for(index=0;encontro && index<metadata->blocks;index++)
 	{
 		encontro = bitarray_test_bit(mapa_bits, index);
 		if (!encontro)
 			bitarray_set_bit(mapa_bits, index);
 	}
-
-	/*int test;
-	for (int i=0; i < 124; i++)
-		{test = bitarray_test_bit(mapa_bits, i);
-		printf("%d", test);}*/
 
 	if (!encontro)
 		{
@@ -62,10 +76,7 @@ int reservar_bloque()
 		memcpy(bit_array_aux, mapa_bits->bitarray, mapa_bits->size);
 		munmap(bit_array_aux, mapa_bits->size);
 		close(fd);
-
-		/*FILE* fBitmap = fopen(obtener_path_bitmap(),"wb+");
-			fwrite(mapa_bits->bitarray,mapa_bits->size,1,fBitmap);
-			fclose(fBitmap);*/
+		log_info(logger, "Se asigno el bloque %d para el archivo %s", index-1, path_archivo);
 		}
 
 
@@ -105,7 +116,7 @@ void guardar_data_en_bloques(t_datos_para_guardar* datos_a_guardar, char* path_a
 			if (!list_is_empty(datos_a_guardar->bloques_siguientes))
 				{int* aux = list_remove(datos_a_guardar->bloques_siguientes, 0);
 				numero_bloque_sig = *aux;}
-			else numero_bloque_sig = reservar_bloque();
+			else numero_bloque_sig = reservar_bloque(path_archivo);
 
 //======================GUARDO PUNTERO AL SIG BLOQUE EN EL BLOQUE==========================//
 			if (numero_bloque_sig >= 0){

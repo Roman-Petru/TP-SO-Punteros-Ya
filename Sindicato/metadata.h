@@ -14,6 +14,7 @@
 typedef struct {
 	int block_size;
 	int blocks;
+	char* magic_number;
 }t_metadata;
 
 extern t_nodo_arbol* raiz;

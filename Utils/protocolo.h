@@ -8,6 +8,7 @@
 #include <commons/log.h>
 #include <commons/collections/list.h>
 
+
 typedef enum
 {
 	//=== CLIENTE/SERVIDOR ===//
@@ -24,6 +25,8 @@ typedef enum
 	SELECCIONAR_RESTAURANTE_RESPUESTA,
 	OBTENER_RESTAURANTE,
 	OBTENER_RESTAURANTE_RESPUESTA,
+	OBTENER_RECETA,
+	OBTENER_RECETA_RESPUESTA,
 	CONSULTAR_PLATOS,
 	CONSULTAR_PLATOS_RESPUESTA,
 	CREAR_PEDIDO,
@@ -139,6 +142,20 @@ typedef struct
 	t_list* platos;
 } t_consultar_pedido;
 
+typedef struct {
+	char* operacion;
+	int ciclos;
+}t_paso;
+
+typedef struct {
+	char* nombre_plato;
+	t_list* pasos_receta;
+}t_receta;
+
+typedef struct
+{
+	t_list* pasos;
+} t_obtener_receta;
 
 
 t_datos_cliente* crear_datos_cliente(char* id_cliente, t_posicion* posicion);
@@ -151,6 +168,7 @@ t_datos_estado_pedido* crear_datos_estado_pedido(t_estado_pedido estado, t_list*
 t_consultar_pedido* crear_datos_consultar_pedido(char* restaurante, t_estado_pedido estado, t_list* platos);
 t_handshake_resto_app* crear_datos_handshake_restaurante_app(int puerto, char* restaurante, t_posicion* posicion);
 t_datos_estado_comida* crear_datos_estado_comida(char* comida, uint32_t cant_total, uint32_t cant_lista);
+t_paso* crear_paso(char* operacion, int tiempo);
 
 typedef t_respuesta* (*t_operacion_servidor)(void* datos);
 typedef t_respuesta* (*t_operacion_servidor_simple)();

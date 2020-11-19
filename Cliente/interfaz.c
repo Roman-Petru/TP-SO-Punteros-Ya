@@ -1,6 +1,5 @@
 #include "interfaz.h"
 
-//Consultar Pedido
 //Obtener Receta
 
 //========== VALIDACIONES ==========//
@@ -222,6 +221,29 @@ static void consultar_pedido()
 	list_iterate(datos_pedido->platos, &logear_platos);
 }
 
+//========== OBTENER RECETA ==========//
+
+static void obtener_receta()
+{
+	if(validar_restaurante())
+		return;
+
+	char* receta = consola_leer("Ingrese el nombre de la receta a obtener: ");
+
+	t_obtener_receta* pasos_receta = cliente_enviar_mensaje(cliente, OBTENER_RECETA, receta);
+
+	void logear_receta(void* paso)
+		{t_paso* paso_a_logear = paso;
+		char* mensaje2 = malloc(100);
+		sprintf(mensaje2, "Operacion: %s, Tiempo: %d", paso_a_logear->operacion, paso_a_logear->ciclos);
+		consola_log(consola, mensaje2);
+		free(mensaje2);
+		}
+
+	list_iterate(pasos_receta->pasos, &logear_receta);
+}
+
+
 static void terminar_pedido()
 {
 	if(validar_pedido() && validar_restaurante())
@@ -231,6 +253,7 @@ static void terminar_pedido()
 	datos.restaurante = restaurante_seleccionado;
 	datos.id_pedido = id_pedido;
 	 */
+
 	bool operacion_ok = cliente_enviar_mensaje(cliente, TERMINAR_PEDIDO, crear_datos_pedido(id_pedido, restaurante_seleccionado));
 	consola_if(consola, operacion_ok);
 }
@@ -270,5 +293,6 @@ void cargar_interfaz()
 	consola_agregar_comando(consola, "terminar pedido", &terminar_pedido);
 	consola_agregar_comando(consola, "finalizar pedido", &finalizar_pedido);
 	consola_agregar_comando(consola, "consultar pedido", &consultar_pedido);
+	consola_agregar_comando(consola, "obtener receta", &obtener_receta);
 }
 
