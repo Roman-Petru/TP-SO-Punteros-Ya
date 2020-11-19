@@ -132,8 +132,13 @@ bool crear_archivo_pedido(char* nodo_resto, int id_pedido)
 	close(fd);
 	free(datos_archivo_info); free(nombre_arch_pedido);
 
-	t_list* bloques_siguientes = list_create();
-	guardar_data_en_bloques(datos_archivo_a_bloques, bloque_inicial, bloques_siguientes);
+
+	t_datos_para_guardar* datos = malloc(sizeof(t_datos_para_guardar));
+	datos->data = datos_archivo_a_bloques;
+	datos->bloque_inicial = bloque_inicial;
+	datos->bloques_siguientes = list_create();
+
+	guardar_data_en_bloques(datos, nombre_arch_pedido);
 
 	return true;
 }
@@ -142,7 +147,7 @@ uint32_t obtener_bloque_inicial(char* info_bloque)
 {
 	char* aux = strstr(info_bloque, "CK=");
 	aux = aux+3;
-	return strtol(aux+3, NULL, 10);
+	return strtol(aux, NULL, 10);
 }
 
 void modificar_tamanio_real(char* path_archivo, int tamanio)
@@ -198,9 +203,12 @@ void crear_receta(char* data)
 	free(datos_archivo_info); free(nombre_arch_recetas);
 	free(aux[0]); free(aux[1]); free(aux[2]); free(aux);
 
+	t_datos_para_guardar* datos = malloc(sizeof(t_datos_para_guardar));
+	datos->data = datos_receta;
+	datos->bloque_inicial = bloque_inicial;
+	datos->bloques_siguientes = list_create();
 
-	t_list* bloques_siguientes = list_create();
-	guardar_data_en_bloques(datos_receta, bloque_inicial, bloques_siguientes);
+	guardar_data_en_bloques(datos, nombre_arch_recetas);
 }
 
 
@@ -247,6 +255,10 @@ void crear_restaurante (char* data)
 	free(aux);
 
 
-	t_list* bloques_siguientes = list_create();
-	guardar_data_en_bloques(datos_restaurante, bloque_inicial, bloques_siguientes);
+	t_datos_para_guardar* datos = malloc(sizeof(t_datos_para_guardar));
+	datos->data = datos_restaurante;
+	datos->bloque_inicial = bloque_inicial;
+	datos->bloques_siguientes = list_create();
+
+	guardar_data_en_bloques(datos, nombre_arch_recestaurante);
 }

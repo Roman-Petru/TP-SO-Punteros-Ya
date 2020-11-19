@@ -29,6 +29,7 @@ static t_respuesta* guardar_plato(t_guardar_plato* datos)
 	if(segmento->estado != PENDIENTE)
 		return respuesta_crear(PLATO_LISTO_RESPUESTA, (void*) false, false);
 
+	//TODO tiene que leer los marcos para saber si esta el plato, no las paginas.
 	//Verificar si existe el plato dentro de la tabla de páginas del pedido. En caso contrario, se deberá asignar una nueva página al segmento.
 	if(!pagina_existe(segmento, datos->comida))
 		asignar_nueva_pagina(segmento, datos->comida);

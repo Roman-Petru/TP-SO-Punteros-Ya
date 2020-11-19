@@ -11,6 +11,7 @@
 //void cerrar(t_config* conf);  //revisar TODO (falta agregar configuracion)
 //void abrir(t_config* conf);
 
+void modificar_tamanio_real(char* path_archivo, int tamanio);
 void inicializar_archivos();
 bool restaurante_existe(char* restaurante);
 bool pedido_existe(char* nodo_resto, int id_pedido);

@@ -1,4 +1,5 @@
 #include "bloques.h"
+#include "string_sindicato.h"
 
 static char* path_bloque(char* nombre) {
 	char* path = string_new();
@@ -76,15 +77,17 @@ int reservar_bloque()
 
 //=================================="ESCRIBIR EN DISCO"==================================//
 
-void guardar_data_en_bloques(char* data, uint32_t bloque_inicial, t_list* bloques_siguientes)
+void guardar_data_en_bloques(t_datos_para_guardar* datos_a_guardar, char* path_archivo)
 
 {
+
+	modificar_tamanio_real(path_archivo, strlen(datos_a_guardar->data));
 	int bloque_extra = 0;
-	if (strlen(data)%(metadata->block_size-4) != 0)
+	if (strlen(datos_a_guardar->data)%(metadata->block_size-4) != 0)
 		bloque_extra = 1;
 
-	int bloques_necesarios = strlen(data)/(metadata->block_size-4)+bloque_extra;
-	int numero_bloque_sig = bloque_inicial;
+	int bloques_necesarios = strlen(datos_a_guardar->data)/(metadata->block_size-4)+bloque_extra;
+	int numero_bloque_sig = datos_a_guardar->bloque_inicial;
 
 	for(int i=0; i<bloques_necesarios;i++)
 		{
@@ -93,20 +96,20 @@ void guardar_data_en_bloques(char* data, uint32_t bloque_inicial, t_list* bloque
 		int arch_bloque = open(path_bloque, O_RDWR, S_IRWXU | S_IRWXG);
 		posix_fallocate(arch_bloque, 0, metadata->block_size);
 		void* archivo_en_memoria = mmap(NULL, metadata->block_size, PROT_READ | PROT_WRITE, MAP_SHARED, arch_bloque, 0);
-		memcpy(archivo_en_memoria, data, metadata->block_size-4);
+		memcpy(archivo_en_memoria, datos_a_guardar->data, metadata->block_size-4);
 		log_info(logger, "Se escribio en el bloque %d", numero_bloque_sig);
 
 		if (bloques_necesarios > i+1)
-			{data = data + metadata->block_size-4;
+			{datos_a_guardar->data = datos_a_guardar->data + metadata->block_size-4;
 //======================BUSCO BLOQUE SIGUIENTE O RESERVO NUEVO SI NO HAY==========================//
-			if (!list_is_empty(bloques_siguientes))
-				{int* aux = list_remove(bloques_siguientes, 0);
+			if (!list_is_empty(datos_a_guardar->bloques_siguientes))
+				{int* aux = list_remove(datos_a_guardar->bloques_siguientes, 0);
 				numero_bloque_sig = *aux;}
 			else numero_bloque_sig = reservar_bloque();
 
 //======================GUARDO PUNTERO AL SIG BLOQUE EN EL BLOQUE==========================//
 			if (numero_bloque_sig >= 0){
-				uint32_t* puntero_a_numero = archivo_en_memoria + metadata->block_size - 4;
+				void* puntero_a_numero = archivo_en_memoria + metadata->block_size - 4;
 				//*puntero_a_numero = numero_bloque_sig;
 				memcpy(puntero_a_numero, &numero_bloque_sig, 4);
 				munmap(puntero_a_numero, 4);} else {log_info(logger, "No hay mas bloques disponibles");
@@ -128,34 +131,56 @@ t_datos_para_guardar* leer_de_bloques(char* path)
 	char* archivo_en_memoria = mmap(NULL, 200, PROT_READ, MAP_PRIVATE, fd, 0);
 
 	char** aux = string_n_split(archivo_en_memoria, 2, "\n");
+	int tamanio_string_a_leer = strtol(aux[0]+5, NULL, 10);
 
 	int bloque_extra = 0;
-	if (strtol(aux[0]+5, NULL, 10)%(metadata->block_size-4) != 0)
+	if (tamanio_string_a_leer%(metadata->block_size-4) != 0)
 		bloque_extra = 1;
-	int bloques_a_leer = strtol(aux[0]+5, NULL, 10)/(metadata->block_size-4) + bloque_extra;
+	int bloques_a_leer = tamanio_string_a_leer/(metadata->block_size-4) + bloque_extra;
 	t_datos_para_guardar* datos_para_guardar = malloc(sizeof(t_datos_para_guardar));
 	datos_para_guardar->bloque_inicial = strtol(aux[1]+14, NULL, 10);
 	free(aux[0]); free(aux[1]); free(aux);
 	munmap(archivo_en_memoria, 200);
 	close(fd);
 
-	int numero_bloque_sig = datos_para_guardar->bloque_inicial;
+	int* numero_bloque_sig = &(datos_para_guardar->bloque_inicial);
+	bool add_end_string = false;
 	datos_para_guardar->data = string_new();
 	datos_para_guardar->bloques_siguientes = list_create();
 
 	for (int i=0; i<bloques_a_leer; i++)
 	{
-		char* path_bloque = obtener_path_bloque(numero_bloque_sig);
+		char* path_bloque = obtener_path_bloque(*numero_bloque_sig);
 		int arch_bloque = open(path_bloque, O_RDONLY, S_IRWXU | S_IRWXG);
 		void* archivo_en_memoria = mmap(NULL, metadata->block_size, PROT_READ, MAP_SHARED, arch_bloque, 0);
-		char aux[metadata->block_size-4];
-		memcpy(aux, archivo_en_memoria, metadata->block_size-4);
-		string_append(&(datos_para_guardar->data), aux);
+	//	char* aux = string_new();
+
+		int cantidad_a_copiar;
+
+		if (tamanio_string_a_leer <= metadata->block_size-4)
+			{cantidad_a_copiar = tamanio_string_a_leer;
+			add_end_string = true;	}
+		else
+			{cantidad_a_copiar = metadata->block_size-4;
+			tamanio_string_a_leer = tamanio_string_a_leer - (metadata->block_size-4);}
+
+
+		int numero_a_reallocar =  (metadata->block_size-4)*(i+(1*(!add_end_string)))+(tamanio_string_a_leer * add_end_string) + (1 * add_end_string);
+		datos_para_guardar->data = realloc(datos_para_guardar->data, numero_a_reallocar);
+
+		memcpy(datos_para_guardar->data+(i*(metadata->block_size-4)), archivo_en_memoria, cantidad_a_copiar);
+
+		if (add_end_string)
+			{char* end_string = string_new();
+			memcpy(datos_para_guardar->data+(numero_a_reallocar-1), end_string, 1);}
+
+		//string_append_sin_mas_uno(&(datos_para_guardar->data), aux);
+		//log_info(logger, "%s", aux);
 
 		if (bloques_a_leer > i+1)
 			{uint32_t* puntero_a_numero = archivo_en_memoria + metadata->block_size - 4;
 			//memcpy(&numero_bloque_sig, puntero_a_numero, 4);
-			int* numero_bloque_sig = malloc(sizeof(int));
+			numero_bloque_sig = malloc(sizeof(int));
 			*numero_bloque_sig = *puntero_a_numero;
 			list_add(datos_para_guardar->bloques_siguientes, numero_bloque_sig);	}
 
@@ -163,7 +188,6 @@ t_datos_para_guardar* leer_de_bloques(char* path)
 		close(arch_bloque);
 
 	}
-
 	return datos_para_guardar;
 }
 
