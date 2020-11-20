@@ -82,6 +82,26 @@ bool receta_existe(char* receta)
 
 	return encontro;
 }
+int obtener_cantidad_pedidos(char* path_resto)
+{
+
+	DIR* dir = opendir(path_resto);
+
+		struct dirent* entry;
+		int cant_pedidos = 0;
+		if (dir == NULL) {
+			log_error(logger,"No se pudo abrir correctamente el directorio del Restaurante");
+		} else {
+			while((entry = readdir(dir)) != NULL) {
+				log_info(logger,"prueba dir name: %s", entry->d_name);
+				if (entry->d_type == DT_REG)
+					cant_pedidos++;
+			}}
+		//free(dup);
+		closedir(dir);
+
+		return cant_pedidos-1;
+}
 
 static char* armar_string_arch_pedido(int id_pedido)
 {
@@ -144,7 +164,7 @@ bool crear_archivo_pedido(char* nodo_resto, int id_pedido)
 
 	char* datos_archivo_a_bloques = "ESTADO_PEDIDO=Pendiente\nLISTA_PLATOS=[]\nCANTIDAD_PLATOS=[]\nCANTIDAD_LISTA=[]\nPRECIO_TOTAL=0";
 
-	bool op_ok = (cantidad_bloques_libres()>=(strlen(datos_archivo_a_bloques)/(metadata->block_size-4)));
+	bool op_ok = (cantidad_bloques_libres()>=(strlen(datos_archivo_a_bloques)/(metadata->block_size-4))+1);
 		if (!op_ok)
 			{log_info(logger, "No se pudo continuar la operacion ya que no hay mas bloques disponibles");
 			return false;}
@@ -220,7 +240,7 @@ void crear_receta(char* data)
 	string_append(&datos_receta, aux[2]);
 
 
-	bool op_ok = (cantidad_bloques_libres()>=(strlen(datos_receta)/(metadata->block_size-4)));
+	bool op_ok = (cantidad_bloques_libres()>=(strlen(datos_receta)/(metadata->block_size-4))+1);
 		if (!op_ok)
 			{log_info(logger, "No se pudo continuar la operacion ya que no hay mas bloques disponibles");
 			return;}
@@ -267,7 +287,8 @@ void crear_restaurante (char* data)
 	char* nombre_arch_recestaurante = string_new();
 	string_append(&nombre_arch_recestaurante, obtener_nodo_restaurante_especifico(aux[0]));
 	mkdir(nombre_arch_recestaurante, 0700);
-
+	perror("...");
+	//CrearRestaurante Resto 5 [4,5] [Milanesa] [Milanesa,Empanadas] [200,50] 2
 
 	string_append(&nombre_arch_recestaurante, "/Info.AFIP");
 
@@ -287,7 +308,7 @@ void crear_restaurante (char* data)
 	string_append(&datos_restaurante, "\nCANTIDAD_HORNOS=");
 	string_append(&datos_restaurante, aux[6]);
 
-	bool op_ok = (cantidad_bloques_libres()>=(strlen(datos_restaurante)/(metadata->block_size-4)));
+	bool op_ok = (cantidad_bloques_libres()>=(strlen(datos_restaurante)/(metadata->block_size-4))+1);
 		if (!op_ok)
 			{log_info(logger, "No se pudo continuar la operacion ya que no hay mas bloques disponibles");
 			return;}

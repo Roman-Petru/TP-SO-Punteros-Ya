@@ -31,7 +31,7 @@ void inicializar_metadata()
 	if(!existe_archivo(meta)) {
 		FILE* metadata = fopen(meta,"wb+");
 		fprintf(metadata,"BLOCK_SIZE=64\n");
-		fprintf(metadata,"BLOCKS=8\n");
+		fprintf(metadata,"BLOCKS=5192\n");
 		fprintf(metadata,"MAGIC_NUMBER=AFIP");
 		fclose(metadata);
 	}

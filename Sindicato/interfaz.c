@@ -172,10 +172,10 @@ static t_respuesta* obtener_receta(char* nombre_receta)
 	log_info(logger, "Llego el mensaje %s", __func__);
 
 	if (!receta_existe(nombre_receta))
-	{log_info(logger, "No se pudo obtener receta ya que no existe");
-	t_obtener_receta* receta = malloc(sizeof(t_obtener_receta));
-	receta->pasos = list_create();
-	return respuesta_crear(OBTENER_RECETA_RESPUESTA, (void*) receta, false);}
+		{log_info(logger, "No se pudo obtener receta ya que no existe");
+		t_obtener_receta* receta = malloc(sizeof(t_obtener_receta));
+		receta->pasos = list_create();
+		return respuesta_crear(OBTENER_RECETA_RESPUESTA, (void*) receta, false);}
 
 
 	char* path_receta = obtener_nodo_recetas();
@@ -191,9 +191,64 @@ static t_respuesta* obtener_receta(char* nombre_receta)
 	return respuesta_crear(OBTENER_RECETA_RESPUESTA, (void*) receta, false);
 }
 
+
+static t_respuesta* obtener_restaurante(char* nombre_restaurante)
+{
+	log_info(logger, "Llego el mensaje %s", __func__);
+
+	if (!restaurante_existe(nombre_restaurante))
+		{log_info(logger, "No se pudo obtener restaurante ya que no existe");
+		t_obtener_restaurante* obtener_res = malloc(sizeof(t_obtener_restaurante));
+		obtener_res->cantidad_cocineros = 9753;
+		obtener_res->lista_afinidades = list_create();
+		obtener_res->lista_precios = list_create();
+		obtener_res->posicion = posicion_crear(0, 0);
+
+		return respuesta_crear(OBTENER_RESTAURANTE_RESPUESTA, (void*) obtener_res, false);}
+
+
+	char* path_restaurante = obtener_nodo_restaurante_especifico(nombre_restaurante);
+	int cant_pedidos = obtener_cantidad_pedidos(path_restaurante);
+	string_append(&path_restaurante, "/Info.AFIP");
+
+	t_datos_para_guardar* datos_para_guardar = leer_de_bloques(path_restaurante);
+
+	t_obtener_restaurante* resto = desglosar_resto(datos_para_guardar->data, cant_pedidos);
+
+	log_info(logger, "Se obtuvo restaurante correctamente");
+	return respuesta_crear(OBTENER_RESTAURANTE_RESPUESTA, (void*) resto, false);
+}
+
+
+
+static t_respuesta* consultar_platos(char* nombre_restaurante)
+{
+	log_info(logger, "Llego el mensaje %s", __func__);
+
+	if (!restaurante_existe(nombre_restaurante))
+	{log_info(logger, "No se pudo consultar plato ya que no existe el restaurante");
+	t_list* lista_vac = list_create();
+		return respuesta_crear(CONSULTAR_PLATOS_RESPUESTA, lista_vac, true);}
+
+
+	char* path_restaurante = obtener_nodo_restaurante_especifico(nombre_restaurante);
+	string_append(&path_restaurante, "/Info.AFIP");
+
+	t_datos_para_guardar* datos_para_guardar = leer_de_bloques(path_restaurante);
+
+	t_list* lista_platos = desglosar_platos(datos_para_guardar->data);
+
+	log_info(logger, "Se obtuvieron platos correctamente");
+	return respuesta_crear(CONSULTAR_PLATOS_RESPUESTA, lista_platos, true);
+
+}
+
+
+
 void cargar_interfaz()
 {
 	servidor_agregar_operacion(servidor, HANDSHAKE_CLIENTE, &handshake_cliente);
+	servidor_agregar_operacion(servidor, CONSULTAR_PLATOS, &consultar_platos);
 	servidor_agregar_operacion(servidor, GUARDAR_PEDIDO, &guardar_pedido);
 	servidor_agregar_operacion(servidor, GUARDAR_PLATO, &guardar_plato);
 	servidor_agregar_operacion(servidor, CONFIRMAR_PEDIDO, &confirmar_pedido);
@@ -201,6 +256,7 @@ void cargar_interfaz()
 	servidor_agregar_operacion(servidor, PLATO_LISTO, &plato_listo);
 	servidor_agregar_operacion(servidor, TERMINAR_PEDIDO, &terminar_pedido);
 	servidor_agregar_operacion(servidor, OBTENER_RECETA, &obtener_receta);
+	servidor_agregar_operacion(servidor, OBTENER_RESTAURANTE, &obtener_restaurante);
 }
 
 

@@ -116,4 +116,24 @@ t_paso* crear_paso(char* operacion, int tiempo)
 	return paso;
 }
 
+t_precio* crear_precio(char* nombre, int precio)
+{
+	t_precio* precio_str = malloc(sizeof(t_precio));
+	precio_str->nombre_plato = nombre;
+	precio_str->precio = precio;
+	return precio_str;
+}
+
+t_obtener_restaurante* crear_datos_obtener_restaurante(t_list* list_afi, t_list* list_prec, t_posicion* posicion, int cant_coc, int cant_hornos, int cant_pedidos)
+{
+	t_obtener_restaurante* datos = malloc(sizeof(t_obtener_restaurante));
+	datos->lista_afinidades = list_afi;
+	datos->lista_precios = list_prec;
+	datos->posicion = posicion;
+	datos->cantidad_cocineros = cant_coc;
+	datos->cantidad_hornos = cant_hornos;
+	datos->cantidad_pedidos = cant_pedidos;
+
+	return datos;
+}
 

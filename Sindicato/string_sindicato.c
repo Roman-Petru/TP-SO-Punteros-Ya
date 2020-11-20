@@ -56,11 +56,8 @@ t_pedido_sind* desglosar_pedido (char* pedido_en_string)
 
 static t_paso* cargar_pasito(char* operacion, char* tiempo)
 {
-
 	t_paso* paso = crear_paso(operacion, strtol(tiempo, NULL, 10));
-
 	free(tiempo);
-
 	return paso;
 }
 
@@ -70,7 +67,7 @@ t_obtener_receta* desglosar_receta (char* receta_en_string)
 {
 	t_config_string* string_config = config_string_create(receta_en_string);
 
-	t_obtener_receta* receta = malloc(sizeof(t_pedido_sind));
+	t_obtener_receta* receta = malloc(sizeof(t_obtener_receta));
 	receta->pasos = list_create();
 
 	char** operacion = config_string_get_array_value(string_config, "PASOS");
@@ -89,7 +86,88 @@ t_obtener_receta* desglosar_receta (char* receta_en_string)
 	return receta;
 }
 
+static t_precio* cargar_precio(char* nombre, char* precio)
+{
+	t_precio* precio_str = crear_precio(nombre, strtol(precio, NULL, 10));
+	free(precio);
+	return precio_str;
+}
 
+
+t_obtener_restaurante* desglosar_resto (char* resto_en_string, int cant_pedidos)
+
+{
+	t_config_string* string_config = config_string_create(resto_en_string);
+
+	t_obtener_restaurante* resto = malloc(sizeof(t_obtener_restaurante));
+	resto->lista_afinidades = list_create();
+
+	char** afinidad = config_string_get_array_value(string_config, "AFINIDAD_COCINEROS");
+
+	for (int i=0; afinidad[i] != NULL; i++)
+		{char* afi = afinidad[i];
+		list_add(resto->lista_afinidades, afi);	}
+
+	resto->lista_precios = list_create();
+
+	char** platos = config_string_get_array_value(string_config, "PLATOS");
+	char** precio_platos = config_string_get_array_value(string_config, "PRECIO_PLATOS");
+
+	for (int i=0; platos[i] != NULL; i++)
+		{t_precio* precio = cargar_precio(string_duplicate(platos[i]), precio_platos[i]);
+		list_add(resto->lista_precios, precio);	}
+
+	resto->cantidad_cocineros = config_string_get_int_value(string_config, "CANTIDAD_COCINEROS");
+	resto->cantidad_hornos = config_string_get_int_value(string_config, "CANTIDAD_HORNOS");
+
+	char** posiciones = config_string_get_array_value(string_config, "POSICION");
+
+	resto->posicion = posicion_crear(strtol(posiciones[0], NULL, 10), strtol(posiciones[1], NULL, 10));
+	resto->cantidad_pedidos = cant_pedidos;
+
+
+//	free(platos); free(afinidad);
+	free(precio_platos);
+//	free(posiciones);free(posiciones[0]);free(posiciones[1]);
+
+	config_string_destroy(string_config);
+	return resto;
+}
+
+t_list* desglosar_platos (char* resto_en_string)
+
+{
+	t_config_string* string_config = config_string_create(resto_en_string);
+
+	t_list* lista_platos = list_create();
+
+	char** platos = config_string_get_array_value(string_config, "PLATOS");
+
+
+	for (int i=0; platos[i] != NULL; i++)
+		{char* plato = platos[i];
+		list_add(lista_platos, plato);	}
+
+	config_string_destroy(string_config);
+	return lista_platos;
+}
+
+int obtener_precio(char* resto_en_string, char* comida)
+{
+	t_config_string* string_config = config_string_create(resto_en_string);
+
+	int precio;
+
+	char** platos = config_string_get_array_value(string_config, "PLATOS");
+	char** precio_platos = config_string_get_array_value(string_config, "PRECIO_PLATOS");
+
+	for (int i=0; platos[i] != NULL; i++)
+		if (string_equals_ignore_case(comida, platos[i]))
+			precio = strtol(precio_platos[i], NULL, 10);
+
+	config_string_destroy(string_config);
+	return precio;
+}
 
 bool string_confirmar_pedido(t_pedido_sind* pedido_sind)
 {
@@ -134,7 +212,12 @@ bool string_guardar_plato(t_pedido_sind* pedido_sind, t_guardar_plato* datos_a_g
 		list_add(pedido_sind->platos, estado_comida);
 		}
 
-	//TODO sumar precio
+
+	char* nodo_resto = obtener_nodo_restaurante_especifico(datos_a_guardar->restaurante);
+	string_append(&nodo_resto, "/Info.AFIP");
+
+	t_datos_para_guardar* datos_para_guardar = leer_de_bloques(nodo_resto);
+	pedido_sind->precio += obtener_precio(datos_para_guardar->data, datos_a_guardar->comida)*datos_a_guardar->cantidad;
 
 	return true;
 }

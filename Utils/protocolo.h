@@ -158,6 +158,25 @@ typedef struct
 } t_obtener_receta;
 
 
+typedef struct
+{
+	t_list* lista_afinidades;
+	t_list* lista_precios;
+	t_posicion* posicion;
+	int cantidad_cocineros;
+	int cantidad_hornos;
+	int cantidad_pedidos;
+} t_obtener_restaurante;
+
+typedef struct {
+	char* nombre_plato;
+	int precio;
+}t_precio;
+
+
+
+
+
 t_datos_cliente* crear_datos_cliente(char* id_cliente, t_posicion* posicion);
 t_datos_pedido* crear_datos_pedido(int id_pedido, char* restaurante);
 t_datos_seleccion_restaurante* crear_datos_seleccion_restaurante(char* id_cliente, char* restaurante);
@@ -169,6 +188,9 @@ t_consultar_pedido* crear_datos_consultar_pedido(char* restaurante, t_estado_ped
 t_handshake_resto_app* crear_datos_handshake_restaurante_app(int puerto, char* restaurante, t_posicion* posicion);
 t_datos_estado_comida* crear_datos_estado_comida(char* comida, uint32_t cant_total, uint32_t cant_lista);
 t_paso* crear_paso(char* operacion, int tiempo);
+t_precio* crear_precio(char* nombre, int precio);
+t_obtener_restaurante* crear_datos_obtener_restaurante(t_list* list_afi, t_list* list_prec, t_posicion* posicion, int cant_coc, int cant_hornos, int cant_pedidos);
+
 
 typedef t_respuesta* (*t_operacion_servidor)(void* datos);
 typedef t_respuesta* (*t_operacion_servidor_simple)();

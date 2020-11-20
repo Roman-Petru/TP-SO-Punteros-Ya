@@ -1,6 +1,6 @@
 #include "interfaz.h"
 
-//Obtener Receta
+t_modulo modulo;
 
 //========== VALIDACIONES ==========//
 static bool validar_restaurante()
@@ -36,7 +36,7 @@ static void terminar()
 //========== INTERFAZ ==========//
 void handshake()
 {
-	t_modulo modulo = (t_modulo) cliente_enviar_mensaje(cliente, HANDSHAKE_CLIENTE, NULL);
+	modulo = (t_modulo) cliente_enviar_mensaje(cliente, HANDSHAKE_CLIENTE, NULL);
 	bool op_ok = true;
 
 	if(modulo == APP)
@@ -72,19 +72,14 @@ static void seleccionar_restaurante()
 	consola_if(consola, operacion_ok);
 }
 
-static void obtener_restaurante()
-{
-	if(validar_restaurante())
-		return;
-
-	//void* restaurante = cliente_enviar_mensaje(cliente, "SINDICATO", OBTENER_RESTAURANTE, restaurante_seleccionado);
-	cliente_enviar_mensaje(cliente, OBTENER_RESTAURANTE, restaurante_seleccionado);
-
-	consola_log(consola, "Datos Restaurante: ");
-}
 
 static void consultar_platos()
 {
+
+
+	if (modulo == SINDICATO)
+		restaurante_seleccionado = consola_leer("Ingrese el nombre del restaurante: ");
+
 	if(validar_restaurante())
 		return;
 
@@ -225,12 +220,14 @@ static void consultar_pedido()
 
 static void obtener_receta()
 {
-	if(validar_restaurante())
-		return;
+
+	restaurante_seleccionado = consola_leer("Ingrese el nombre del restaurante: ");
 
 	char* receta = consola_leer("Ingrese el nombre de la receta a obtener: ");
 
 	t_obtener_receta* pasos_receta = cliente_enviar_mensaje(cliente, OBTENER_RECETA, receta);
+
+	consola_log(consola, "Pasos de la receta: ");
 
 	void logear_receta(void* paso)
 		{t_paso* paso_a_logear = paso;
@@ -243,6 +240,52 @@ static void obtener_receta()
 	list_iterate(pasos_receta->pasos, &logear_receta);
 }
 
+
+
+static void obtener_restaurante()
+{
+
+	restaurante_seleccionado = consola_leer("Ingrese el nombre del restaurante: ");
+
+	t_obtener_restaurante* datos_resto = cliente_enviar_mensaje(cliente, OBTENER_RESTAURANTE, restaurante_seleccionado);
+
+
+	if (datos_resto->cantidad_cocineros == 9753)
+		{consola_log(consola, "No existe el restaurante");
+		return;	}
+
+
+	consola_log(consola, "Datos del restaurante: ");
+	consola_log(consola, "Afinidades: ");
+	void logear_afinidades(void* afinidad)
+		{char* afi = afinidad;
+		char* mensaje = malloc(100);
+		sprintf(mensaje, "Afinidad: %s", afi);
+		consola_log(consola, mensaje);
+		free(mensaje);
+		}
+
+	list_iterate(datos_resto->lista_afinidades, &logear_afinidades);
+
+
+
+	consola_log(consola, "Lista Precios: ");
+	void logear_precios(void* precio)
+		{t_precio* precio_str = precio;
+		char* mensaje2 = malloc(100);
+		sprintf(mensaje2, "Plato: %s, precio: %d", precio_str->nombre_plato, precio_str->precio);
+		consola_log(consola, mensaje2);
+		free(mensaje2);
+		}
+
+	list_iterate(datos_resto->lista_precios, &logear_precios);
+
+	char* mensaje3 = malloc(200);
+			sprintf(mensaje3, "Posicion: %d, %d; Cantidad cocineros: %d; Cantidad hornos: %d; Cantidad pedidos: %d", datos_resto->posicion->x, datos_resto->posicion->y, datos_resto->cantidad_cocineros, datos_resto->cantidad_hornos, datos_resto->cantidad_pedidos);
+			consola_log(consola, mensaje3);
+			free(mensaje3);
+
+}
 
 static void terminar_pedido()
 {

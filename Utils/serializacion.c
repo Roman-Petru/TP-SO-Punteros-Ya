@@ -203,7 +203,6 @@ static t_buffer* serializar_obtener_receta(void* datos_void)
 	t_list* lista_mapeada = list_map(datos->pasos, (void*) &nombre_paso);
 
 	t_buffer* buffer = buffer_crear(sizeof(uint32_t) + sizeof(uint32_t)*cantidad_pasos*2 + tamanio_lista_string(lista_mapeada));
-	//destruir_lista_string(lista_mapeada);
 
 	buffer_serializar_int(buffer, cantidad_pasos);
 
@@ -213,6 +212,43 @@ static t_buffer* serializar_obtener_receta(void* datos_void)
 		buffer_serializar_string(buffer, datos_paso->operacion);
 		buffer_serializar_int(buffer, datos_paso->ciclos);
 		}
+
+	return buffer;
+}
+
+static t_buffer* serializar_obtener_restaurante(void* datos_void)
+{
+	t_obtener_restaurante* datos = datos_void;
+	uint32_t cant_lista_afinidades = list_size(datos->lista_afinidades);
+	uint32_t cant_lista_precios = list_size(datos->lista_precios);
+
+	char* nombre_precio(void* precio) { return ((t_precio*)precio)->nombre_plato;}
+	t_list* lista_mapeada = list_map(datos->lista_precios, (void*) &nombre_precio);
+
+
+	t_buffer* buffer = buffer_crear(sizeof(uint32_t)*7+sizeof(uint32_t)*cant_lista_afinidades+sizeof(uint32_t)*cant_lista_precios*2+tamanio_lista_string(datos->lista_afinidades)+tamanio_lista_string(lista_mapeada));
+
+
+	buffer_serializar_int(buffer, cant_lista_afinidades);
+
+	for (int i=0; i<cant_lista_afinidades; i++)
+			{char* afinidad =  list_get(datos->lista_afinidades, i);
+			buffer_serializar_string(buffer, afinidad);	}
+
+	buffer_serializar_int(buffer, cant_lista_precios);
+
+	for (int i=0; i<cant_lista_precios; i++)
+		{
+		t_precio* datos_precio =  list_get(datos->lista_precios, i);
+		buffer_serializar_string(buffer, datos_precio->nombre_plato);
+		buffer_serializar_int(buffer, datos_precio->precio);
+		}
+
+	buffer_serializar_int(buffer, datos->posicion->x);
+	buffer_serializar_int(buffer, datos->posicion->y);
+	buffer_serializar_int(buffer, datos->cantidad_cocineros);
+	buffer_serializar_int(buffer, datos->cantidad_hornos);
+	buffer_serializar_int(buffer, datos->cantidad_pedidos);
 
 	return buffer;
 }
@@ -342,6 +378,35 @@ static void* deserializar_obtener_receta(t_buffer* buffer)
 	return datos;
 }
 
+static void* deserializar_obtener_restaurante(t_buffer* buffer)
+{
+	int cantidad_afinidades = buffer_deserializar_int(buffer);
+	t_list* afinidades = list_create();
+
+	for (int i=0; i<cantidad_afinidades; i++)
+		{
+		char* afinidad = buffer_deserializar_string(buffer);
+		list_add(afinidades, afinidad);	}
+
+	int cantidad_precios = buffer_deserializar_int(buffer);
+
+	t_list* lista_precios = list_create();
+	for (int i=0; i<cantidad_precios; i++)
+		{
+		char* nombre = buffer_deserializar_string(buffer);
+		int precio = buffer_deserializar_int(buffer);
+		list_add(lista_precios, crear_precio(nombre, precio));	}
+
+	int posx = buffer_deserializar_int(buffer);
+	int posy = buffer_deserializar_int(buffer);
+	t_posicion* posicion = posicion_crear(posx, posy);
+
+	int cant_coci = buffer_deserializar_int(buffer);
+	int cant_hornos = buffer_deserializar_int(buffer);
+	int cant_pedidos = buffer_deserializar_int(buffer);
+
+	return crear_datos_obtener_restaurante(afinidades, lista_precios, posicion, cant_coci, cant_hornos, cant_pedidos);
+}
 
 static void* deserializar_estado_pedido(t_buffer* buffer)
 {
@@ -502,6 +567,8 @@ void diccionario_serializaciones_inicializar()
 
 	dictionary_int_put(diccionario_serializaciones, OBTENER_RECETA, &serializar_string);
 	dictionary_int_put(diccionario_serializaciones, OBTENER_RECETA_RESPUESTA, &serializar_obtener_receta);
+	dictionary_int_put(diccionario_serializaciones, OBTENER_RESTAURANTE, &serializar_string);
+	dictionary_int_put(diccionario_serializaciones, OBTENER_RESTAURANTE_RESPUESTA, &serializar_obtener_restaurante);
 	dictionary_int_put(diccionario_serializaciones, FINALIZAR_PEDIDO, &serializar_datos_pedido);
 	dictionary_int_put(diccionario_serializaciones, FINALIZAR_PEDIDO_RESPUESTA, &serializar_bool);
 	dictionary_int_put(diccionario_serializaciones, TERMINAR_PEDIDO, &serializar_datos_pedido);
@@ -550,6 +617,8 @@ void diccionario_deserializaciones_inicializar()
 
 	dictionary_int_put(diccionario_deserializaciones, OBTENER_RECETA, &deserializar_string);
 	dictionary_int_put(diccionario_deserializaciones, OBTENER_RECETA_RESPUESTA, &deserializar_obtener_receta);
+	dictionary_int_put(diccionario_deserializaciones, OBTENER_RESTAURANTE, &deserializar_string);
+	dictionary_int_put(diccionario_deserializaciones, OBTENER_RESTAURANTE_RESPUESTA, &deserializar_obtener_restaurante);
 	dictionary_int_put(diccionario_deserializaciones, FINALIZAR_PEDIDO, &deserializar_datos_pedido);
 	dictionary_int_put(diccionario_deserializaciones, FINALIZAR_PEDIDO_RESPUESTA, &deserializar_bool);
 	dictionary_int_put(diccionario_deserializaciones, TERMINAR_PEDIDO, &deserializar_datos_pedido);
@@ -593,6 +662,8 @@ void diccionario_destrucciones_inicializar()
 
 	dictionary_int_put(diccionario_destrucciones, OBTENER_RECETA, &free);
 	dictionary_int_put(diccionario_destrucciones, OBTENER_RECETA_RESPUESTA, &sin_free);//ver free
+	dictionary_int_put(diccionario_destrucciones, OBTENER_RESTAURANTE, &free);
+	dictionary_int_put(diccionario_destrucciones, OBTENER_RESTAURANTE_RESPUESTA, &sin_free);//ver free
 	dictionary_int_put(diccionario_destrucciones, FINALIZAR_PEDIDO, &destruir_datos_pedido);
 	dictionary_int_put(diccionario_destrucciones, FINALIZAR_PEDIDO_RESPUESTA, &sin_free);
 	dictionary_int_put(diccionario_destrucciones, TERMINAR_PEDIDO, &destruir_datos_pedido);
