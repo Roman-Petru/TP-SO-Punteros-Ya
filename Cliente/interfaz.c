@@ -79,7 +79,8 @@ static void consultar_platos()
 
 	if (modulo == SINDICATO)
 		restaurante_seleccionado = consola_leer("Ingrese el nombre del restaurante: ");
-
+	if (modulo == RESTAURANTE)
+		restaurante_seleccionado = "no importa";
 	if(validar_restaurante())
 		return;
 
@@ -94,8 +95,12 @@ static void consultar_platos()
 
 static void crear_pedido()
 {
-	if(validar_restaurante())
+
+	if (modulo == RESTAURANTE)
+		restaurante_seleccionado = "no importa";
+	else if(validar_restaurante())
 		return;
+
 
 	id_pedido = (int) cliente_enviar_mensaje(cliente, CREAR_PEDIDO, config_get_string_value(config, "ID_CLIENTE"));
 

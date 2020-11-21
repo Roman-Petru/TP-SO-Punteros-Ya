@@ -287,7 +287,7 @@ void crear_restaurante (char* data)
 	char* nombre_arch_recestaurante = string_new();
 	string_append(&nombre_arch_recestaurante, obtener_nodo_restaurante_especifico(aux[0]));
 	mkdir(nombre_arch_recestaurante, 0700);
-	perror("...");
+
 	//CrearRestaurante Resto 5 [4,5] [Milanesa] [Milanesa,Empanadas] [200,50] 2
 
 	string_append(&nombre_arch_recestaurante, "/Info.AFIP");

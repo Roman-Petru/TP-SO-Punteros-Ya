@@ -1,12 +1,13 @@
 #include "interfaz_restaurante.h"
 #include "restaurante.h"
 
-int indice_id_pedido;
+
+
 
 void realizar_handshake_con_app()
 {
 
-	bool operacion_ok = cliente_enviar_mensaje(cliente, "APP", HANDSHAKE_RESTO_APP, crear_datos_handshake_restaurante_app(config_get_int_value(config_resto, "PUERTO_ESCUCHA"), nombre_restaurante, posicion));
+	bool operacion_ok = cliente_enviar_mensaje(cliente_app, HANDSHAKE_RESTO_APP, crear_datos_handshake_restaurante_app(config_get_int_value(config_resto, "PUERTO_ESCUCHA"), nombre_restaurante, posicion));
 
 	if (operacion_ok)
 		log_info(logger_resto, "Abierto el restaurante %s, se hizo correctamente el handshake con la app", nombre_restaurante);
@@ -15,68 +16,78 @@ void realizar_handshake_con_app()
 
 }
 
+static t_respuesta* handshake_cliente()
+{
+	log_info(logger_resto, "Un cliente realizo un handshake");
+	return respuesta_crear(HANDSHAKE_CLIENTE_RESPUESTA, (void*) RESTAURANTE, false);
+}
 
 
 static t_respuesta* consultar_platos(char* restaurante)
 {
-	log_info(logger_resto, "Me consultaron los platos y de paso empece 2 milanesas.");
+	log_info(logger_resto, "Me consultaron los platos");
 
-	restaurante = config_get_string_value(config_resto, "NOMBRE_RESTAURANTE");
-	//t_list* platos = cliente_enviar_mensaje(cliente, "SINDICATO", CONSULTAR_PLATOS, restaurante);
+	t_list* platos = cliente_enviar_mensaje(cliente_sind, CONSULTAR_PLATOS, nombre_restaurante);
 
-	for (int i=7; i < 9; i++)
-	{
-	t_para_nuevo_plato* pure = malloc(sizeof(t_para_nuevo_plato));
-	pure->nombre_plato = "milanesa";
-	pure->id_pedido = i;
-	agregar_interrupcion(NUEVO_PLATO, pure);
-	}
-
-	t_list* platos = list_create();
-	list_add(platos, "milanesa");
-	return respuesta_crear(CONSULTAR_PLATOS_RESPUESTA, platos, false);
+	return respuesta_crear(CONSULTAR_PLATOS_RESPUESTA, platos, true);
 }
 
 static t_respuesta* crear_pedido()
 {
 	log_info(logger_resto, "Me pidieron crear pedido.");
 
-	/*void* extra = malloc (sizeof(int));
-	int *id_nuevo_pedido = (int*) extra;
-	*id_nuevo_pedido = 5;*/
-
 	int id_nuevo_pedido = indice_id_pedido;
 	indice_id_pedido ++;
 
-	//bool operacion_ok = cliente_enviar_mensaje(cliente, "SINDICATO", GUARDAR_PEDIDO, id_nuevo_pedido y restaurante);
+	bool operacion_ok = cliente_enviar_mensaje(cliente_sind, GUARDAR_PEDIDO, crear_datos_pedido(id_nuevo_pedido, nombre_restaurante));
 
-
+	if (operacion_ok)
+		log_info(logger_resto, "Se mando correctamente el mensaje Guardar Pedido al sindicato");
+	else log_info(logger_resto, "No se mando correctamente el mensaje Guardar Pedido al sindicato");
 
 	return respuesta_crear(CREAR_PEDIDO_RESPUESTA, (void*) id_nuevo_pedido, false);
 }
 
 static t_respuesta* agregar_plato(t_agregar_plato* datos_para_agregar_plato)
 {
-	bool operacion_ok = cliente_enviar_mensaje(cliente, "SINDICATO", GUARDAR_PLATO, datos_para_agregar_plato);
+	bool operacion_ok = cliente_enviar_mensaje(cliente_sind, GUARDAR_PLATO, crear_datos_guardar_plato(datos_para_agregar_plato->id_pedido, 1, datos_para_agregar_plato->plato , nombre_restaurante));
 
 		if (operacion_ok)
-			return respuesta_crear(AGREGAR_PLATO_RESPUESTA, (void*) true, true);
+			return respuesta_crear(AGREGAR_PLATO_RESPUESTA, (void*) true, false);
 		else
-			return respuesta_crear(AGREGAR_PLATO_RESPUESTA, (void*) false, true);
+			return respuesta_crear(AGREGAR_PLATO_RESPUESTA, (void*) false, false);
 }
 
 static t_respuesta* confirmar_pedido(t_datos_pedido* datos_para_confirmar)
 {
 
 // cliente_enviar_mensaje ( PEDIRLE AL SINDICATO QUE PASE EL PEDIDO A ESTADO CONFIRMADO)
-//t_datos_del_pedido (no eixste todavia) = cliente_enviar_mensaje(cliente, "SINDICATO", OBTENER_PEDIDO, datos_para_confirmar);
+
+	bool conf_ok = cliente_enviar_mensaje(cliente_sind, CONFIRMAR_PEDIDO, crear_datos_pedido(datos_para_confirmar->id_pedido, nombre_restaurante));
+	if (!conf_ok)
+		{log_info(logger_resto, "No se pudo confirmar el pedido ya que el sindicato no lo pudo confirmar");
+		return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) false, false);}
+
+	t_datos_estado_pedido* datos_pedido = cliente_enviar_mensaje(cliente_sind, OBTENER_PEDIDO, crear_datos_pedido(datos_para_confirmar->id_pedido, nombre_restaurante));
+
+	bool op_ok = obtener_recetas(datos_pedido->platos);
+	if (!op_ok)
+		{log_info(logger_resto, "No se pudo confirmar el pedido ya que no se encontro alguna receta");
+		return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) false, false);}
 
 
-	//se analiza la informacion que se recibe y
-	//se comienza la planificacion de todos los platos con agregar_interrupcion(NUEVO_PLATO, "")
+	void empezar_pedido (void* en_lista) {
+		t_datos_estado_comida* plato = en_lista;
+		for (int i=0; i<plato->cant_total;i++)
+			{t_para_nuevo_plato* nuevo_plato = malloc(sizeof(t_para_nuevo_plato));
+			nuevo_plato->nombre_plato = plato->comida;
+			nuevo_plato->id_pedido = datos_para_confirmar->id_pedido;
+			agregar_interrupcion(NUEVO_PLATO, nuevo_plato);}}
 
-	//if se confirmo bien
-	return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) true, true);
+
+	list_iterate(datos_pedido->platos, &empezar_pedido);
+
+	return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) true, false);
 }
 /*
 
@@ -93,8 +104,9 @@ static t_respuesta* consultar_pedido(t_datos_pedido* datos_para_confirmar)
 void cargar_interfaz()
 {
 	serializacion_inicializar();
-	indice_id_pedido = 0;
 
+
+	servidor_agregar_operacion(servidor, HANDSHAKE_CLIENTE, &handshake_cliente);
 	servidor_agregar_operacion(servidor, CONSULTAR_PLATOS, &consultar_platos);
 	servidor_agregar_operacion(servidor, CREAR_PEDIDO, &crear_pedido);
 	servidor_agregar_operacion(servidor, AGREGAR_PLATO, &agregar_plato);

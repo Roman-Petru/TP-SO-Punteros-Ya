@@ -28,13 +28,13 @@ static void inicializar()
 	inicializar_gestor_pedidos();
 }
 
-static void comiezo_ciclo()
+/*static void comiezo_ciclo()
 {
 	cant_ciclo++;
 	//if(cant_ciclo == 100)
 	//	terminar();
 	//log_info(logger, "===== INSTANTE %d =====", cant_ciclo);
-}
+}*/
 
 void terminar()
 {
@@ -53,7 +53,7 @@ int main()
 
 	while(true)
 	{
-		comiezo_ciclo();
+		//comiezo_ciclo();
 		planificar_largo_plazo();
 		planificar_corto_plazo();
 		ejecutar_ciclo();

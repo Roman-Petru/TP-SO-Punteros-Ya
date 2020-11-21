@@ -14,17 +14,20 @@
 #include "platos.h"
 #include "interfaz_restaurante.h"
 #include "interrupciones.h"
+#include "metadata.h"
 
 extern t_servidor_red* servidor;
-extern t_cliente_red* cliente;
+extern t_cliente_red* cliente_sind;
+extern t_cliente_red* cliente_app;
 extern t_log* logger_resto;
 extern t_config* config_resto;
 extern char* nombre_restaurante;
 extern t_posicion* posicion;
-
+extern t_dictionary* diccionario_recetas;
 extern t_list* lista_afinidades;
 
 extern int cantidad_hornos;
+extern int indice_id_pedido;;
 
 typedef struct{
 	char* plato;
