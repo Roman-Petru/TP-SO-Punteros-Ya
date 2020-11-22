@@ -39,10 +39,10 @@ t_marco* obtener_marco_virtual(int index)
 	return marco;
 }
 
-void cargar_marco_virtual(int index, t_pagina* pagina)
+void cargar_marco_virtual(int index, t_pagina* pagina, char* comida)
 {
 	t_marco* marco = obtener_marco_virtual(index);
-	strcpy (marco->nombre_plato, pagina->comida);
+	strcpy (marco->nombre_plato, comida);
 	marco->cantidad_total = 0;
 	marco->cantidad_lista = 0;
 
@@ -99,14 +99,14 @@ bool cargar_desde_swap_si_es_necesario(t_pagina* pagina)
 		return true;
 	}
 
-	if(!pagina->validacion_virtual)
+/*	if(!pagina->validacion_virtual)
 	{
 		int index = primer_marco_virtual_libre();
 		if(index == -1)
 			return false;
 
 		cargar_marco_virtual(index, pagina);
-	}
+	}*/
 
 	int index = primer_marco_principal_libre();
 	if(index == -1)

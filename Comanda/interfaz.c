@@ -27,14 +27,29 @@ static t_respuesta* guardar_plato(t_guardar_plato* datos)
 	t_segmento* segmento = obtener_segmento(datos->restaurante, datos->id_pedido);
 
 	if(segmento->estado != PENDIENTE)
-		return respuesta_crear(PLATO_LISTO_RESPUESTA, (void*) false, false);
+		return respuesta_crear(GUARDAR_PLATO_RESPUESTA, (void*) false, false);
 
 	//TODO tiene que leer los marcos para saber si esta el plato, no las paginas.
 	//Verificar si existe el plato dentro de la tabla de páginas del pedido. En caso contrario, se deberá asignar una nueva página al segmento.
-	if(!pagina_existe(segmento, datos->comida))
-		asignar_nueva_pagina(segmento, datos->comida);
+	pthread_mutex_lock(&(segmento->mutex_tabla_paginas));
 
-	t_pagina* pagina = obtener_pagina(segmento, datos->comida);
+	int numero_pagina = obtener_pagina_comida(segmento, datos->comida);
+	if(numero_pagina == -1)
+		{numero_pagina = asignar_nueva_pagina(segmento);
+		int index = primer_marco_virtual_libre();
+		if(index == -1)
+			{
+			log_info(logger, "No hay mas memoria virtual disponible, se elimina pagina");
+			list_remove_and_destroy_element(segmento->tabla_paginas, numero_pagina, &free);
+			return respuesta_crear(GUARDAR_PLATO_RESPUESTA, (void*) false, false);
+
+			}
+		t_pagina* pagina = list_get(segmento->tabla_paginas, numero_pagina);
+		cargar_marco_virtual(index, pagina, datos->comida);
+		}
+
+	t_pagina* pagina = list_get(segmento->tabla_paginas, numero_pagina);
+	pthread_mutex_unlock(&(segmento->mutex_tabla_paginas));
 
 	//En caso de que la página que corresponde al pedido no se encuentre cargada en memoria principal, se deberá cargar la misma desde swap (iniciando la elección de víctima de ser necesario). En caso contrario, proceder al paso  número 5.
 	bool op_ok = cargar_desde_swap_si_es_necesario(pagina);
@@ -42,8 +57,6 @@ static t_respuesta* guardar_plato(t_guardar_plato* datos)
 	//Se deberá agregar el plato y anexar la cantidad que se tiene que cocinar de dicho plato.
 	if(op_ok)
 		escribir_marco_principal_guardar_plato(pagina, datos->cantidad);
-	else
-		{eliminar_pagina_falta_memoria(segmento, pagina);return respuesta_crear(GUARDAR_PLATO_RESPUESTA, (void*) false, false);}
 
 	//Responder el mensaje indicando si se pudo realizar la operación correctamente (Ok/Fail).
 	return respuesta_crear(GUARDAR_PLATO_RESPUESTA, (void*) op_ok, false);
@@ -112,14 +125,18 @@ static t_respuesta* plato_listo(t_guardar_plato* datos)
 	t_segmento* segmento = obtener_segmento(datos->restaurante, datos->id_pedido);
 
 	//Verificar si existe el plato dentro de la tabla de páginas del pedido. En caso contrario, se deberá informar dicha situación.
-	if(!pagina_existe(segmento, datos->comida))
-		return respuesta_crear(PLATO_LISTO_RESPUESTA, (void*) false, false);
 
-	t_pagina* pagina = obtener_pagina(segmento, datos->comida);
 
 	//Verificar que el pedido esté en estado “Confirmado”. En caso contrario se deberá informar dicha situación.
 	if(segmento->estado != CONFIRMADO)
 		return respuesta_crear(PLATO_LISTO_RESPUESTA, (void*) false, false);
+
+	int numero_pagina = obtener_pagina_comida(segmento, datos->comida);
+	if(numero_pagina == -1)
+		{log_info(logger, "No se encontro el plato en la memoria, no se pudo cargar plato listo");
+		return respuesta_crear(PLATO_LISTO_RESPUESTA, (void*) false, false);}
+
+	t_pagina* pagina = list_get(segmento->tabla_paginas, numero_pagina);
 
 	//En caso de que la página que corresponde al pedido no se encuentre cargada en memoria principal, se deberá cargar la misma desde swap (iniciando la elección de víctima de ser necesario). En caso contrario, proceder al paso  número 5.
 	bool op_ok = cargar_desde_swap_si_es_necesario(pagina);
@@ -158,7 +175,7 @@ static t_respuesta* finalizar_pedido(t_datos_pedido* datos)
 	tabla_restaurante_eliminar_segmento(datos->restaurante, segmento);
 
 	//Responder el mensaje indicando si se pudo realizar la operación correctamente (Ok/Fail).
-	return respuesta_crear(PLATO_LISTO_RESPUESTA, (void*) true, false);
+	return respuesta_crear(FINALIZAR_PEDIDO_RESPUESTA, (void*) true, false);
 }
 
 void cargar_interfaz()

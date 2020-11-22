@@ -21,7 +21,7 @@ static t_respuesta* handshake_restaurante_app(t_handshake_resto_app* datos)
 
 	if (!restaurante_esta_conectado(datos->restaurante))
 		{
-		//agregar_restaurante(datos->restaurante, puerto, datos->posicion);
+		agregar_restaurante(datos->restaurante, datos->posicion, puerto);
 		log_info(logger, "Se conecto el restaurante %s con posicion X: %d, Y: %d.", datos->restaurante, datos->posicion->x, datos->posicion->y);
 		}
 
@@ -93,7 +93,8 @@ static t_respuesta* crear_pedido(char* id_cliente)
 	else if(es_resto_default(restaurante))
 		id_pedido = generar_id_pedido();
 	else
-		return respuesta_crear(CREAR_PEDIDO_RESPUESTA, (void*) -1, false);
+		{log_info(logger, "No se selecciono un restaurante valido para crear el pedido");
+		return respuesta_crear(CREAR_PEDIDO_RESPUESTA, (void*) -1, false);}
 
 	t_datos_pedido* datos = crear_datos_pedido(id_pedido, restaurante);
 	bool op_ok = cliente_enviar_mensaje(cliente_comanda, GUARDAR_PEDIDO, datos);
@@ -121,11 +122,12 @@ static t_respuesta* agregar_plato(t_agregar_plato* datos)
 {
 	char* restaurante = pedido_obtener_restaurante(datos->id_pedido);
 	if (restaurante == NULL)
-		return respuesta_crear(AGREGAR_PLATO_RESPUESTA, (void*) false, false);
+		{log_info(logger, "No hay restaurante o no hay id pedido para este cliente");
+		return respuesta_crear(AGREGAR_PLATO_RESPUESTA, (void*) false, false);}
 	bool op_ok = false;
 
 	if(restaurante_esta_conectado(restaurante))
-		op_ok = cliente_enviar_mensaje(restaurante_obtener_cliente(restaurante), AGREGAR_PLATO, &datos);
+		op_ok = cliente_enviar_mensaje(restaurante_obtener_cliente(restaurante), AGREGAR_PLATO, datos);
 
 	if(es_resto_default(restaurante))
 		op_ok = es_plato_default(datos->plato);
@@ -194,6 +196,19 @@ static t_respuesta* consultar_pedido(uint32_t id_pedido)
 	return respuesta_crear(CONSULTAR_PEDIDO_RESPUESTA, crear_datos_consultar_pedido(restaurante, estado->estado, estado->platos), false);
 }
 
+/*FINALIZAR PEDIDO*/
+static t_respuesta* finalizar_pedido(t_datos_pedido* datos)
+{
+	sem_t* sincronizador = pedido_obtener_semaforo(datos->id_pedido);
+	sem_wait(sincronizador);
+
+	bool op_ok = cliente_enviar_mensaje(cliente_comanda, FINALIZAR_PEDIDO, datos);
+	//semdestroy
+
+	return respuesta_crear(FINALIZAR_PEDIDO_RESPUESTA, (void*) op_ok , false);
+}
+
+
 static t_respuesta* operacion_terminar()
 {
 	agregar_interrupcion(TERMINAR_APP, NULL);
@@ -215,5 +230,6 @@ void cargar_interfaz()
 	servidor_agregar_operacion(servidor, PLATO_LISTO, &plato_listo);
 	servidor_agregar_operacion(servidor, CONFIRMAR_PEDIDO, &confirmar_pedido);
 	servidor_agregar_operacion(servidor, CONSULTAR_PEDIDO, &consultar_pedido);
+	servidor_agregar_operacion(servidor, FINALIZAR_PEDIDO, &finalizar_pedido);
 }
 

@@ -73,7 +73,6 @@ bool receta_existe(char* receta)
 		log_error(logger,"No se pudo abrir correctamente el directorio Recetas");
 	} else {
 		while((entry = readdir(dir)) && !encontro) {
-			log_info(logger,"prueba dir name: %s", entry->d_name);
 			if (string_equals_ignore_case(entry->d_name, dupli))
 				encontro = true;
 		}}
@@ -93,7 +92,6 @@ int obtener_cantidad_pedidos(char* path_resto)
 			log_error(logger,"No se pudo abrir correctamente el directorio del Restaurante");
 		} else {
 			while((entry = readdir(dir)) != NULL) {
-				log_info(logger,"prueba dir name: %s", entry->d_name);
 				if (entry->d_type == DT_REG)
 					cant_pedidos++;
 			}}

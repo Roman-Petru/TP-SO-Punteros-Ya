@@ -25,7 +25,7 @@ void inicializar_comanda(){
 int main()
 {
 	inicializar_comanda();
-
+	log_info(logger, "Se inicializo la comanda, esperando conecciones de la app");
 	while(true)
 		sleep(1000000);
 }

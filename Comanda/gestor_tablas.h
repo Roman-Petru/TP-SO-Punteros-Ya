@@ -21,7 +21,6 @@ typedef struct{
 
 typedef struct{
 	int id;
-	char* comida;
 	int marco_principal;
 	int marco_virtual;
 	bool comida_esta_lista;
@@ -36,17 +35,18 @@ void inicializar_gestor_tablas();
 
 bool tabla_segmento_restaurante_existe(char* restaurante);
 bool segmento_existe(char* restaurante, int id_pedido);
-bool pagina_existe(t_segmento* segmento, char* comida);
+//bool pagina_existe(t_segmento* segmento, char* comida);
 
 t_restaurante* obtener_tabla_restaurante(char* restaurante);
 t_segmento* obtener_segmento(char* restaurante, int id_pedido);
-t_pagina* obtener_pagina(t_segmento* segmento, char* comida);
+int obtener_pagina_comida(t_segmento* segmento, char* comida);
+//t_pagina* obtener_pagina(t_segmento* segmento, char* comida);
 
 void tabla_restaurante_crear(char* nombre_restaurante);
 bool tabla_restaurante_agregar_segmento(t_datos_pedido* datos);
-bool asignar_nueva_pagina(t_segmento* segmento, char* comida);
+int asignar_nueva_pagina(t_segmento* segmento);
 
 void tabla_restaurante_eliminar_segmento(char* restaurante, t_segmento* segmento);
 void eliminar_paginas(t_segmento* segmento);
-void eliminar_pagina_falta_memoria(t_segmento* segmento,t_pagina* pagina);
+//void eliminar_pagina_falta_memoria(t_segmento* segmento,t_pagina* pagina);
 #endif

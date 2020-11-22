@@ -545,6 +545,8 @@ void diccionario_serializaciones_inicializar()
 	dictionary_int_put(diccionario_serializaciones, CONEXION_CLIENTE_RESPUESTA, &serializar_bool);
 	dictionary_int_put(diccionario_serializaciones, HANDSHAKE_RESTO_APP, &serializar_handshake_restaurante_app);
 	dictionary_int_put(diccionario_serializaciones, HANDSHAKE_RESTO_APP_RESPUESTA, &serializar_bool);
+	dictionary_int_put(diccionario_serializaciones, HANDSHAKE_RESTO_SIND, &serializar_sin_datos);
+	dictionary_int_put(diccionario_serializaciones, HANDSHAKE_RESTO_SIND_RESPUESTA, &serializar_bool);
 
 	dictionary_int_put(diccionario_serializaciones, CONSULTAR_RESTAURANTES, &serializar_sin_datos);
 	dictionary_int_put(diccionario_serializaciones, CONSULTAR_RESTAURANTES_RESPUESTA, &serializar_lista_string);
@@ -595,6 +597,8 @@ void diccionario_deserializaciones_inicializar()
 	dictionary_int_put(diccionario_deserializaciones, CONEXION_CLIENTE_RESPUESTA, &deserializar_bool);
 	dictionary_int_put(diccionario_deserializaciones, HANDSHAKE_RESTO_APP, &deserializar_handshake_restaurante_app);
 	dictionary_int_put(diccionario_deserializaciones, HANDSHAKE_RESTO_APP_RESPUESTA, &deserializar_bool);
+	dictionary_int_put(diccionario_deserializaciones, HANDSHAKE_RESTO_SIND, &deserializar_sin_datos);
+	dictionary_int_put(diccionario_deserializaciones, HANDSHAKE_RESTO_SIND_RESPUESTA, &deserializar_bool);
 
 	dictionary_int_put(diccionario_deserializaciones, CONSULTAR_RESTAURANTES, &deserializar_sin_datos);
 	dictionary_int_put(diccionario_deserializaciones, CONSULTAR_RESTAURANTES_RESPUESTA, &deserializar_lista_string);
@@ -640,6 +644,8 @@ void diccionario_destrucciones_inicializar()
 	dictionary_int_put(diccionario_destrucciones, CONEXION_CLIENTE_RESPUESTA, &free);
 	dictionary_int_put(diccionario_destrucciones, HANDSHAKE_RESTO_APP, &destruir_handshake_restaurante_app);
 	dictionary_int_put(diccionario_destrucciones, HANDSHAKE_RESTO_APP_RESPUESTA, &free);
+	dictionary_int_put(diccionario_destrucciones, HANDSHAKE_RESTO_SIND, &sin_free);
+	dictionary_int_put(diccionario_destrucciones, HANDSHAKE_RESTO_SIND_RESPUESTA, &free);
 
 	dictionary_int_put(diccionario_destrucciones, CONSULTAR_RESTAURANTES, &sin_free);
 	dictionary_int_put(diccionario_destrucciones, CONSULTAR_RESTAURANTES_RESPUESTA, &destruir_lista_string);

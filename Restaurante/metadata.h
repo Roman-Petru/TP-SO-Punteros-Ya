@@ -9,5 +9,6 @@
 
 void obtener_metadata();
 bool obtener_recetas(t_list* platos);
+bool existe_plato(char* nombre_plato_buscado);
 
 #endif

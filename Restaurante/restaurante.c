@@ -7,10 +7,12 @@ t_cliente_red* cliente_app;
 t_log* logger_resto;
 t_config* config_resto;
 t_list* lista_afinidades;
+t_list* lista_platos;
 char* nombre_restaurante;
 t_posicion* posicion;
 int indice_id_pedido;
 t_dictionary* diccionario_recetas;
+
 
 void inicializar_restaurante()
 {
@@ -28,7 +30,7 @@ void inicializar_restaurante()
 	inicializar_interrupciones();
 
 	obtener_metadata();
-	//realizar_handshake_con_app();
+	realizar_handshake_con_app();
 
 	inicializar_planificador();
 	diccionario_recetas = dictionary_create();
@@ -47,7 +49,7 @@ int main()
 
 {
 	inicializar_restaurante();
-
+	log_info(logger_resto, "Se inicializó el Restaurante");
 	//para test/**/
 
 

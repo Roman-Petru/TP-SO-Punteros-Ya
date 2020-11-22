@@ -1,6 +1,7 @@
 #include "interfaz.h"
 
 t_modulo modulo;
+static void esperar_finalizar_pedido();
 
 //========== VALIDACIONES ==========//
 static bool validar_restaurante()
@@ -182,6 +183,16 @@ static void confirmar_pedido()
 
 	bool operacion_ok = cliente_enviar_mensaje(cliente, CONFIRMAR_PEDIDO, crear_datos_pedido(id_pedido, restaurante_seleccionado));
 	consola_if(consola, operacion_ok);
+
+
+
+
+	if (operacion_ok && modulo == APP)
+	{
+		pthread_t hilo_finalizar_pedido;
+		pthread_create(&(hilo_finalizar_pedido), NULL, (void*) &esperar_finalizar_pedido, NULL);
+		pthread_detach(hilo_finalizar_pedido);
+	}
 }
 
 static void plato_listo()
@@ -302,12 +313,26 @@ static void terminar_pedido()
 	datos.id_pedido = id_pedido;
 	 */
 
-	bool operacion_ok = cliente_enviar_mensaje(cliente, TERMINAR_PEDIDO, crear_datos_pedido(id_pedido, restaurante_seleccionado));
+	bool operacion_ok = cliente_enviar_mensaje(cliente2, TERMINAR_PEDIDO, crear_datos_pedido(id_pedido, restaurante_seleccionado));
 	consola_if(consola, operacion_ok);
 }
 
 
 //========== FINALIZAR PEDIDO ==========//
+
+static void esperar_finalizar_pedido()
+{
+	t_datos_pedido* datos = crear_datos_pedido(id_pedido, restaurante_seleccionado);
+
+//TODO POR QUE PORONGA NO HACE EL RECV
+	bool operacion_ok = cliente_enviar_mensaje(cliente, FINALIZAR_PEDIDO, datos);
+	//exit(-5);
+	if (operacion_ok)
+		log_info(logger_finalizar_pedido, "El pedido ha finalizado correctamente");
+	else log_info(logger_finalizar_pedido, "El pedido no ha podido finalizarse correctamente");
+	//	consola_log(consola, "El pedido ha finalizado correctamente");
+//	else consola_log(consola, "El pedido no ha podido finalizarse correctamente");
+}
 
 static void finalizar_pedido()
 {
@@ -318,7 +343,6 @@ static void finalizar_pedido()
 
 	bool operacion_ok = cliente_enviar_mensaje(cliente, FINALIZAR_PEDIDO, datos);
 	consola_if(consola, operacion_ok);
-
 }
 
 void cargar_interfaz()

@@ -34,13 +34,28 @@ bool segmento_existe(char* restaurante, int id_pedido)
 	bool es_mismo_segmento(void* segmento) { return ((t_segmento*) segmento)->id_pedido == id_pedido; }
 	return list_any_satisfy(restaurante_buscado->tabla_segmentos, &es_mismo_segmento);
 }
-
+/*
 bool pagina_existe(t_segmento* segmento, char* comida)
 {
 	bool es_mismo_plato(void* pagina) { return strcmp(((t_pagina*)pagina)->comida, comida)==0; }
 	return list_any_satisfy(segmento->tabla_paginas, &es_mismo_plato);
-}
+}*/
 
+int obtener_pagina_comida(t_segmento* segmento, char* comida)
+{
+	for (int i=0; i< list_size(segmento->tabla_paginas);i++)
+	{
+		t_pagina* pagina = list_get(segmento->tabla_paginas, i);
+		cargar_desde_swap_si_es_necesario(pagina);
+		t_marco* marco_principal = obtener_marco_principal(pagina->marco_principal);
+		pagina->uso = true;
+		log_info(logger, "Se leyo el marco de memoria principal de posicion %d con nombre de plato %s, cantidad lista %d y cantidad total %d", pagina->marco_principal, marco_principal->nombre_plato, marco_principal->cantidad_lista, marco_principal->cantidad_total);
+
+		if (strcmp(marco_principal->nombre_plato, comida)== 0)
+			return i;
+	}
+	return -1;
+}
 
 static int restaurante_index(char* nombre_restaurante)
 {
@@ -65,7 +80,7 @@ static int segmento_index(t_restaurante* restaurante_buscado, int id_pedido)
 
 	return encontro ? index-1 : -1;
 }
-
+/*
 static int pagina_index(t_segmento* segmento, char* comida)
 {
 	int index;
@@ -76,7 +91,7 @@ static int pagina_index(t_segmento* segmento, char* comida)
 		encontro = es_mismo_plato(list_get(segmento->tabla_paginas, index));
 
 	return encontro ? index-1 : -1;
-}
+}*/
 
 
 t_restaurante* obtener_tabla_restaurante(char* restaurante)
@@ -102,7 +117,7 @@ t_segmento* obtener_segmento(char* restaurante, int id_pedido)
 	return segmento;
 }
 
-
+/*
 t_pagina* obtener_pagina(t_segmento* segmento, char* comida)
 {
 	pthread_mutex_lock(&(segmento->mutex_tabla_paginas));
@@ -112,7 +127,7 @@ t_pagina* obtener_pagina(t_segmento* segmento, char* comida)
 
 	return pagina;
 }
-
+*/
 void tabla_restaurante_crear(char* nombre_restaurante)
 {
 	t_restaurante* restaurante = malloc(sizeof(t_restaurante));
@@ -156,7 +171,7 @@ bool tabla_restaurante_agregar_segmento(t_datos_pedido* datos)
 	return true;
 }
 
-bool asignar_nueva_pagina(t_segmento* segmento, char* comida)
+int asignar_nueva_pagina(t_segmento* segmento)
 {
 	t_pagina* pagina = malloc(sizeof(t_pagina));
 	if (pagina == NULL)
@@ -165,23 +180,19 @@ bool asignar_nueva_pagina(t_segmento* segmento, char* comida)
 	pagina->id = id_para_algoritmos;
 	id_para_algoritmos++;
 
-	size_t tam = strlen(comida)+1;
-	pagina->comida = malloc(tam);
-	memcpy(pagina->comida, comida, tam);
-
 	pagina->validacion_principal = 0;
 	pagina->validacion_virtual= 0;
 	pagina->uso = 0;
 	pagina->modificado = 0;
 	pagina->comida_esta_lista = false;
 
-	pthread_mutex_lock(&(segmento->mutex_tabla_paginas));
+	//pthread_mutex_lock(&(segmento->mutex_tabla_paginas));
 	list_add(segmento->tabla_paginas, pagina);
-	pthread_mutex_unlock(&(segmento->mutex_tabla_paginas));
+	//pthread_mutex_unlock(&(segmento->mutex_tabla_paginas));
 
-	log_info(logger, "Se creo una nueva pagina con el plato %s para el pedido %d", pagina->comida, segmento->id_pedido);
+	log_info(logger, "Se creo una nueva pagina para el pedido %d",segmento->id_pedido);
 
-	return true;
+	return (list_size(segmento->tabla_paginas))-1;
 }
 
 void tabla_restaurante_eliminar_segmento(char* restaurante, t_segmento* segmento)
@@ -203,13 +214,12 @@ void eliminar_paginas(t_segmento* segmento)
 		if(pagina->validacion_principal)
 			vaciar_pagina_memoria_principal(pagina);
 		vaciar_pagina_memoria_virtual(pagina);
-		free(pagina->comida);
 		free(pagina);
 	}
 
 	list_destroy_and_destroy_elements(segmento->tabla_paginas, &destruir_pagina);
 }
-
+/*
 void eliminar_pagina_falta_memoria(t_segmento* segmento,t_pagina* pagina)
 {
 	pthread_mutex_lock(&(segmento->mutex_tabla_paginas));
@@ -218,6 +228,5 @@ void eliminar_pagina_falta_memoria(t_segmento* segmento,t_pagina* pagina)
 
 	log_info(logger, "Se elimino la pagina con el plato %s para el pedido %d por insuficiente espacio en memoria virtual", pagina->comida, segmento->id_pedido);
 
-	free(pagina->comida);
 	free(pagina);
-}
+}*/

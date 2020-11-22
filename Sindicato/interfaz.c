@@ -7,6 +7,13 @@ static t_respuesta* handshake_cliente()
 	return respuesta_crear(HANDSHAKE_CLIENTE_RESPUESTA, (void*) SINDICATO, false);
 }
 
+static t_respuesta* handshake_restaurante()
+{
+	log_info(logger, "Un restaurante realizo un handshake");
+	return respuesta_crear(HANDSHAKE_RESTO_SIND_RESPUESTA, (void*) true, false);
+}
+
+
 static t_respuesta* guardar_pedido(t_datos_pedido* datos)
 {
 	log_info(logger, "Llego el mensaje %s", __func__);
@@ -248,6 +255,7 @@ static t_respuesta* consultar_platos(char* nombre_restaurante)
 void cargar_interfaz()
 {
 	servidor_agregar_operacion(servidor, HANDSHAKE_CLIENTE, &handshake_cliente);
+	servidor_agregar_operacion(servidor, HANDSHAKE_RESTO_SIND, &handshake_restaurante);
 	servidor_agregar_operacion(servidor, CONSULTAR_PLATOS, &consultar_platos);
 	servidor_agregar_operacion(servidor, GUARDAR_PEDIDO, &guardar_pedido);
 	servidor_agregar_operacion(servidor, GUARDAR_PLATO, &guardar_plato);

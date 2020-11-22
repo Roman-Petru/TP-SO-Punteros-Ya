@@ -13,7 +13,7 @@ extern t_bitarray* mapa_bits_virtual;
 void inicializar_memoria_virtual();
 int primer_marco_virtual_libre();
 t_marco* obtener_marco_virtual(int index);
-void cargar_marco_virtual(int index, t_pagina* pagina);
+void cargar_marco_virtual(int index, t_pagina* pagina, char* comida);
 void escribir_marco_virtual(t_pagina* pagina);
 bool cargar_desde_swap_si_es_necesario(t_pagina* pagina);
 void vaciar_pagina_memoria_virtual(t_pagina* pagina);

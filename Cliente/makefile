@@ -1,5 +1,5 @@
 TARGET = cliente
-LIBS = -L./../Utils -lutils -lcommons -lreadline
+LIBS = -L./../Utils -lutils -lcommons -lreadline -lpthread
 CC = gcc
 CFLAGS = -g -Wall
 

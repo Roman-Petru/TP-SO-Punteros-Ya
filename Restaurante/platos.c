@@ -89,7 +89,6 @@ void cambiar_paso_de_ser_necesario(t_platos_PCB* plato)
 			//log_info(logger_resto, "Se avanzo en la operacion, el plato con PCB %d ahora se va a %s", plato->id_PCB, paso->operacion);
 		}
 	}
-
 }
 
 void terminar_plato (t_platos_PCB* plato)
@@ -98,6 +97,15 @@ void terminar_plato (t_platos_PCB* plato)
 	cambiar_estado_a(plato, EXIT);
 	log_info(logger_resto, "Se finalizo %s, correspondiente al PCB %d", plato->nombre_plato, plato->id_PCB);
 	pthread_cancel(plato->hilo);
+
+	t_guardar_plato* datos = crear_datos_guardar_plato(plato->id_pedido, 1, plato->nombre_plato, nombre_restaurante);
+	sem_wait (&(mutex_cliente));
+	cliente_enviar_mensaje(cliente_sind, PLATO_LISTO, datos);
+	cliente_enviar_mensaje(cliente_app, PLATO_LISTO, datos);
+	sem_post (&(mutex_cliente));
+
+	//TODO dstruir PCB
+
 }
 
 

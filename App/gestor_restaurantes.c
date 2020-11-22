@@ -13,14 +13,16 @@ t_list* obtener_restaurantes_conectados()
 void inicializar_gestor_restaurantes()
 {
 	restaurantes_conectados = list_create();
-	agregar_restaurante("Resto_Default", posicion_crear(config_get_int_value(config, "POSICION_REST_DEFAULT_X"), config_get_int_value(config, "POSICION_REST_DEFAULT_Y")), NULL);
+	agregar_restaurante("Resto_Default", posicion_crear(config_get_int_value(config, "POSICION_REST_DEFAULT_X"), config_get_int_value(config, "POSICION_REST_DEFAULT_Y")), "Puerto Default");
 	pthread_mutex_init(&mutex, NULL);
 }
 
 bool hay_restaurantes_conectados() { return !list_is_empty(restaurantes_conectados); }
 bool restaurante_esta_conectado(char* nombre_restaurante)
 {
-	bool es_mismo_restaurante(void* resto) { return strcmp(nombre_restaurante, resto)==0; }
+	bool es_mismo_restaurante(void* resto) { t_restaurante_conectado* resto_pivot = resto;
+		return strcmp(nombre_restaurante, resto_pivot->nombre)==0; }
+
 	return list_any_satisfy(restaurantes_conectados, &es_mismo_restaurante);
 }
 
@@ -41,9 +43,14 @@ static int restaurante_index(char* nombre_restaurante)
 void agregar_restaurante(char* nombre_restaurante, t_posicion* posicion, char* puerto)
 {
 	t_restaurante_conectado* restaurante = malloc(sizeof(t_restaurante_conectado));
-	restaurante->nombre = nombre_restaurante;
-	restaurante->posicion = posicion; //posicion_copiar(posicion);
-	restaurante->cliente = cliente_crear("127.0.0.1", puerto);
+	size_t tam = strlen(nombre_restaurante)+1;
+	restaurante->nombre = malloc(tam);
+	memcpy(restaurante->nombre, nombre_restaurante, tam);
+	restaurante->posicion = posicion_copiar(posicion); //posicion_copiar(posicion);
+	size_t tam2 = strlen(puerto)+1;
+	char* puerto2 = malloc(tam2);
+	memcpy(puerto2, puerto, tam2);
+	restaurante->cliente = cliente_crear("127.0.0.1", puerto2);
 
 	pthread_mutex_lock(&mutex);
 	list_add(restaurantes_conectados, restaurante);

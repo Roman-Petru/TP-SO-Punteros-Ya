@@ -22,7 +22,7 @@ extern t_list* cola_Hornos_EXEC;
 extern int id_PCB;
 
 extern sem_t semaforo_resto;
-
+extern sem_t mutex_cliente;
 
 void ejecutar_ciclo();
 void planificar_corto_plazo();

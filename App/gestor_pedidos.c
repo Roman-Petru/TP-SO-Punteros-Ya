@@ -45,6 +45,8 @@ void vincular_pedido(int id_pedido, char* id_cliente, char* restaurante)
 	pedido->id = id_pedido;
 	pedido->restaurante = restaurante;
 	pedido->id_cliente = id_cliente;
+	pedido->sincronizar_finalizacion = malloc(sizeof(sem_t));
+	sem_init(pedido->sincronizar_finalizacion, 0, 0);
 
 	size_t tam = strlen(id_cliente)+1;
 	pedido->id_cliente  = malloc(tam);
@@ -96,6 +98,20 @@ char* pedido_obtener_cliente(int id_pedido)
 	pthread_mutex_unlock(&mutex);
 
 	return id_cliente;
+}
+
+sem_t* pedido_obtener_semaforo(int id_pedido)
+{
+	sem_t* semaforo;
+
+	bool es_mismo_pedido(void* pedido) { return ((t_pedido_pendiente*) pedido)->id == id_pedido; }
+
+	pthread_mutex_lock(&mutex);
+	t_pedido_pendiente* pedido = list_find(pedidos_pendientes, &es_mismo_pedido);
+	semaforo = pedido->sincronizar_finalizacion;
+	pthread_mutex_unlock(&mutex);
+
+	return semaforo;
 }
 
 void remover_pedido(int id_pedido)

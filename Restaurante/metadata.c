@@ -25,7 +25,12 @@ static void sumar_cocinero_a_afinidad (char* afinidad)
 void obtener_metadata()
 {
 
-	//TODO handshake sindicato;
+	bool op_ok = cliente_enviar_mensaje(cliente_sind, HANDSHAKE_RESTO_SIND, NULL);
+
+	if (op_ok)
+		log_info(logger_resto, "Se realizo handshake contra sindicato correctamente");
+	else
+		log_info(logger_resto, "No se realizo handshake contra sindicato correctamente");
 
 	t_obtener_restaurante* datos_restaurante = cliente_enviar_mensaje(cliente_sind, OBTENER_RESTAURANTE, nombre_restaurante);
 
@@ -61,10 +66,26 @@ void obtener_metadata()
 				list_add(lista_afinidades, afinidad_nueva);
 
 	//platos y precios no parecen servir para nada (destroy list)
+	lista_platos = list_create();
+		for (int i=0; i<list_size(datos_restaurante->lista_precios);i++)
+		{
+			t_precio* precio = list_get(datos_restaurante->lista_precios, i);
+			char* plato_del_resto = precio->nombre_plato;
+			list_add(lista_platos, plato_del_resto);
+		}
 
 	free(datos_restaurante);
 
 }
+
+bool existe_plato(char* nombre_plato_buscado)
+{
+	bool es_mismo_plato(void* nombre_plato) {	return strcmp(nombre_plato, nombre_plato_buscado)==0; }
+
+	return list_any_satisfy(lista_platos, &es_mismo_plato);
+}
+
+
 
 bool obtener_recetas(t_list* platos)
 {
@@ -77,7 +98,9 @@ bool obtener_recetas(t_list* platos)
 		if (list_is_empty(pasos_receta->pasos))
 			return false;
 
+
 		dictionary_put(diccionario_recetas, dup, pasos_receta->pasos);
+
 	}
 
 	return true;

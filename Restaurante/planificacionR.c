@@ -13,6 +13,7 @@ t_list* cola_Hornos_READY;
 t_list* cola_Hornos_EXEC;
 
 sem_t semaforo_resto;
+sem_t mutex_cliente;
 
 static void actualizar_estado_bloqueados();
 static void actualizar_estado_ejecutados();
@@ -275,6 +276,7 @@ void inicializar_planificador()
 {
 
 	sem_init (&(semaforo_resto), 0, 0);
+	sem_init (&(mutex_cliente), 0, 1);
 
 		cola_Resto_NEW = list_create();
 		cola_Resto_BLOCKED = list_create();

@@ -50,6 +50,10 @@ static t_respuesta* crear_pedido()
 
 static t_respuesta* agregar_plato(t_agregar_plato* datos_para_agregar_plato)
 {
+	if (!existe_plato(datos_para_agregar_plato->plato))
+		{	log_info(logger_resto, "No se agrego plato ya que no lo hace el restaurante");
+		return respuesta_crear(AGREGAR_PLATO_RESPUESTA, (void*) false, false);	}
+
 	bool operacion_ok = cliente_enviar_mensaje(cliente_sind, GUARDAR_PLATO, crear_datos_guardar_plato(datos_para_agregar_plato->id_pedido, 1, datos_para_agregar_plato->plato , nombre_restaurante));
 
 		if (operacion_ok)
@@ -60,8 +64,6 @@ static t_respuesta* agregar_plato(t_agregar_plato* datos_para_agregar_plato)
 
 static t_respuesta* confirmar_pedido(t_datos_pedido* datos_para_confirmar)
 {
-
-// cliente_enviar_mensaje ( PEDIRLE AL SINDICATO QUE PASE EL PEDIDO A ESTADO CONFIRMADO)
 
 	bool conf_ok = cliente_enviar_mensaje(cliente_sind, CONFIRMAR_PEDIDO, crear_datos_pedido(datos_para_confirmar->id_pedido, nombre_restaurante));
 	if (!conf_ok)
@@ -89,17 +91,16 @@ static t_respuesta* confirmar_pedido(t_datos_pedido* datos_para_confirmar)
 
 	return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) true, false);
 }
-/*
 
 static t_respuesta* consultar_pedido(t_datos_pedido* datos_para_confirmar)
 {
 
-//t_datos_del_pedido (no eixste todavia) = cliente_enviar_mensaje(cliente, "SINDICATO", OBTENER_PEDIDO, datos_para_confirmar);
+	t_datos_estado_pedido* datos_pedido = cliente_enviar_mensaje(cliente_sind, OBTENER_PEDIDO, crear_datos_pedido(datos_para_confirmar->id_pedido, nombre_restaurante));
 
-	return respuesta_crear(CONSULTAR_PEDIDO_RESPUESTA, t_datos_del_pedido, true);
+	return respuesta_crear(CONSULTAR_PEDIDO_RESPUESTA, crear_datos_consultar_pedido(nombre_restaurante, datos_pedido->estado, datos_pedido->platos), false);
 }
 
-*/
+
 
 void cargar_interfaz()
 {
@@ -111,6 +112,6 @@ void cargar_interfaz()
 	servidor_agregar_operacion(servidor, CREAR_PEDIDO, &crear_pedido);
 	servidor_agregar_operacion(servidor, AGREGAR_PLATO, &agregar_plato);
 	servidor_agregar_operacion(servidor, CONFIRMAR_PEDIDO, &confirmar_pedido);
-	//servidor_agregar_operacion(servidor, CONSULTAR_PEDIDO, &consultar_pedido);
+	servidor_agregar_operacion(servidor, CONSULTAR_PEDIDO, &consultar_pedido);
 }
 

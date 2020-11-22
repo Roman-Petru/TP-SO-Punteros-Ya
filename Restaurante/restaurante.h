@@ -25,6 +25,7 @@ extern char* nombre_restaurante;
 extern t_posicion* posicion;
 extern t_dictionary* diccionario_recetas;
 extern t_list* lista_afinidades;
+extern t_list* lista_platos;
 
 extern int cantidad_hornos;
 extern int indice_id_pedido;;

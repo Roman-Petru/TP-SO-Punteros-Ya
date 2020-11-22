@@ -49,7 +49,7 @@ void terminar()
 int main()
 {
 	inicializar();
-	//recibir_pedidos_default(3); // Para Test
+	log_info(logger, "Se inicializo la app, esperando conecciones de restaurantes y clientes");
 
 	while(true)
 	{
