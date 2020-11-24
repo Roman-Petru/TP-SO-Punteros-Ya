@@ -111,12 +111,12 @@ void terminar_plato (t_platos_PCB* plato)
 
 	pthread_mutex_lock(&mutex_pedidos);
 	t_platos_listos* platos_listos = list_find(lista_pedidos, &buscar_pedido);
-	platos_listos->platos_total++;
+	platos_listos->platos_listos++;
 	bool terminar_pedido = (platos_listos->platos_listos==platos_listos->platos_total);
 	pthread_mutex_unlock(&mutex_pedidos);
 
 	if (terminar_pedido)
-		{cliente_enviar_mensaje(cliente_sind, TERMINAR_PEDIDO, nombre_restaurante);}
+		{cliente_enviar_mensaje(cliente_sind, TERMINAR_PEDIDO,  crear_datos_pedido(plato->id_pedido, nombre_restaurante));}
 		//TODO MANDAR AL CLIENTE SI EL CLIENTE MANDO CONFIRMAR PEDIDO(no es prioridad)
 	//TODO dstruir PCB
 
