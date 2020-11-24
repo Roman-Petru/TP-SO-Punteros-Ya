@@ -25,9 +25,14 @@ int socket_crear(char *ip, char* puerto)
 {
 	struct addrinfo* server_info = direccion_crear(ip, puerto);
 	int socket_cliente = socket(server_info->ai_family, server_info->ai_socktype, server_info->ai_protocol);
-	connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen);
+		if (socket_cliente == -1)
+			{perror("Error de socket:");
+			return socket_cliente;	}
+	int coneccion = connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen);
 	freeaddrinfo(server_info);
-
+	if (coneccion == -1)
+		{perror("Error de connect:");
+			return -1;}
 	return socket_cliente;
 }
 

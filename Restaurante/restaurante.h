@@ -26,9 +26,12 @@ extern t_posicion* posicion;
 extern t_dictionary* diccionario_recetas;
 extern t_list* lista_afinidades;
 extern t_list* lista_platos;
+extern bool app_activada;
+extern t_list* lista_pedidos;
 
 extern int cantidad_hornos;
 extern int indice_id_pedido;;
+
 
 typedef struct{
 	char* plato;

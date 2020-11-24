@@ -23,6 +23,7 @@ void buffer_serializar_string(t_buffer* buffer, char* string);
 void buffer_serializar_int(t_buffer* buffer, uint32_t integer);
 void* buffer_deserializar(t_buffer* buffer, size_t tamanio);
 char* buffer_deserializar_string(t_buffer* buffer);
+bool buffer_deserializar_bool(t_buffer* buffer);
 uint32_t buffer_deserializar_int(t_buffer* buffer);
 bool buffer_leido(t_buffer* buffer);
 

@@ -76,6 +76,14 @@ char* buffer_deserializar_string(t_buffer* buffer)
 	return string;
 }
 
+bool buffer_deserializar_bool(t_buffer* buffer)
+{
+	bool* p_booleano = buffer_deserializar(buffer, sizeof(bool));
+	uint32_t booleano = *p_booleano;
+	free(p_booleano);
+	return booleano;
+}
+
 uint32_t buffer_deserializar_int(t_buffer* buffer)
 {
 	uint32_t* integer_p = buffer_deserializar(buffer, sizeof(uint32_t));

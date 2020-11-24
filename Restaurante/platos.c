@@ -101,9 +101,23 @@ void terminar_plato (t_platos_PCB* plato)
 	t_guardar_plato* datos = crear_datos_guardar_plato(plato->id_pedido, 1, plato->nombre_plato, nombre_restaurante);
 	sem_wait (&(mutex_cliente));
 	cliente_enviar_mensaje(cliente_sind, PLATO_LISTO, datos);
-	cliente_enviar_mensaje(cliente_app, PLATO_LISTO, datos);
+	if (app_activada)
+		cliente_enviar_mensaje(cliente_app, PLATO_LISTO, datos);
 	sem_post (&(mutex_cliente));
 
+	bool buscar_pedido (void* estado_platos)
+	{t_platos_listos* platos_listos = estado_platos;
+	return platos_listos->id_pedido == plato->id_pedido;}
+
+	pthread_mutex_lock(&mutex_pedidos);
+	t_platos_listos* platos_listos = list_find(lista_pedidos, &buscar_pedido);
+	platos_listos->platos_total++;
+	bool terminar_pedido = (platos_listos->platos_listos==platos_listos->platos_total);
+	pthread_mutex_unlock(&mutex_pedidos);
+
+	if (terminar_pedido)
+		{cliente_enviar_mensaje(cliente_sind, TERMINAR_PEDIDO, nombre_restaurante);}
+		//TODO MANDAR AL CLIENTE SI EL CLIENTE MANDO CONFIRMAR PEDIDO(no es prioridad)
 	//TODO dstruir PCB
 
 }

@@ -17,6 +17,9 @@ extern char* restaurante_seleccionado;
 extern bool hay_que_leer;
 extern t_log* logger_finalizar_pedido;
 
+
+void leer_consola();
+
 #endif /*CLIENTE_H_*/
 
 

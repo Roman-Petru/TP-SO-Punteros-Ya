@@ -292,9 +292,9 @@ static void* deserializar_lista_string(t_buffer* buffer)
 	return lista;
 }
 
-static void* deserializar_bool(t_buffer* buffer)
+static bool deserializar_bool(t_buffer* buffer)
 {
-	return buffer_deserializar(buffer, sizeof(bool));
+	return buffer_deserializar_bool(buffer);
 }
 
 static int deserializar_int(t_buffer* buffer)
@@ -675,7 +675,7 @@ void diccionario_destrucciones_inicializar()
 	dictionary_int_put(diccionario_destrucciones, TERMINAR_PEDIDO, &destruir_datos_pedido);
 	dictionary_int_put(diccionario_destrucciones, TERMINAR_PEDIDO_RESPUESTA, &sin_free);
 	dictionary_int_put(diccionario_destrucciones, OBTENER_PEDIDO, &destruir_datos_pedido);
-	dictionary_int_put(diccionario_destrucciones, OBTENER_PEDIDO_RESPUESTA, &sin_free); //ver free
+	dictionary_int_put(diccionario_destrucciones, OBTENER_PEDIDO_RESPUESTA, &destruir_estado_pedido);
 	dictionary_int_put(diccionario_destrucciones, CONSULTAR_PEDIDO, &sin_free);
 	dictionary_int_put(diccionario_destrucciones, CONSULTAR_PEDIDO_RESPUESTA, &sin_free);//ver free
 }

@@ -1,6 +1,8 @@
 #include "interfaz.h"
 
 t_modulo modulo;
+
+
 static void esperar_finalizar_pedido();
 
 //========== VALIDACIONES ==========//
@@ -320,12 +322,30 @@ static void terminar_pedido()
 
 //========== FINALIZAR PEDIDO ==========//
 
+void handler (int signum)
+{
+	//consola_log(consola, "El pedido ha finalizado correctamente");
+
+	if (signum == SIGUSR1)
+		{consola_log(consola, "El pedido ha finalizado correctamente");
+	//	leer_consola();
+		}
+}
+
 static void esperar_finalizar_pedido()
 {
 	t_datos_pedido* datos = crear_datos_pedido(id_pedido, restaurante_seleccionado);
-
+	sleep(1);
 //TODO POR QUE PORONGA NO HACE EL RECV
+
+
+	pid_t conseguir_tid = syscall(SYS_gettid);
+	char* tid = string_itoa(conseguir_tid);
+	datos->restaurante = tid;
+	signal(SIGUSR1, handler);
 	bool operacion_ok = cliente_enviar_mensaje(cliente, FINALIZAR_PEDIDO, datos);
+
+
 	//exit(-5);
 	if (operacion_ok)
 		log_info(logger_finalizar_pedido, "El pedido ha finalizado correctamente");

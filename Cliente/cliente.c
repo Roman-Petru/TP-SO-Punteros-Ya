@@ -35,13 +35,19 @@ static void inicializar()
 
 	handshake();
 }
+void leer_consola()
+{
+	while(hay_que_leer)
+		consola_leer_comando(consola, "Cliente: ");
+	terminar_programa();
+}
+
 
 int main()
 {
 	inicializar();
-	while(hay_que_leer)
-		consola_leer_comando(consola, "Cliente: ");
-	terminar_programa();
+	leer_consola();
+
 }
 
 

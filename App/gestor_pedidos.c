@@ -17,7 +17,7 @@ void inicializar_gestor_pedidos()
 static void destruir_pedido(void* pedido_void)
 {
 	t_pedido_pendiente* pedido = pedido_void;
-	free(pedido->restaurante);
+	//free(pedido->restaurante);
 	free(pedido->id_cliente);
 	free(pedido);
 }

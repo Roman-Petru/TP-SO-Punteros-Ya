@@ -7,13 +7,15 @@
 void realizar_handshake_con_app()
 {
 
-	bool operacion_ok = cliente_enviar_mensaje(cliente_app, HANDSHAKE_RESTO_APP, crear_datos_handshake_restaurante_app(config_get_int_value(config_resto, "PUERTO_ESCUCHA"), nombre_restaurante, posicion));
+	void* operacion_ok = cliente_enviar_mensaje(cliente_app, HANDSHAKE_RESTO_APP, crear_datos_handshake_restaurante_app(config_get_int_value(config_resto, "PUERTO_ESCUCHA"), nombre_restaurante, posicion));
 
-	if (operacion_ok)
-		log_info(logger_resto, "Abierto el restaurante %s, se hizo correctamente el handshake con la app", nombre_restaurante);
-	else
-		log_info(logger_resto, "No se logró hacer el handshake con la app");
+	if (operacion_ok == NULL)
+		{log_info(logger_resto, "Abierto el restaurante %s, activado modo funcionamiento sin app", nombre_restaurante);
+		app_activada = false;
+		return;}
 
+	log_info(logger_resto, "Abierto el restaurante %s, se hizo correctamente el handshake con la app", nombre_restaurante);
+	app_activada = true;
 }
 
 static t_respuesta* handshake_cliente()
@@ -89,6 +91,7 @@ static t_respuesta* confirmar_pedido(t_datos_pedido* datos_para_confirmar)
 
 	list_iterate(datos_pedido->platos, &empezar_pedido);
 
+	agendar_pedido(datos_para_confirmar->id_pedido, datos_pedido);
 	return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) true, false);
 }
 

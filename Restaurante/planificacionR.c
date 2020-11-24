@@ -100,7 +100,7 @@ static void actualizar_estado_bloqueados()
 		{
 			t_platos_PCB* plato = list_get(cola_Resto_BLOCKED, i);
 
-			if (termino_horneado(plato))
+			if (list_is_empty(plato->pasos_receta_faltantes) || termino_horneado(plato))
 				{
 				cambiar_paso_de_ser_necesario(plato);
 				//((t_insertador_terminar_hornos) dictionary_int_get(diccionario_interrupciones, TERMINAR_HORNEADO))(plato);

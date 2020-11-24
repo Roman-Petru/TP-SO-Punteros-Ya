@@ -1,5 +1,7 @@
 #include "metadata.h"
 
+pthread_mutex_t mutex_pedidos;
+
 static bool esta_en_lista_afinidad(char* afinidad)
 {
 	for (int i=0;i<list_size(lista_afinidades);i++)
@@ -25,6 +27,8 @@ static void sumar_cocinero_a_afinidad (char* afinidad)
 void obtener_metadata()
 {
 
+	lista_pedidos = list_create();
+	pthread_mutex_init(&(mutex_pedidos), NULL);
 	bool op_ok = cliente_enviar_mensaje(cliente_sind, HANDSHAKE_RESTO_SIND, NULL);
 
 	if (op_ok)
@@ -104,4 +108,25 @@ bool obtener_recetas(t_list* platos)
 	}
 
 	return true;
+}
+
+void agendar_pedido(int id_pedido, t_datos_estado_pedido* estado_pedido)
+{
+
+	int contar_plantos (int semilla, t_datos_estado_comida* estado_plato){
+		return semilla + estado_plato->cant_total;	}
+
+	int cantidad_platos =(int) list_fold(estado_pedido->platos, (void*) 0, (void*) &contar_plantos);
+
+	t_platos_listos* pedido = malloc(sizeof(t_platos_listos));
+	pedido->id_pedido = id_pedido;
+	pedido->platos_total = cantidad_platos;
+	pedido->platos_listos = 0;
+
+	log_info(logger_resto, "cantidad platos: %d", cantidad_platos);
+
+
+	pthread_mutex_lock(&mutex_pedidos);
+	list_add(lista_pedidos, pedido);
+	pthread_mutex_unlock(&mutex_pedidos);
 }

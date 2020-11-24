@@ -9,6 +9,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <pthread.h>
+#include <signal.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/syscall.h>
+
+
 
 void cargar_interfaz();
 void handshake();

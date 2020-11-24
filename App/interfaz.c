@@ -1,6 +1,8 @@
 #include "interfaz.h"
 #include "app.h"
 
+
+
 static t_respuesta* handshake_cliente()
 {
 	return respuesta_crear(HANDSHAKE_CLIENTE_RESPUESTA, (void*) APP, false);
@@ -88,10 +90,11 @@ static t_respuesta* crear_pedido(char* id_cliente)
 	char* restaurante = cliente_obtener_restaurante(id_cliente);
 	int id_pedido;
 
-	if(restaurante_esta_conectado(restaurante))
-		id_pedido = (int) cliente_enviar_mensaje(restaurante_obtener_cliente(restaurante), CREAR_PEDIDO, NULL);
-	else if(es_resto_default(restaurante))
+
+	if(es_resto_default(restaurante))
 		id_pedido = generar_id_pedido();
+	else if(restaurante_esta_conectado(restaurante))
+		id_pedido = (int) cliente_enviar_mensaje(restaurante_obtener_cliente(restaurante), CREAR_PEDIDO, NULL);
 	else
 		{log_info(logger, "No se selecciono un restaurante valido para crear el pedido");
 		return respuesta_crear(CREAR_PEDIDO_RESPUESTA, (void*) -1, false);}
@@ -126,11 +129,13 @@ static t_respuesta* agregar_plato(t_agregar_plato* datos)
 		return respuesta_crear(AGREGAR_PLATO_RESPUESTA, (void*) false, false);}
 	bool op_ok = false;
 
-	if(restaurante_esta_conectado(restaurante))
-		op_ok = cliente_enviar_mensaje(restaurante_obtener_cliente(restaurante), AGREGAR_PLATO, datos);
 
 	if(es_resto_default(restaurante))
 		op_ok = es_plato_default(datos->plato);
+	else if(restaurante_esta_conectado(restaurante))
+		op_ok = cliente_enviar_mensaje(restaurante_obtener_cliente(restaurante), AGREGAR_PLATO, datos);
+
+
 
 	if(!op_ok)
 		return respuesta_crear(AGREGAR_PLATO_RESPUESTA, (void*) false, false);
@@ -138,6 +143,7 @@ static t_respuesta* agregar_plato(t_agregar_plato* datos)
 	t_guardar_plato* datos_comanda = crear_datos_guardar_plato(datos->id_pedido, 1, datos->plato, restaurante);
 	op_ok = cliente_enviar_mensaje(cliente_comanda, GUARDAR_PLATO, datos_comanda);
 
+	//destruir(GUARDAR_PLATO, datos_comanda);
 	return respuesta_crear(AGREGAR_PLATO_RESPUESTA, (void*) op_ok, false);
 }
 
@@ -157,6 +163,7 @@ static t_respuesta* plato_listo(t_guardar_plato* datos)
 	if(pedido->estado == TERMINADO)
 		agregar_interrupcion(PASAR_A_LISTO, (int*) datos->id_pedido);
 
+	destruir(OBTENER_PEDIDO_RESPUESTA, pedido);
 	return respuesta_crear(PLATO_LISTO_RESPUESTA, (void*) true, false);
 }
 
@@ -166,11 +173,11 @@ static t_respuesta* confirmar_pedido(t_datos_pedido* datos)
 	//cliente_enviar_mensaje(cliente_comanda, OBTENER_PEDIDO, crear_datos_pedido(datos->id_pedido, datos->restaurante));
 
 	bool op_ok = true;
-	if(restaurante_esta_conectado(datos->restaurante))
+	if(!es_resto_default(datos->restaurante))
+		{if(restaurante_esta_conectado(datos->restaurante))
 		op_ok = cliente_enviar_mensaje(restaurante_obtener_cliente(datos->restaurante), CONFIRMAR_PEDIDO, datos);
-
-	if(!op_ok)
-		return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) false, false);
+		if(!op_ok)
+			return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) false, false);}
 
 	t_pedido* pedido = pedido_crear(datos->id_pedido);
 
@@ -192,8 +199,11 @@ static t_respuesta* consultar_pedido(uint32_t id_pedido)
 
 	t_datos_estado_pedido* estado = cliente_enviar_mensaje(cliente_comanda, OBTENER_PEDIDO, crear_datos_pedido(id_pedido, restaurante));
 
+	t_estado_pedido estado_n = estado->estado;
+	t_list* nuevos_pl = list_duplicate(estado->platos);
 
-	return respuesta_crear(CONSULTAR_PEDIDO_RESPUESTA, crear_datos_consultar_pedido(restaurante, estado->estado, estado->platos), false);
+	destruir(OBTENER_PEDIDO_RESPUESTA, estado);
+	return respuesta_crear(CONSULTAR_PEDIDO_RESPUESTA, crear_datos_consultar_pedido(restaurante, estado_n, nuevos_pl), false);
 }
 
 /*FINALIZAR PEDIDO*/
@@ -201,9 +211,13 @@ static t_respuesta* finalizar_pedido(t_datos_pedido* datos)
 {
 	sem_t* sincronizador = pedido_obtener_semaforo(datos->id_pedido);
 	sem_wait(sincronizador);
-
+//	sleep(10);
 	bool op_ok = cliente_enviar_mensaje(cliente_comanda, FINALIZAR_PEDIDO, datos);
 	//semdestroy
+
+	//tkill(TID, SIGUSR1);
+	int TID = strtol(datos->restaurante, NULL, 10);
+	syscall(SYS_tkill,TID,SIGUSR1);
 
 	return respuesta_crear(FINALIZAR_PEDIDO_RESPUESTA, (void*) op_ok , false);
 }
