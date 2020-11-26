@@ -2,9 +2,6 @@
 
 t_modulo modulo;
 
-
-static void esperar_finalizar_pedido();
-
 //========== VALIDACIONES ==========//
 static bool validar_restaurante()
 {
@@ -177,7 +174,20 @@ static void obtener_pedido()
 	list_iterate(datos_pedido->platos, &logear_platos);
 }
 
+/*FINALIZAR PEDIDO*/
+static void finalizar_pedido()
+{
+	if(validar_pedido() && validar_restaurante())
+		return;
+	t_datos_pedido* datos = crear_datos_pedido(id_pedido, restaurante_seleccionado);
+	consola_log(consola, "voy a mandar mensaje");
+	bool operacion_ok = cliente_enviar_mensaje(cliente, FINALIZAR_PEDIDO, datos);
+	consola_log(consola, "recibi respuesta");
+	char* mensaje = operacion_ok ? "El pedido ha finalizado correctamente" : "El pedido no ha podido finalizarse correctamente" ;
+	consola_log(consola, mensaje);
+}
 
+/*CONFIRMAR PEDIDO*/
 static void confirmar_pedido()
 {
 	if(validar_restaurante() && validar_pedido())
@@ -186,17 +196,15 @@ static void confirmar_pedido()
 	bool operacion_ok = cliente_enviar_mensaje(cliente, CONFIRMAR_PEDIDO, crear_datos_pedido(id_pedido, restaurante_seleccionado));
 	consola_if(consola, operacion_ok);
 
-
-
-
-	if (operacion_ok && modulo == APP)
+	if (operacion_ok && (modulo == APP  || modulo == RESTAURANTE))
 	{
 		pthread_t hilo_finalizar_pedido;
-		pthread_create(&(hilo_finalizar_pedido), NULL, (void*) &esperar_finalizar_pedido, NULL);
+		pthread_create(&(hilo_finalizar_pedido), NULL, (void*) &finalizar_pedido, NULL);
 		pthread_detach(hilo_finalizar_pedido);
 	}
 }
 
+/*PLATO LISTO*/
 static void plato_listo()
 {
 
@@ -212,6 +220,7 @@ static void plato_listo()
 	consola_if(consola, operacion_ok);
 }
 
+/*CONSULTAR PEDIDO*/
 static void consultar_pedido()
 {
 	if(validar_pedido())
@@ -234,8 +243,7 @@ static void consultar_pedido()
 	list_iterate(datos_pedido->platos, &logear_platos);
 }
 
-//========== OBTENER RECETA ==========//
-
+/*OBTENER RECETA*/
 static void obtener_receta()
 {
 
@@ -258,8 +266,7 @@ static void obtener_receta()
 	list_iterate(pasos_receta->pasos, &logear_receta);
 }
 
-
-
+/*OBTENER RESTAURANTE*/
 static void obtener_restaurante()
 {
 
@@ -285,8 +292,6 @@ static void obtener_restaurante()
 
 	list_iterate(datos_resto->lista_afinidades, &logear_afinidades);
 
-
-
 	consola_log(consola, "Lista Precios: ");
 	void logear_precios(void* precio)
 		{t_precio* precio_str = precio;
@@ -305,23 +310,17 @@ static void obtener_restaurante()
 
 }
 
+/*TERMINAR PEDIDO*/
 static void terminar_pedido()
 {
 	if(validar_pedido() && validar_restaurante())
 		return;
-	/*
-	t_datos_pedido datos;
-	datos.restaurante = restaurante_seleccionado;
-	datos.id_pedido = id_pedido;
-	 */
 
-	bool operacion_ok = cliente_enviar_mensaje(cliente2, TERMINAR_PEDIDO, crear_datos_pedido(id_pedido, restaurante_seleccionado));
+	bool operacion_ok = cliente_enviar_mensaje(cliente, TERMINAR_PEDIDO, crear_datos_pedido(id_pedido, restaurante_seleccionado));
 	consola_if(consola, operacion_ok);
 }
 
-
-//========== FINALIZAR PEDIDO ==========//
-
+/*
 void handler (int signum)
 {
 	//consola_log(consola, "El pedido ha finalizado correctamente");
@@ -352,18 +351,9 @@ static void esperar_finalizar_pedido()
 	else log_info(logger_finalizar_pedido, "El pedido no ha podido finalizarse correctamente");
 	//	consola_log(consola, "El pedido ha finalizado correctamente");
 //	else consola_log(consola, "El pedido no ha podido finalizarse correctamente");
-}
+}*/
 
-static void finalizar_pedido()
-{
-	if(validar_pedido() && validar_restaurante())
-		return;
 
-	t_datos_pedido* datos = crear_datos_pedido(id_pedido, restaurante_seleccionado);
-
-	bool operacion_ok = cliente_enviar_mensaje(cliente, FINALIZAR_PEDIDO, datos);
-	consola_if(consola, operacion_ok);
-}
 
 void cargar_interfaz()
 {

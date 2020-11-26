@@ -38,7 +38,7 @@ void* cliente_enviar_mensaje(t_cliente_red* cliente, t_codigo_de_operacion codig
 	return pedido;
 }
 
-
+/*
 void cliente_enviar_mensaje_asincronico(t_cliente_red* cliente, t_codigo_de_operacion codigo_operacion, void* datos)
 {
 
@@ -61,4 +61,4 @@ void cliente_enviar_mensaje_asincronico(t_cliente_red* cliente, t_codigo_de_oper
 
 	paquete_destruir(paquete);
 	socket_cerrar(cliente->socket);
-}
+}*/

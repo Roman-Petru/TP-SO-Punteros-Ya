@@ -1,9 +1,6 @@
 #include "interfaz_restaurante.h"
 #include "restaurante.h"
 
-
-
-
 void realizar_handshake_con_app()
 {
 
@@ -103,12 +100,24 @@ static t_respuesta* consultar_pedido(t_datos_pedido* datos_para_confirmar)
 	return respuesta_crear(CONSULTAR_PEDIDO_RESPUESTA, crear_datos_consultar_pedido(nombre_restaurante, datos_pedido->estado, datos_pedido->platos), false);
 }
 
+/*FINALIZAR PEDIDO*/
+static t_respuesta* finalizar_pedido(t_datos_pedido* datos)
+{
+	bool buscar_pedido (void* estado_platos)
+	{t_platos_listos* platos_listos = estado_platos;
+	return platos_listos->id_pedido == datos->id_pedido;}
 
+	pthread_mutex_lock(&mutex_pedidos);
+	t_platos_listos* platos_listos = list_find(lista_pedidos, &buscar_pedido);
+	pthread_mutex_unlock(&mutex_pedidos);
+	sem_wait(platos_listos->sincronizador);
+
+	return respuesta_crear(FINALIZAR_PEDIDO_RESPUESTA, (void*) true , false);
+}
 
 void cargar_interfaz()
 {
 	serializacion_inicializar();
-
 
 	servidor_agregar_operacion(servidor, HANDSHAKE_CLIENTE, &handshake_cliente);
 	servidor_agregar_operacion(servidor, CONSULTAR_PLATOS, &consultar_platos);
@@ -116,5 +125,7 @@ void cargar_interfaz()
 	servidor_agregar_operacion(servidor, AGREGAR_PLATO, &agregar_plato);
 	servidor_agregar_operacion(servidor, CONFIRMAR_PEDIDO, &confirmar_pedido);
 	servidor_agregar_operacion(servidor, CONSULTAR_PEDIDO, &consultar_pedido);
+	servidor_agregar_operacion(servidor, FINALIZAR_PEDIDO, &finalizar_pedido);
+
 }
 

@@ -23,7 +23,6 @@ static void sumar_cocinero_a_afinidad (char* afinidad)
 	list_iterate(lista_afinidades, &sumar_afi);
 }
 
-
 void obtener_metadata()
 {
 
@@ -110,9 +109,10 @@ bool obtener_recetas(t_list* platos)
 	return true;
 }
 
+
+
 void agendar_pedido(int id_pedido, t_datos_estado_pedido* estado_pedido)
 {
-
 	int contar_plantos (int semilla, t_datos_estado_comida* estado_plato){
 		return semilla + estado_plato->cant_total;	}
 
@@ -122,9 +122,9 @@ void agendar_pedido(int id_pedido, t_datos_estado_pedido* estado_pedido)
 	pedido->id_pedido = id_pedido;
 	pedido->platos_total = cantidad_platos;
 	pedido->platos_listos = 0;
-
-	log_info(logger_resto, "cantidad platos: %d", cantidad_platos);
-
+	pedido->sincronizador = malloc(sizeof(sem_t));
+	sem_init(pedido->sincronizador , 0, 0);
+	//log_info(logger_resto, "cantidad platos: %d", cantidad_platos);
 
 	pthread_mutex_lock(&mutex_pedidos);
 	list_add(lista_pedidos, pedido);

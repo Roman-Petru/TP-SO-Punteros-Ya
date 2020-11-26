@@ -49,9 +49,6 @@ t_platos_PCB* crear_plato(char* plato, int id_pedido)
 
 }
 
-
-
-
 void ciclo_plato(t_platos_PCB* plato)
 {
 	while(1)
@@ -116,10 +113,12 @@ void terminar_plato (t_platos_PCB* plato)
 	pthread_mutex_unlock(&mutex_pedidos);
 
 	if (terminar_pedido)
-		{cliente_enviar_mensaje(cliente_sind, TERMINAR_PEDIDO,  crear_datos_pedido(plato->id_pedido, nombre_restaurante));}
-		//TODO MANDAR AL CLIENTE SI EL CLIENTE MANDO CONFIRMAR PEDIDO(no es prioridad)
-	//TODO dstruir PCB
+	{
+		cliente_enviar_mensaje(cliente_sind, TERMINAR_PEDIDO,  crear_datos_pedido(plato->id_pedido, nombre_restaurante));
+		sem_post(platos_listos->sincronizador);
+	}
 
+	//TODO dstruir PCB
 }
 
 

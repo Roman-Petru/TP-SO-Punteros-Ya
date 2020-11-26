@@ -14,7 +14,6 @@ int indice_id_pedido;
 t_dictionary* diccionario_recetas;
 t_list* lista_pedidos;
 
-
 bool app_activada;
 
 void inicializar_restaurante()

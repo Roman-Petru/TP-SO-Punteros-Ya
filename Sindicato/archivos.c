@@ -278,8 +278,6 @@ void crear_receta(char* data)
 
 void crear_restaurante (char* data)
 {
-
-
 	char** aux = string_n_split(data, 7, " ");
 
 	char* nombre_arch_recestaurante = string_new();

@@ -1,8 +1,6 @@
 #include "interfaz.h"
 #include "app.h"
 
-
-
 static t_respuesta* handshake_cliente()
 {
 	return respuesta_crear(HANDSHAKE_CLIENTE_RESPUESTA, (void*) APP, false);
@@ -90,7 +88,6 @@ static t_respuesta* crear_pedido(char* id_cliente)
 	char* restaurante = cliente_obtener_restaurante(id_cliente);
 	int id_pedido;
 
-
 	if(es_resto_default(restaurante))
 		id_pedido = generar_id_pedido();
 	else if(restaurante_esta_conectado(restaurante))
@@ -171,23 +168,20 @@ static t_respuesta* plato_listo(t_guardar_plato* datos)
 static t_respuesta* confirmar_pedido(t_datos_pedido* datos)
 {
 	//cliente_enviar_mensaje(cliente_comanda, OBTENER_PEDIDO, crear_datos_pedido(datos->id_pedido, datos->restaurante));
-
 	bool op_ok = true;
-	if(!es_resto_default(datos->restaurante))
-		{if(restaurante_esta_conectado(datos->restaurante))
+	if(!es_resto_default(datos->restaurante) && restaurante_esta_conectado(datos->restaurante))
 		op_ok = cliente_enviar_mensaje(restaurante_obtener_cliente(datos->restaurante), CONFIRMAR_PEDIDO, datos);
-		if(!op_ok)
-			return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) false, false);}
+
+	if(!op_ok)
+		return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) false, false);
 
 	t_pedido* pedido = pedido_crear(datos->id_pedido);
 
 	//TODO: Enviar mensaje Confirmar Pedido a Cliente
-
 	op_ok = cliente_enviar_mensaje(cliente_comanda, CONFIRMAR_PEDIDO, datos);
 
 	if (op_ok)
 		agregar_interrupcion(NUEVO_PEDIDO, pedido);
-
 
 	return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) op_ok , false);
 }
@@ -211,17 +205,11 @@ static t_respuesta* finalizar_pedido(t_datos_pedido* datos)
 {
 	sem_t* sincronizador = pedido_obtener_semaforo(datos->id_pedido);
 	sem_wait(sincronizador);
-//	sleep(10);
+	log_info(logger, "paso el wait");
 	bool op_ok = cliente_enviar_mensaje(cliente_comanda, FINALIZAR_PEDIDO, datos);
-	//semdestroy
-
-	//tkill(TID, SIGUSR1);
-	int TID = strtol(datos->restaurante, NULL, 10);
-	syscall(SYS_tkill,TID,SIGUSR1);
-
+	log_info(logger, "mando mensaje a comanda %d", op_ok);
 	return respuesta_crear(FINALIZAR_PEDIDO_RESPUESTA, (void*) op_ok , false);
 }
-
 
 static t_respuesta* operacion_terminar()
 {

@@ -11,6 +11,7 @@ typedef struct{
 	int id_pedido;
 	int platos_total;
 	int platos_listos;
+	sem_t* sincronizador;
 }t_platos_listos;
 
 extern pthread_mutex_t mutex_pedidos;

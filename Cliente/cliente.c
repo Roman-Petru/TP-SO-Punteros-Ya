@@ -3,8 +3,6 @@
 t_config* config;
 t_consola* consola;
 t_cliente_red* cliente;
-t_cliente_red* cliente2;
-t_log* logger_finalizar_pedido;
 
 int id_pedido;
 char* restaurante_seleccionado;
@@ -28,9 +26,7 @@ static void inicializar()
 
 	serializacion_inicializar();
 	cliente = cliente_crear(config_get_string_value(config, "IP"), config_get_string_value(config, "PUERTO"));
-	cliente2 = cliente_crear(config_get_string_value(config, "IP"), config_get_string_value(config, "PUERTO"));
 	consola = consola_crear("cliente.log", "Cliente"); //config_get_string_value(config, "ARCHIVO_LOG")
-	logger_finalizar_pedido = log_create("clienteFinalizar.log", "ClienteFin", true, LOG_LEVEL_INFO);
 	cargar_interfaz();
 
 	handshake();
