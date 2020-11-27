@@ -6,6 +6,7 @@ t_cliente_red* cliente;
 
 int id_pedido;
 char* restaurante_seleccionado;
+char* cliente_id;
 bool hay_que_leer;
 
 static void terminar_programa()
@@ -18,18 +19,23 @@ static void terminar_programa()
 
 static void inicializar()
 {
-	config = config_create("cliente.config");
+	consola = consola_crear("cliente.log", "Cliente");
+	char* string_config = consola_leer("Ingrese el nombre del config deseado: ");
+
+	config = config_create(string_config);
 
 	id_pedido = 0;
 	restaurante_seleccionado = NULL;
 	hay_que_leer = true;
+	cliente_id = config_get_string_value(config, "ID_CLIENTE");
 
 	serializacion_inicializar();
 	cliente = cliente_crear(config_get_string_value(config, "IP"), config_get_string_value(config, "PUERTO"));
-	consola = consola_crear("cliente.log", "Cliente"); //config_get_string_value(config, "ARCHIVO_LOG")
+	 //config_get_string_value(config, "ARCHIVO_LOG")
 	cargar_interfaz();
 
 	handshake();
+	log_info(consola->logger, "Cliente con id: %s conectado!", cliente_id);
 }
 void leer_consola()
 {

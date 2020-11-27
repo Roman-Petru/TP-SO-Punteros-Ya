@@ -134,8 +134,7 @@ static void actualizar_estado_ejecutados()
 			pthread_cancel(pedido->hilo);
 			sem_t* sincronizador = pedido_obtener_semaforo(pedido->id_pedido);
 			sem_post(sincronizador);
-			pedido->repartidor = NULL;
-
+			pedido_destruir(pedido);
 		}
 		else
 		{

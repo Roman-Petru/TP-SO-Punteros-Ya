@@ -28,12 +28,14 @@ void obtener_metadata()
 
 	lista_pedidos = list_create();
 	pthread_mutex_init(&(mutex_pedidos), NULL);
-	bool op_ok = cliente_enviar_mensaje(cliente_sind, HANDSHAKE_RESTO_SIND, NULL);
+	void* op_ok = cliente_enviar_mensaje(cliente_sind, HANDSHAKE_RESTO_SIND, NULL);
+	while (op_ok == NULL)
+		{log_info(logger_resto, "Fallo el handshake con el sindicato, se intentara reconectar en 5 segundos");
+		sleep(5);
+		op_ok = cliente_enviar_mensaje(cliente_sind, HANDSHAKE_RESTO_SIND, NULL);}
 
-	if (op_ok)
-		log_info(logger_resto, "Se realizo handshake contra sindicato correctamente");
-	else
-		log_info(logger_resto, "No se realizo handshake contra sindicato correctamente");
+
+	log_info(logger_resto, "Se realizo handshake contra sindicato correctamente");
 
 	t_obtener_restaurante* datos_restaurante = cliente_enviar_mensaje(cliente_sind, OBTENER_RESTAURANTE, nombre_restaurante);
 

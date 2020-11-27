@@ -15,6 +15,7 @@
 #include "interfaz_restaurante.h"
 #include "interrupciones.h"
 #include "metadata.h"
+#include <readline/readline.h>
 
 extern t_servidor_red* servidor;
 extern t_cliente_red* cliente_sind;

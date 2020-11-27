@@ -52,6 +52,7 @@ typedef void (*t_accion)(t_pedido* pedido);
 t_pedido* pedido_crear(int id_pedido);
 void recibir_pedidos_default(int cantidad);
 
+void pedido_destruir(t_pedido* pedido);
 bool pedido_es_mismo(t_pedido* pedido_A, t_pedido* pedido_B);
 void pedido_actualizar_estado(int id_pedido, t_estado_pedido estado);
 void inicializar_diccionario_acciones();

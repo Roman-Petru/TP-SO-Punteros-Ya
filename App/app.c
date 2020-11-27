@@ -26,6 +26,14 @@ static void inicializar()
 	inicializar_gestor_restaurantes();
 	inicializar_gestor_clientes();
 	inicializar_gestor_pedidos();
+
+	void* op_ok = cliente_enviar_mensaje(cliente_comanda, HANDSHAKE_RESTO_SIND, NULL);
+	while (op_ok == NULL)
+		{log_info(logger, "Fallo el handshake con la comanda, se intentara reconectar en 5 segundos");
+		sleep(5);
+		op_ok = cliente_enviar_mensaje(cliente_comanda, HANDSHAKE_RESTO_SIND, NULL);}
+
+	log_info(logger, "Se realizo correctamente el handshake con la comanda");
 }
 
 /*static void comiezo_ciclo()

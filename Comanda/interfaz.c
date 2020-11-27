@@ -6,6 +6,12 @@ static t_respuesta* handshake_cliente()
 	return respuesta_crear(HANDSHAKE_CLIENTE_RESPUESTA, (void*) COMANDA, false);
 }
 
+static t_respuesta* handshake_app()
+{
+	log_info(logger, "La app realizo el handshake");
+	return respuesta_crear(HANDSHAKE_RESTO_SIND_RESPUESTA, (void*) true, false);
+}
+
 static t_respuesta* guardar_pedido(t_datos_pedido* datos)
 {
 	if(!tabla_segmento_restaurante_existe(datos->restaurante))
@@ -181,6 +187,7 @@ static t_respuesta* finalizar_pedido(t_datos_pedido* datos)
 void cargar_interfaz()
 {
 	servidor_agregar_operacion(servidor, HANDSHAKE_CLIENTE, &handshake_cliente);
+	servidor_agregar_operacion(servidor, HANDSHAKE_RESTO_SIND, &handshake_app);
 	servidor_agregar_operacion(servidor, GUARDAR_PEDIDO, &guardar_pedido);
 	servidor_agregar_operacion(servidor, GUARDAR_PLATO, &guardar_plato);
 	servidor_agregar_operacion(servidor, OBTENER_PEDIDO, &obtener_pedido);

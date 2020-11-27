@@ -1,5 +1,5 @@
 TARGET = app
-LIBS = -L./../Utils -lutils -lcommons -lpthread -lm
+LIBS = -L./../Utils -lutils -lcommons -lpthread
 CC = gcc
 CFLAGS = -g -Wall
 

@@ -46,11 +46,17 @@ void handshake()
 	}
 
 	if(modulo == MODULO_ERROR || !op_ok)
-		consola_log(consola, "Error al realizar el handshake.");
+		{consola_log(consola, "Error al realizar el handshake, se intentara reconectar en 5 segundos");
+		sleep(5);
+		handshake();}
 }
 
 static void consultar_restaurantes()
 {
+	if (modulo != APP)
+	{consola_log(consola, "El modulo no entiende este mensaje");
+	return;}
+
 	t_list* restaurantes = cliente_enviar_mensaje(cliente, CONSULTAR_RESTAURANTES, NULL);
 
 	consola_log(consola, "Restaurantes: ");
@@ -63,19 +69,25 @@ static void consultar_restaurantes()
 
 static void seleccionar_restaurante()
 {
+	if (modulo != APP)
+	{consola_log(consola, "El modulo no entiende este mensaje");
+	return;}
+
 	char* restaurante = consola_leer("Ingrese el nombre del restaurante: ");
 	if(restaurante_seleccionado!=NULL)
 		free(restaurante_seleccionado);
 	restaurante_seleccionado = restaurante;
 
-	bool operacion_ok = cliente_enviar_mensaje(cliente, SELECCIONAR_RESTAURANTE, crear_datos_seleccion_restaurante(config_get_string_value(config, "ID_CLIENTE"), restaurante_seleccionado));
+	bool operacion_ok = cliente_enviar_mensaje(cliente, SELECCIONAR_RESTAURANTE, crear_datos_seleccion_restaurante( cliente_id, restaurante_seleccionado));
 	consola_if(consola, operacion_ok);
 }
 
 
 static void consultar_platos()
 {
-
+	if (modulo == COMANDA)
+	{consola_log(consola, "El modulo no entiende este mensaje");
+	return;}
 
 	if (modulo == SINDICATO)
 		restaurante_seleccionado = consola_leer("Ingrese el nombre del restaurante: ");
@@ -95,6 +107,10 @@ static void consultar_platos()
 
 static void crear_pedido()
 {
+	if (modulo == COMANDA || modulo == SINDICATO)
+	{consola_log(consola, "El modulo no entiende este mensaje");
+	return;}
+
 
 	if (modulo == RESTAURANTE)
 		restaurante_seleccionado = "no importa";
@@ -102,13 +118,17 @@ static void crear_pedido()
 		return;
 
 
-	id_pedido = (int) cliente_enviar_mensaje(cliente, CREAR_PEDIDO, config_get_string_value(config, "ID_CLIENTE"));
+	id_pedido = (int) cliente_enviar_mensaje(cliente, CREAR_PEDIDO, cliente_id);
 
 	consola_if(consola, id_pedido > 0);
 }
 
 static void guardar_pedido()
 {
+	if (modulo == RESTAURANTE || modulo == APP)
+	{consola_log(consola, "El modulo no entiende este mensaje");
+	return;}
+
 	if(validar_restaurante() && validar_pedido())
 		return;
 
@@ -125,6 +145,10 @@ static void guardar_pedido()
 /*AGREGAR PLATO*/
 static void agregar_plato()
 {
+	if (modulo == COMANDA || modulo == SINDICATO)
+	{consola_log(consola, "El modulo no entiende este mensaje");
+	return;}
+
 	if(validar_pedido())
 		return;
 
@@ -136,6 +160,11 @@ static void agregar_plato()
 /*GUARDAR PLATO*/
 static void guardar_plato()
 {
+	if (modulo == RESTAURANTE || modulo == APP)
+	{consola_log(consola, "El modulo no entiende este mensaje");
+	return;}
+
+
 	if(validar_pedido() && validar_restaurante())
 		return;
 
@@ -152,6 +181,10 @@ static void guardar_plato()
 /*OBTENER PEDIDO*/
 static void obtener_pedido()
 {
+	if (modulo == RESTAURANTE || modulo == APP)
+	{consola_log(consola, "El modulo no entiende este mensaje");
+	return;}
+
 	if(validar_pedido() && validar_restaurante())
 		return;
 
@@ -190,23 +223,28 @@ static void finalizar_pedido()
 /*CONFIRMAR PEDIDO*/
 static void confirmar_pedido()
 {
+
+
 	if(validar_restaurante() && validar_pedido())
 		return;
 
 	bool operacion_ok = cliente_enviar_mensaje(cliente, CONFIRMAR_PEDIDO, crear_datos_pedido(id_pedido, restaurante_seleccionado));
 	consola_if(consola, operacion_ok);
-
+/*
 	if (operacion_ok && (modulo == APP  || modulo == RESTAURANTE))
 	{
 		pthread_t hilo_finalizar_pedido;
 		pthread_create(&(hilo_finalizar_pedido), NULL, (void*) &finalizar_pedido, NULL);
 		pthread_detach(hilo_finalizar_pedido);
-	}
+	}*/
 }
 
 /*PLATO LISTO*/
 static void plato_listo()
 {
+	if (modulo == RESTAURANTE)
+	{consola_log(consola, "El modulo no entiende este mensaje");
+	return;}
 
 	if(validar_pedido() && validar_restaurante())
 		return;
@@ -223,6 +261,11 @@ static void plato_listo()
 /*CONSULTAR PEDIDO*/
 static void consultar_pedido()
 {
+	if (modulo == COMANDA || modulo == SINDICATO)
+	{consola_log(consola, "El modulo no entiende este mensaje");
+	return;}
+
+
 	if(validar_pedido())
 		return;
 
@@ -246,6 +289,9 @@ static void consultar_pedido()
 /*OBTENER RECETA*/
 static void obtener_receta()
 {
+	if (modulo != SINDICATO)
+	{consola_log(consola, "El modulo no entiende este mensaje");
+	return;}
 
 	restaurante_seleccionado = consola_leer("Ingrese el nombre del restaurante: ");
 
@@ -269,6 +315,9 @@ static void obtener_receta()
 /*OBTENER RESTAURANTE*/
 static void obtener_restaurante()
 {
+	if (modulo != SINDICATO)
+	{consola_log(consola, "El modulo no entiende este mensaje");
+	return;}
 
 	restaurante_seleccionado = consola_leer("Ingrese el nombre del restaurante: ");
 
@@ -313,6 +362,10 @@ static void obtener_restaurante()
 /*TERMINAR PEDIDO*/
 static void terminar_pedido()
 {
+	if (modulo != SINDICATO)
+	{consola_log(consola, "El modulo no entiende este mensaje");
+	return;}
+
 	if(validar_pedido() && validar_restaurante())
 		return;
 
@@ -335,7 +388,6 @@ static void esperar_finalizar_pedido()
 {
 	t_datos_pedido* datos = crear_datos_pedido(id_pedido, restaurante_seleccionado);
 	sleep(1);
-//TODO POR QUE PORONGA NO HACE EL RECV
 
 
 	pid_t conseguir_tid = syscall(SYS_gettid);

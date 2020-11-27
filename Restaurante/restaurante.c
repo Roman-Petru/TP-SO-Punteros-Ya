@@ -18,9 +18,10 @@ bool app_activada;
 
 void inicializar_restaurante()
 {
+	char* config = readline("Elegir archivo de config: ");
 
 	logger_resto = log_create("resto.log", "RESTAURANTE", true, LOG_LEVEL_INFO);
-	config_resto = config_create("restaurante.config");
+	config_resto = config_create(config);
 	nombre_restaurante = config_get_string_value(config_resto, "NOMBRE_RESTAURANTE");
 
 	servidor = servidor_crear("127.0.0.1", config_get_string_value(config_resto, "PUERTO_ESCUCHA"));

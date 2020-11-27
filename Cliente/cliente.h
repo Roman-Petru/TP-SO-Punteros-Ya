@@ -13,6 +13,7 @@ extern t_cliente_red* cliente;
 extern int id;
 extern int id_pedido;
 extern char* restaurante_seleccionado;
+extern char* cliente_id;
 extern bool hay_que_leer;
 extern t_log* logger_finalizar_pedido;
 

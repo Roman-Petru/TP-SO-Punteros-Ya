@@ -44,6 +44,7 @@ typedef struct {
 }t_para_nuevo_plato;
 
 t_platos_PCB* crear_plato(char* plato, int id_pedido);
+void destruir_plato (t_platos_PCB* plato);
 void ciclo_plato(t_platos_PCB* plato);
 void avanzar_paso_receta (t_platos_PCB* plato);
 void cambiar_paso_de_ser_necesario(t_platos_PCB* plato);

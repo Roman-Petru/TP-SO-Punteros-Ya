@@ -63,18 +63,19 @@ static t_respuesta* agregar_plato(t_agregar_plato* datos_para_agregar_plato)
 
 static t_respuesta* confirmar_pedido(t_datos_pedido* datos_para_confirmar)
 {
-
-	bool conf_ok = cliente_enviar_mensaje(cliente_sind, CONFIRMAR_PEDIDO, crear_datos_pedido(datos_para_confirmar->id_pedido, nombre_restaurante));
-	if (!conf_ok)
-		{log_info(logger_resto, "No se pudo confirmar el pedido ya que el sindicato no lo pudo confirmar");
-		return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) false, false);}
-
 	t_datos_estado_pedido* datos_pedido = cliente_enviar_mensaje(cliente_sind, OBTENER_PEDIDO, crear_datos_pedido(datos_para_confirmar->id_pedido, nombre_restaurante));
 
 	bool op_ok = obtener_recetas(datos_pedido->platos);
 	if (!op_ok)
 		{log_info(logger_resto, "No se pudo confirmar el pedido ya que no se encontro alguna receta");
 		return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) false, false);}
+
+
+	bool conf_ok = cliente_enviar_mensaje(cliente_sind, CONFIRMAR_PEDIDO, crear_datos_pedido(datos_para_confirmar->id_pedido, nombre_restaurante));
+	if (!conf_ok)
+		{log_info(logger_resto, "No se pudo confirmar el pedido ya que el sindicato no lo pudo confirmar");
+		return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) false, false);}
+
 
 
 	void empezar_pedido (void* en_lista) {

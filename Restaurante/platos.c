@@ -12,7 +12,7 @@ t_platos_PCB* crear_plato(char* plato, int id_pedido)
 	id_PCB++;
 
 	nuevo_plato->id_pedido = id_pedido;
-	nuevo_plato->nombre_plato = plato;
+	nuevo_plato->nombre_plato = string_duplicate(plato);
 	nuevo_plato->estado_pcb = NEW;
 
 	nuevo_plato->ciclos_ejecutandose = 0;
@@ -47,6 +47,13 @@ t_platos_PCB* crear_plato(char* plato, int id_pedido)
 
 	return nuevo_plato;
 
+}
+
+void destruir_plato (t_platos_PCB* plato)
+{
+	free(plato->nombre_plato);
+	list_destroy(plato->pasos_receta_faltantes);
+	free(plato);
 }
 
 void ciclo_plato(t_platos_PCB* plato)
@@ -118,7 +125,7 @@ void terminar_plato (t_platos_PCB* plato)
 		sem_post(platos_listos->sincronizador);
 	}
 
-	//TODO dstruir PCB
+	destruir_plato(plato);
 }
 
 

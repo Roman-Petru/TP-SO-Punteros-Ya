@@ -54,6 +54,10 @@ t_pedido* pedido_crear(int id_pedido)
 	return nuevo_pedido;
 }
 
+void pedido_destruir(t_pedido* pedido)
+{
+	free(pedido);
+}
 
 float pedido_estimacion(t_pedido* pedido)
 {
