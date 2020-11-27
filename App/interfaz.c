@@ -191,12 +191,12 @@ static t_respuesta* consultar_pedido(uint32_t id_pedido)
 {
 	char* restaurante = pedido_obtener_restaurante(id_pedido);
 
-	t_datos_estado_pedido* estado = cliente_enviar_mensaje(cliente_comanda, OBTENER_PEDIDO, crear_datos_pedido(id_pedido, string_duplicate(restaurante)));
+	t_datos_estado_pedido* estado = cliente_enviar_mensaje(cliente_comanda, OBTENER_PEDIDO, crear_datos_pedido(id_pedido, restaurante));
 
 	t_estado_pedido estado_n = estado->estado;
 	t_list* nuevos_pl = list_duplicate(estado->platos);
 
-	destruir(OBTENER_PEDIDO_RESPUESTA, estado);
+	//destruir(OBTENER_PEDIDO_RESPUESTA, estado);
 	return respuesta_crear(CONSULTAR_PEDIDO_RESPUESTA, crear_datos_consultar_pedido(restaurante, estado_n, nuevos_pl), false);
 }
 

@@ -1,6 +1,7 @@
 #include "interfaz.h"
 
 t_modulo modulo;
+t_dictionary_int* diccionario_estados;
 
 //========== VALIDACIONES ==========//
 static bool validar_restaurante()
@@ -193,7 +194,7 @@ static void obtener_pedido()
 	t_datos_estado_pedido* datos_pedido = cliente_enviar_mensaje(cliente, OBTENER_PEDIDO, datos);
 
 	char mensaje[40];
-	sprintf(mensaje, "El estado del pedido es: %d, y contiene: ", datos_pedido->estado);
+	sprintf(mensaje, "El estado del pedido es: %s, y contiene: ", (char*) dictionary_int_get(diccionario_estados, (datos_pedido->estado)));
 	consola_log(consola, mensaje);
 
 	void logear_platos(void* plato)
@@ -258,6 +259,7 @@ static void plato_listo()
 	consola_if(consola, operacion_ok);
 }
 
+
 /*CONSULTAR PEDIDO*/
 static void consultar_pedido()
 {
@@ -271,9 +273,10 @@ static void consultar_pedido()
 
 	t_consultar_pedido* datos_pedido = cliente_enviar_mensaje(cliente, CONSULTAR_PEDIDO, (void*) id_pedido);
 
-	char mensaje[80];
-	sprintf(mensaje, "El estado del pedido es: %d, pertenece al restaurante %s, y contiene: ", datos_pedido->estado, datos_pedido->restaurante);
+	char* mensaje = malloc(200);
+	sprintf(mensaje, "El estado del pedido es: %s, pertenece al restaurante %s, y contiene: ", (char*) dictionary_int_get(diccionario_estados, (datos_pedido->estado)), datos_pedido->restaurante);
 	consola_log(consola, mensaje);
+	free(mensaje);
 
 	void logear_platos(void* plato)
 		{t_datos_estado_comida* plato_a_logear = plato;
@@ -405,6 +408,14 @@ static void esperar_finalizar_pedido()
 //	else consola_log(consola, "El pedido no ha podido finalizarse correctamente");
 }*/
 
+void inicializar_diccionario_estados ()
+{
+diccionario_estados = dictionary_int_create();
+dictionary_int_put(diccionario_estados, CONFIRMADO, "Confirmado");
+dictionary_int_put(diccionario_estados, PENDIENTE, "Pendiente");
+dictionary_int_put(diccionario_estados, TERMINADO, "Terminado");
+dictionary_int_put(diccionario_estados, ERROR_ESTADO, "Error Estado");
+}
 
 
 void cargar_interfaz()

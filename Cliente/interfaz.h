@@ -15,7 +15,7 @@
 #include <sys/syscall.h>
 
 
-
+void inicializar_diccionario_estados();
 void cargar_interfaz();
 void handshake();
 

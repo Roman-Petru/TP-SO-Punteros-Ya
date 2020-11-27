@@ -33,7 +33,7 @@ static void inicializar()
 	cliente = cliente_crear(config_get_string_value(config, "IP"), config_get_string_value(config, "PUERTO"));
 	 //config_get_string_value(config, "ARCHIVO_LOG")
 	cargar_interfaz();
-
+	inicializar_diccionario_estados();
 	handshake();
 	log_info(consola->logger, "Cliente con id: %s conectado!", cliente_id);
 }
