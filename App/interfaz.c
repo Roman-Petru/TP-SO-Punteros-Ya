@@ -76,7 +76,7 @@ static t_respuesta* consultar_platos(char* restaurante)
 {
 	log_info(logger, "Se consulto platos de Restaurante %s.", restaurante);
 
-	if(restaurante_esta_conectado(restaurante))
+	if(!es_resto_default(restaurante) && restaurante_esta_conectado(restaurante))
 		return respuesta_crear(CONSULTAR_PLATOS_RESPUESTA, cliente_enviar_mensaje(restaurante_obtener_cliente(restaurante), CONSULTAR_PLATOS, NULL), true);
 
 	return respuesta_crear(CONSULTAR_PLATOS_RESPUESTA, platos_default(), true);
@@ -193,6 +193,13 @@ static t_respuesta* consultar_pedido(uint32_t id_pedido)
 
 	t_datos_estado_pedido* estado = cliente_enviar_mensaje(cliente_comanda, OBTENER_PEDIDO, crear_datos_pedido(id_pedido, restaurante));
 
+	if (estado == NULL)
+		{
+		t_estado_pedido estado_n = ERROR_ESTADO;
+		t_list* nuevos_pl = list_create();
+		return respuesta_crear(CONSULTAR_PEDIDO_RESPUESTA, crear_datos_consultar_pedido(restaurante, estado_n, nuevos_pl), false);
+
+		}
 	t_estado_pedido estado_n = estado->estado;
 	t_list* nuevos_pl = list_duplicate(estado->platos);
 

@@ -24,7 +24,7 @@ void inicializar_restaurante()
 	config_resto = config_create(config);
 	nombre_restaurante = config_get_string_value(config_resto, "NOMBRE_RESTAURANTE");
 
-	servidor = servidor_crear("127.0.0.1", config_get_string_value(config_resto, "PUERTO_ESCUCHA"));
+	servidor = servidor_crear(config_get_string_value(config_resto, "IP_SERVIDOR"), config_get_string_value(config_resto, "PUERTO_ESCUCHA"));
 	cargar_interfaz();
 
 	cliente_sind = cliente_crear(config_get_string_value(config_resto, "IP_SINDICATO"), config_get_string_value(config_resto, "PUERTO_SINDICATO"));

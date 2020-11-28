@@ -14,7 +14,7 @@ static void inicializar_sindicato()
 	config = config_create("sindicato.config");
 
 	serializacion_inicializar();
-	servidor = servidor_crear("127.0.0.1", config_get_string_value(config, "PUERTO_ESCUCHA"));
+	servidor = servidor_crear(config_get_string_value(config, "IP_SERVIDOR"), config_get_string_value(config, "PUERTO_ESCUCHA"));
 	cargar_interfaz();
 
 	consola = consola_crear("sindicato_consola.log", "Sindicato");

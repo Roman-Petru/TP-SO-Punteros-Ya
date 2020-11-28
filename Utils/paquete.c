@@ -56,7 +56,7 @@ bool paquete_enviar(t_paquete* paquete, int socket)
 {
 	void* paquete_serializado = paquete_serializar(paquete);
 	int estado = send(socket, paquete_serializado, paquete_tamanio(paquete), 0);
-	perror("Perror: ");
+	//perror("Perror: ");
 	free(paquete_serializado);
 
 	return estado >= 0;

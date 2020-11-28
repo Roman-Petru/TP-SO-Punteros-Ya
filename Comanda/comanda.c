@@ -13,7 +13,7 @@ void inicializar_comanda(){
 	config = config_create("comanda.config");
 
 	serializacion_inicializar();
-	servidor = servidor_crear("127.0.0.1", config_get_string_value(config, "PUERTO_ESCUCHA"));
+	servidor = servidor_crear(config_get_string_value(config, "IP_SERVIDOR"), config_get_string_value(config, "PUERTO_ESCUCHA"));
 	cargar_interfaz();
 
 	inicializar_memoria_principal();

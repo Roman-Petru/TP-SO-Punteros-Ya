@@ -136,6 +136,7 @@ static void actualizar_estado_ejecutados()
 			pthread_cancel(pedido->hilo);
 			sem_t* sincronizador = pedido_obtener_semaforo(pedido->id_pedido);
 			sem_post(sincronizador);
+			cliente_enviar_mensaje(cliente_comanda, FINALIZAR_PEDIDO, crear_datos_pedido(pedido->id_pedido, pedido_obtener_restaurante(pedido->id_pedido)));
 			pedido_destruir(pedido);
 		}
 		else
