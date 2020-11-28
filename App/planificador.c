@@ -93,27 +93,29 @@ static void actualizar_estado_listos()
 
 static void actualizar_estado_bloqueados()
 {
-	void actualizar_estado(t_pedido* pedido)
-	{
-		if (pedido->instruccion_a_realizar == ESPERAR_EN_RESTAURANTE)
-		{
-			if (pedido->esta_listo)
-			{
-				cambiar_estado_a(pedido, READY, A_READY_LISTO);
-				pedido->instruccion_a_realizar = IR_A_CLIENTE;
-				//TODO y en el caso que quede esperando, descansa mientras esta en el restaurante?
-			}
-		}
-		else
-		{
-			repartidor_descansar(pedido->repartidor);
-			if (!pedido->repartidor->esta_cansado)
-				cambiar_estado_a(pedido, READY, A_READY_DESCANSO);
-		}
-	}
 
-	list_iterate(cola_BLOCKED, (void*) &actualizar_estado);
-	//TODO: lista cambios
+	for (int i=0; i < list_size(cola_BLOCKED); i++)
+	{
+		t_pedido* pedido = list_get(cola_BLOCKED, i);
+
+			if (pedido->instruccion_a_realizar == ESPERAR_EN_RESTAURANTE)
+			{
+				if (pedido->esta_listo)
+				{
+					cambiar_estado_a(pedido, READY, A_READY_LISTO);
+					i--;
+					pedido->instruccion_a_realizar = IR_A_CLIENTE;
+					//TODO y en el caso que quede esperando, descansa mientras esta en el restaurante?
+				}
+			}
+			else
+			{
+				repartidor_descansar(pedido->repartidor);
+				if (!pedido->repartidor->esta_cansado)
+					{cambiar_estado_a(pedido, READY, A_READY_DESCANSO);
+					i--;}
+			}
+	}
 }
 
 static void actualizar_estado_ejecutados()
