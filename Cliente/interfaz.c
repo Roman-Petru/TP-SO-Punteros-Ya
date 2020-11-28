@@ -193,9 +193,10 @@ static void obtener_pedido()
 
 	t_datos_estado_pedido* datos_pedido = cliente_enviar_mensaje(cliente, OBTENER_PEDIDO, datos);
 
-	char mensaje[40];
+	char* mensaje = malloc(200);
 	sprintf(mensaje, "El estado del pedido es: %s, y contiene: ", (char*) dictionary_int_get(diccionario_estados, (datos_pedido->estado)));
 	consola_log(consola, mensaje);
+	free(mensaje);
 
 	void logear_platos(void* plato)
 		{t_datos_estado_comida* plato_a_logear = plato;
