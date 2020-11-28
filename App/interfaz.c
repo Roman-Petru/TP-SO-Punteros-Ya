@@ -76,7 +76,7 @@ static t_respuesta* consultar_platos(char* restaurante)
 {
 	log_info(logger, "Se consulto platos de Restaurante %s.", restaurante);
 
-	if(!es_resto_default(restaurante) && restaurante_esta_conectado(restaurante))
+	if(restaurante_esta_conectado(restaurante))
 		return respuesta_crear(CONSULTAR_PLATOS_RESPUESTA, cliente_enviar_mensaje(restaurante_obtener_cliente(restaurante), CONSULTAR_PLATOS, NULL), true);
 
 	return respuesta_crear(CONSULTAR_PLATOS_RESPUESTA, platos_default(), true);
@@ -208,7 +208,7 @@ static t_respuesta* finalizar_pedido(t_datos_pedido* datos)
 	log_info(logger, "paso el wait");
 	bool op_ok = cliente_enviar_mensaje(cliente_comanda, FINALIZAR_PEDIDO, datos);
 	log_info(logger, "mando mensaje a comanda %d", op_ok);
-	return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) op_ok , false);
+	return respuesta_crear(FINALIZAR_PEDIDO_RESPUESTA, (void*) op_ok , false);
 }
 
 static t_respuesta* operacion_terminar()

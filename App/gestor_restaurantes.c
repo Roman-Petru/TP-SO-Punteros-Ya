@@ -23,9 +23,7 @@ bool restaurante_esta_conectado(char* nombre_restaurante)
 	bool es_mismo_restaurante(void* resto) { t_restaurante_conectado* resto_pivot = resto;
 		return strcmp(nombre_restaurante, resto_pivot->nombre)==0; }
 
-	pthread_mutex_lock(&mutex);
 	return list_any_satisfy(restaurantes_conectados, &es_mismo_restaurante);
-	pthread_mutex_unlock(&mutex);
 }
 
 bool es_resto_default(char* nombre_restaurante) { return strcmp(nombre_restaurante, "Resto_Default")==0; }

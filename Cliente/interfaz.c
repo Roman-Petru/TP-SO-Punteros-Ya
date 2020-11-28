@@ -231,13 +231,13 @@ static void confirmar_pedido()
 
 	bool operacion_ok = cliente_enviar_mensaje(cliente, CONFIRMAR_PEDIDO, crear_datos_pedido(id_pedido, restaurante_seleccionado));
 	consola_if(consola, operacion_ok);
-
+/*
 	if (operacion_ok && (modulo == APP  || modulo == RESTAURANTE))
 	{
 		pthread_t hilo_finalizar_pedido;
 		pthread_create(&(hilo_finalizar_pedido), NULL, (void*) &finalizar_pedido, NULL);
 		pthread_detach(hilo_finalizar_pedido);
-	}
+	}*/
 }
 
 /*PLATO LISTO*/
