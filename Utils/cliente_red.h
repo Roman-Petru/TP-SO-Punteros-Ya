@@ -12,6 +12,8 @@
 #include <string.h>
 #include <pthread.h>
 #include <stdbool.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 
 typedef struct
 {
@@ -23,6 +25,7 @@ typedef struct
 t_cliente_red* cliente_crear(char* ip, char* puerto);
 void cliente_destruir(t_cliente_red* cliente);
 void* cliente_enviar_mensaje(t_cliente_red* cliente, t_codigo_de_operacion codigo_operacion, void* datos);
+void* cliente_enviar_mensaje_asincronico(t_cliente_red* cliente, t_codigo_de_operacion codigo_operacion, void* datos);
 void cliente_agregar_operacion(t_cliente_red* cliente, t_codigo_de_operacion codigo_operacion, void* operacion);
 
 #endif /*CLIENTE_RED_H_*/
