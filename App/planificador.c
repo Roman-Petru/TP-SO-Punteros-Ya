@@ -137,6 +137,11 @@ static void actualizar_estado_ejecutados()
 			sem_t* sincronizador = pedido_obtener_semaforo(pedido->id_pedido);
 			sem_post(sincronizador);
 			cliente_enviar_mensaje(cliente_comanda, FINALIZAR_PEDIDO, crear_datos_pedido(pedido->id_pedido, pedido_obtener_restaurante(pedido->id_pedido)));
+			char* id_cliente = pedido_obtener_cliente(pedido->id_pedido);
+			t_cliente_conectado* cliente = list_get(clientes_conectados, cliente_index(id_cliente));
+			t_cliente_red* cliente_auxiliar = cliente_crear(cliente->IP, cliente->Puerto);
+			cliente_enviar_mensaje(cliente_auxiliar, FINALIZAR_PEDIDO_CLIENTE,(void*) true);
+			cliente_destruir(cliente_auxiliar);
 			pedido_destruir(pedido);
 		}
 		else

@@ -6,6 +6,8 @@
 #include "../Utils/cliente_red.h"
 #include "../Utils/consola.h"
 #include <commons/config.h>
+#include "../Utils/servidor_red.h"
+
 
 extern t_config* config;
 extern t_consola* consola;

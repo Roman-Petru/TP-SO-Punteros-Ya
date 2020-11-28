@@ -42,7 +42,7 @@ void handshake()
 
 	if(modulo == APP)
 	{
-		t_datos_cliente* datos = crear_datos_cliente(config_get_string_value(config, "ID_CLIENTE"), posicion_crear(config_get_int_value(config, "POSICION_X"), config_get_int_value(config, "POSICION_Y")));
+		t_datos_cliente* datos = crear_datos_cliente(config_get_string_value(config, "ID_CLIENTE"), posicion_crear(config_get_int_value(config, "POSICION_X"), config_get_int_value(config, "POSICION_Y")), config_get_string_value(config, "IP_SERVIDOR"), config_get_string_value(config, "PUERTO_ESCUCHA"));
 		op_ok = cliente_enviar_mensaje(cliente, CONEXION_CLIENTE, datos);
 	}
 

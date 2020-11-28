@@ -14,11 +14,16 @@ typedef struct {
 	t_posicion* posicion;
 	t_list* pedidos;
 	char* restaurante_seleccionado;
+	char* IP;
+	char* Puerto;
 } t_cliente_conectado;
+
+extern t_list* clientes_conectados;
 
 void inicializar_gestor_clientes();
 void finalizar_gestor_clientes();
 
+int cliente_index(char* id_cliente);
 void agregar_cliente(t_datos_cliente* datos);
 void cliente_agregar_pedido(char* id_cliente, int id_pedido);
 void cliente_remover_pedido(char* id_cliente, int id_pedido);

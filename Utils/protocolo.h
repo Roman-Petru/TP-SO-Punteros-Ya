@@ -51,6 +51,7 @@ typedef enum
 	CONSULTAR_PEDIDO_RESPUESTA,
 	FINALIZAR_PEDIDO,
 	FINALIZAR_PEDIDO_RESPUESTA,
+	FINALIZAR_PEDIDO_CLIENTE,
 	//=== ERROR ===//
 	ERROR = -1,
 	ERROR_DESERIALIZAR_BUFFER = -2
@@ -75,6 +76,8 @@ typedef struct
 {
 	char* id_cliente;
 	t_posicion* posicion;
+	char* IP;
+	char* Puerto;
 } t_datos_cliente;
 
 typedef struct
@@ -179,7 +182,7 @@ typedef struct {
 
 
 
-t_datos_cliente* crear_datos_cliente(char* id_cliente, t_posicion* posicion);
+t_datos_cliente* crear_datos_cliente(char* id_cliente, t_posicion* posicion, char* IP, char* Puerto);
 t_datos_pedido* crear_datos_pedido(int id_pedido, char* restaurante);
 t_datos_seleccion_restaurante* crear_datos_seleccion_restaurante(char* id_cliente, char* restaurante);
 t_guardar_plato* crear_datos_guardar_plato(int id_pedido, int cantidad, char* comida, char* restaurante);

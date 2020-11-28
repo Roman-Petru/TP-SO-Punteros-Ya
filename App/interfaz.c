@@ -207,7 +207,7 @@ static t_respuesta* consultar_pedido(uint32_t id_pedido)
 	return respuesta_crear(CONSULTAR_PEDIDO_RESPUESTA, crear_datos_consultar_pedido(restaurante, estado_n, nuevos_pl), false);
 }
 
-/*FINALIZAR PEDIDO*/
+/*FINALIZAR PEDIDO
 static t_respuesta* finalizar_pedido(t_datos_pedido* datos)
 {
 	sem_t* sincronizador = pedido_obtener_semaforo(datos->id_pedido);
@@ -216,7 +216,7 @@ static t_respuesta* finalizar_pedido(t_datos_pedido* datos)
 	bool op_ok = cliente_enviar_mensaje(cliente_comanda, FINALIZAR_PEDIDO, datos);
 	log_info(logger, "mando mensaje a comanda %d", op_ok);
 	return respuesta_crear(FINALIZAR_PEDIDO_RESPUESTA, (void*) op_ok , false);
-}
+}*/
 
 static t_respuesta* operacion_terminar()
 {
@@ -239,6 +239,6 @@ void cargar_interfaz()
 	servidor_agregar_operacion(servidor, PLATO_LISTO, &plato_listo);
 	servidor_agregar_operacion(servidor, CONFIRMAR_PEDIDO, &confirmar_pedido);
 	servidor_agregar_operacion(servidor, CONSULTAR_PEDIDO, &consultar_pedido);
-	servidor_agregar_operacion(servidor, FINALIZAR_PEDIDO, &finalizar_pedido);
+	//servidor_agregar_operacion(servidor, FINALIZAR_PEDIDO, &finalizar_pedido);
 }
 

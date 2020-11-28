@@ -6,7 +6,7 @@ pthread_mutex_t mutex;
 
 static void agregar_cliente_default()
 {
-	t_datos_cliente* datos_cliente_default = crear_datos_cliente("Cliente_Default", posicion_crear(4, 4));
+	t_datos_cliente* datos_cliente_default = crear_datos_cliente("Cliente_Default", posicion_crear(4, 4), "Sin IP", "Sin Puerto");
 	agregar_cliente(datos_cliente_default);
 	free(datos_cliente_default->posicion);
 	free(datos_cliente_default);
@@ -33,7 +33,7 @@ void finalizar_gestor_clientes()
 	list_destroy_and_destroy_elements(clientes_conectados, (void*) &destruir_cliente_conectado);
 }
 
-static int cliente_index(char* id_cliente)
+int cliente_index(char* id_cliente)
 {
 	if(id_cliente == NULL)
 		return -1;
@@ -58,6 +58,14 @@ void agregar_cliente(t_datos_cliente* datos)
 	cliente->id = malloc(tam);
 	memcpy(cliente->id, datos->id_cliente, tam);
 	cliente->restaurante_seleccionado = NULL;
+
+	tam = strlen(datos->IP)+1;
+	cliente->IP = malloc(tam);
+	memcpy(cliente->IP, datos->IP, tam);
+
+	tam = strlen(datos->Puerto)+1;
+	cliente->Puerto = malloc(tam);
+	memcpy(cliente->Puerto, datos->Puerto, tam);
 
 	pthread_mutex_lock(&mutex);
 	list_add(clientes_conectados, cliente);

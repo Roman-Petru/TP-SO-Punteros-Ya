@@ -3,6 +3,7 @@
 t_config* config;
 t_consola* consola;
 t_cliente_red* cliente;
+t_servidor_red* servidor;
 
 int id_pedido;
 char* restaurante_seleccionado;
@@ -17,6 +18,21 @@ static void terminar_programa()
 	serializacion_finalizar();
 }
 
+
+/*FINALIZAR PEDIDO*/
+static t_respuesta* finalizar_pedido(t_datos_pedido* datos)
+{
+	consola_log(consola, "Se finalizo el pedido correctamente!.");
+	return respuesta_crear(FINALIZAR_PEDIDO_RESPUESTA, (void*) true , false);
+}
+
+
+static void cargar_interfaz_serv(){
+
+servidor_agregar_operacion(servidor, FINALIZAR_PEDIDO_CLIENTE, &finalizar_pedido);
+
+}
+
 static void inicializar()
 {
 	consola = consola_crear("cliente.log", "Cliente");
@@ -28,8 +44,10 @@ static void inicializar()
 	restaurante_seleccionado = NULL;
 	hay_que_leer = true;
 	cliente_id = config_get_string_value(config, "ID_CLIENTE");
-
+	servidor = servidor_crear(config_get_string_value(config, "IP_SERVIDOR"), config_get_string_value(config, "PUERTO_ESCUCHA"));
 	serializacion_inicializar();
+	cargar_interfaz_serv();
+
 	cliente = cliente_crear(config_get_string_value(config, "IP"), config_get_string_value(config, "PUERTO"));
 	 //config_get_string_value(config, "ARCHIVO_LOG")
 	cargar_interfaz();
