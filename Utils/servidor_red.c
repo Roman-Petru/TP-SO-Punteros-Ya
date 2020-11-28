@@ -42,7 +42,7 @@ static void servidor_enviar_respuesta(int socket_cliente, t_respuesta* respuesta
 static void atender_cliente(t_cliente_servidor* cliente)
 {
 	t_paquete* paquete = paquete_recibir(cliente->socket);
-	if(paquete == NULL || paquete->codigo_operacion < 0)
+	if(paquete == NULL)
 		return;
 
 	t_respuesta* respuesta = servidor_procesar_paquete(cliente->servidor, paquete);
