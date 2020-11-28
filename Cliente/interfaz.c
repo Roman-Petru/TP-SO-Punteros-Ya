@@ -215,7 +215,7 @@ static void finalizar_pedido()
 		return;
 	t_datos_pedido* datos = crear_datos_pedido(id_pedido, restaurante_seleccionado);
 	consola_log(consola, "voy a mandar mensaje");
-	bool operacion_ok = cliente_enviar_mensaje_asincronico(cliente, FINALIZAR_PEDIDO, datos);
+	bool operacion_ok = cliente_enviar_mensaje(cliente, FINALIZAR_PEDIDO, datos);
 	consola_log(consola, "recibi respuesta");
 	char* mensaje = operacion_ok ? "El pedido ha finalizado correctamente" : "El pedido no ha podido finalizarse correctamente" ;
 	consola_log(consola, mensaje);

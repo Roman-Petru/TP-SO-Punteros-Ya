@@ -41,7 +41,7 @@ void* cliente_enviar_mensaje(t_cliente_red* cliente, t_codigo_de_operacion codig
 
 	return pedido;
 }
-
+/*
 t_paquete* paquete_recibir_asincronico(int numero_socket)
 {
 	t_paquete* paquete;
@@ -106,4 +106,4 @@ void* cliente_enviar_mensaje_asincronico(t_cliente_red* cliente, t_codigo_de_ope
 	socket_cerrar(cliente->socket);
 
 	return pedido;
-}
+}*/
