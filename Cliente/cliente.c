@@ -20,10 +20,10 @@ static void terminar_programa()
 static void inicializar()
 {
 	consola = consola_crear("cliente.log", "Cliente");
-//	char* string_config = consola_leer("Ingrese el nombre del config deseado: ");
-	//config = config_create(string_config);
+	char* string_config = consola_leer("Ingrese el nombre del config deseado: ");
+	config = config_create(string_config);
 
-	config = config_create("cliente.config");
+//	config = config_create("cliente.config");
 	id_pedido = 0;
 	restaurante_seleccionado = NULL;
 	hay_que_leer = true;

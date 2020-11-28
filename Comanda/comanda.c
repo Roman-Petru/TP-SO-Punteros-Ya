@@ -57,7 +57,7 @@ struct ifaddrs * ifAddrStruct=NULL;
 
     log_info(logger, "IP: %s", IP);*/
 	serializacion_inicializar();
-	servidor = servidor_crear("104.131.164.39", config_get_string_value(config, "PUERTO_ESCUCHA"));
+	servidor = servidor_crear("10.108.64.3", config_get_string_value(config, "PUERTO_ESCUCHA"));
 	cargar_interfaz();
 
 	inicializar_memoria_principal();
