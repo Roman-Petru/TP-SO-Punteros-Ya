@@ -9,23 +9,26 @@ t_list* paginas_en_memoria;
 
 int puntero_a_paginas;
 
-#include <stdio.h>
-#include <sys/types.h>
-#include <ifaddrs.h>
-#include <netinet/in.h>
-#include <string.h>
-#include <arpa/inet.h>
+
 
 void inicializar_comanda(){
 
 	logger = log_create("comanda.log", "COMANDA", true, LOG_LEVEL_INFO);
 	config = config_create("comanda.config");
 
-    struct ifaddrs * ifAddrStruct=NULL;
+	 /*
+	  * #include <stdio.h>
+#include <sys/types.h>
+#include <ifaddrs.h>
+#include <netinet/in.h>
+#include <string.h>
+#include <arpa/inet.h>
+
+struct ifaddrs * ifAddrStruct=NULL;
     struct ifaddrs * ifa=NULL;
     void * tmpAddrPtr=NULL;
 
-    getifaddrs(&ifAddrStruct);
+   getifaddrs(&ifAddrStruct);
     char* IP;
 
     for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next) {
@@ -52,9 +55,9 @@ void inicializar_comanda(){
     }
     if (ifAddrStruct!=NULL) freeifaddrs(ifAddrStruct);
 
-    log_info(logger, "IP: %s", IP);
+    log_info(logger, "IP: %s", IP);*/
 	serializacion_inicializar();
-	servidor = servidor_crear(IP, config_get_string_value(config, "PUERTO_ESCUCHA"));
+	servidor = servidor_crear("104.131.164.39", config_get_string_value(config, "PUERTO_ESCUCHA"));
 	cargar_interfaz();
 
 	inicializar_memoria_principal();
