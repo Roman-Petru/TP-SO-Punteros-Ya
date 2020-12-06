@@ -89,7 +89,8 @@ typedef struct
 typedef struct
 {
 	char* restaurante;
-	uint32_t puerto;
+	char* ip;
+	char* puerto;
 	t_posicion* posicion;
 } t_handshake_resto_app;
 
@@ -190,7 +191,7 @@ t_agregar_plato* crear_datos_agregar_plato(int id_pedido, char* plato);
 t_plato_listo* crear_datos_plato_listo(int id_pedido, char* comida, char* restaurante);
 t_datos_estado_pedido* crear_datos_estado_pedido(t_estado_pedido estado, t_list* platos);
 t_consultar_pedido* crear_datos_consultar_pedido(char* restaurante, t_estado_pedido estado, t_list* platos);
-t_handshake_resto_app* crear_datos_handshake_restaurante_app(int puerto, char* restaurante, t_posicion* posicion);
+t_handshake_resto_app* crear_datos_handshake_restaurante_app(char* restaurante, char* ip, char* puerto, t_posicion* posicion);
 t_datos_estado_comida* crear_datos_estado_comida(char* comida, uint32_t cant_total, uint32_t cant_lista);
 t_paso* crear_paso(char* operacion, int tiempo);
 t_precio* crear_precio(char* nombre, int precio);

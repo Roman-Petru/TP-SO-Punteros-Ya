@@ -24,7 +24,7 @@ bool es_resto_default(char* nombre_restaurante);
 
 t_list* obtener_restaurantes_conectados();
 
-void agregar_restaurante(char* nombre_restaurante, t_posicion* posicion, char* puerto);
+void agregar_restaurante(char* nombre_restaurante, t_posicion* posicion, char* ip, char* puerto);
 t_cliente_red* restaurante_obtener_cliente(char* nombre_restaurante);
 t_posicion* restaurante_obtener_posicion(char* nombre_restaurante);
 void remover_restaurante(char* nombre_restaurante);

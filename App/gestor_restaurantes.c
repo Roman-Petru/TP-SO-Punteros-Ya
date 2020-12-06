@@ -13,7 +13,7 @@ t_list* obtener_restaurantes_conectados()
 void inicializar_gestor_restaurantes()
 {
 	restaurantes_conectados = list_create();
-	agregar_restaurante("Resto_Default", posicion_crear(config_get_int_value(config, "POSICION_REST_DEFAULT_X"), config_get_int_value(config, "POSICION_REST_DEFAULT_Y")), "Puerto Default");
+	agregar_restaurante("Resto_Default", posicion_crear(config_get_int_value(config, "POSICION_REST_DEFAULT_X"), config_get_int_value(config, "POSICION_REST_DEFAULT_Y")), "IP de mentira", "Puerto Default");
 	pthread_mutex_init(&mutex, NULL);
 }
 
@@ -40,7 +40,7 @@ static int restaurante_index(char* nombre_restaurante)
 	return encontro ? index-1 : -1;
 }
 
-void agregar_restaurante(char* nombre_restaurante, t_posicion* posicion, char* puerto)
+void agregar_restaurante(char* nombre_restaurante, t_posicion* posicion, char* ip, char* puerto)
 {
 	t_restaurante_conectado* restaurante = malloc(sizeof(t_restaurante_conectado));
 	size_t tam = strlen(nombre_restaurante)+1;
@@ -50,7 +50,10 @@ void agregar_restaurante(char* nombre_restaurante, t_posicion* posicion, char* p
 	size_t tam2 = strlen(puerto)+1;
 	char* puerto2 = malloc(tam2);
 	memcpy(puerto2, puerto, tam2);
-	restaurante->cliente = cliente_crear("127.0.0.1", puerto2);
+	size_t tam3 = strlen(ip)+1;
+	char* ip2 = malloc(tam3);
+	memcpy(ip2, ip, tam3);
+	restaurante->cliente = cliente_crear(ip2, puerto2);
 
 	pthread_mutex_lock(&mutex);
 	list_add(restaurantes_conectados, restaurante);

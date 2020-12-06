@@ -260,11 +260,14 @@ static t_buffer* serializar_handshake_restaurante_app(void* datos_void)
 	t_handshake_resto_app* datos = datos_void;
 
 	size_t tamanio = strlen(datos->restaurante);
+	size_t tamanio2 = strlen(datos->ip);
+	size_t tamanio3 = strlen(datos->puerto);
 
-	t_buffer* buffer = buffer_crear(sizeof(uint32_t)+sizeof(size_t)+tamanio+sizeof(int)*2);
+	t_buffer* buffer = buffer_crear(tamanio+tamanio2+tamanio3+sizeof(uint32_t)*5);
 
-	buffer_serializar_int(buffer, datos->puerto);
 	buffer_serializar_string(buffer, datos->restaurante);
+	buffer_serializar_string(buffer, datos->ip);
+	buffer_serializar_string(buffer, datos->puerto);
 	buffer_serializar_int(buffer, datos->posicion->x);
 	buffer_serializar_int(buffer, datos->posicion->y);
 
@@ -454,14 +457,15 @@ static void* deserializar_consultar_pedido(t_buffer* buffer)
 
 static void* deserializar_handshake_restaurante_app(t_buffer* buffer)
 {
-	int puerto = buffer_deserializar_int(buffer);
 	char* restaurante = buffer_deserializar_string(buffer);
+	char* ip = buffer_deserializar_string(buffer);
+	char* puerto = buffer_deserializar_string(buffer);
 	int x = buffer_deserializar_int(buffer);
 	int y = buffer_deserializar_int(buffer);
 
 	t_posicion* posicion = posicion_crear(x, y);
 
-	return crear_datos_handshake_restaurante_app(puerto, restaurante, posicion);
+	return crear_datos_handshake_restaurante_app(restaurante, ip, puerto, posicion);
 }
 
 static void* deserializar_sin_datos(t_buffer* buffer)
@@ -524,6 +528,8 @@ void destruir_handshake_restaurante_app(void* datos_void)
 {
 	t_handshake_resto_app* datos = datos_void;
 	free(datos->restaurante);
+	free(datos->ip);
+	free(datos->puerto);
 	free(datos);
 }
 

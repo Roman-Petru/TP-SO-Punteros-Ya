@@ -4,7 +4,7 @@
 void realizar_handshake_con_app()
 {
 
-	void* operacion_ok = cliente_enviar_mensaje(cliente_app, HANDSHAKE_RESTO_APP, crear_datos_handshake_restaurante_app(config_get_int_value(config_resto, "PUERTO_ESCUCHA"), nombre_restaurante, posicion));
+	void* operacion_ok = cliente_enviar_mensaje(cliente_app, HANDSHAKE_RESTO_APP, crear_datos_handshake_restaurante_app(nombre_restaurante, config_get_string_value(config_resto, "IP_SERVIDOR"), config_get_string_value(config_resto, "PUERTO_ESCUCHA"), posicion));
 
 	if (operacion_ok == NULL)
 		{log_info(logger_resto, "Abierto el restaurante %s, activado modo funcionamiento sin app", nombre_restaurante);

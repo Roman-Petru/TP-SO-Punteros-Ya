@@ -16,12 +16,11 @@ static t_respuesta* conexion_cliente(t_datos_cliente* datos)
 //========== INTERFAZ ==========//
 static t_respuesta* handshake_restaurante_app(t_handshake_resto_app* datos)
 {
-	char puerto[6];
-	sprintf(puerto,"%d",datos->puerto);
+
 
 	if (!restaurante_esta_conectado(datos->restaurante))
 		{
-		agregar_restaurante(datos->restaurante, datos->posicion, puerto);
+		agregar_restaurante(datos->restaurante, datos->posicion, datos->ip, datos->puerto);
 		log_info(logger, "Se conecto el restaurante %s con posicion X: %d, Y: %d.", datos->restaurante, datos->posicion->x, datos->posicion->y);
 		}
 
