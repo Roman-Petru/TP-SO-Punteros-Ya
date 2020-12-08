@@ -121,11 +121,17 @@ void terminar_plato (t_platos_PCB* plato)
 
 	if (terminar_pedido)
 	{
-		cliente_enviar_mensaje(cliente_sind, TERMINAR_PEDIDO,  crear_datos_pedido(plato->id_pedido, nombre_restaurante));
-		sem_post(platos_listos->sincronizador);
-	}
+		cliente_enviar_mensaje(cliente_sind, TERMINAR_PEDIDO, crear_datos_pedido(plato->id_pedido, nombre_restaurante));
+		if (!app_activada)
+			{
+			cliente_enviar_mensaje(conseguir_cliente_pedido(plato->id_pedido), FINALIZAR_PEDIDO_CLIENTE,  (void*) true);
+			}
 
+		log_info(logger_resto, "Se finalizaron todos los platos del pedido con id %d", plato->id_pedido);
+		//sem_post(platos_listos->sincronizador);
+	}
 	destruir_plato(plato);
+	free(datos);
 }
 
 

@@ -21,6 +21,13 @@ static t_respuesta* handshake_cliente()
 	return respuesta_crear(HANDSHAKE_CLIENTE_RESPUESTA, (void*) RESTAURANTE, false);
 }
 
+static t_respuesta* conexion_cliente(t_datos_cliente* datos)
+{
+	agregar_cliente(datos);
+	log_info(logger_resto, "Se conecto un cliente Id: %s.", datos->id_cliente);
+	return respuesta_crear(CONEXION_CLIENTE_RESPUESTA, (void*) true, false);
+}
+
 
 static t_respuesta* consultar_platos(char* restaurante)
 {
@@ -31,7 +38,7 @@ static t_respuesta* consultar_platos(char* restaurante)
 	return respuesta_crear(CONSULTAR_PLATOS_RESPUESTA, platos, true);
 }
 
-static t_respuesta* crear_pedido()
+static t_respuesta* crear_pedido(char* id_cliente)
 {
 	log_info(logger_resto, "Me pidieron crear pedido.");
 
@@ -44,6 +51,10 @@ static t_respuesta* crear_pedido()
 		log_info(logger_resto, "Se mando correctamente el mensaje Guardar Pedido al sindicato");
 	else log_info(logger_resto, "No se mando correctamente el mensaje Guardar Pedido al sindicato");
 
+
+	if (!app_activada)
+		cliente_agregar_pedido(id_cliente, id_nuevo_pedido);
+
 	return respuesta_crear(CREAR_PEDIDO_RESPUESTA, (void*) id_nuevo_pedido, false);
 }
 
@@ -52,6 +63,7 @@ static t_respuesta* agregar_plato(t_agregar_plato* datos_para_agregar_plato)
 	if (!existe_plato(datos_para_agregar_plato->plato))
 		{	log_info(logger_resto, "No se agrego plato ya que no lo hace el restaurante");
 		return respuesta_crear(AGREGAR_PLATO_RESPUESTA, (void*) false, false);	}
+
 
 	bool operacion_ok = cliente_enviar_mensaje(cliente_sind, GUARDAR_PLATO, crear_datos_guardar_plato(datos_para_agregar_plato->id_pedido, 1, datos_para_agregar_plato->plato , nombre_restaurante));
 
@@ -82,7 +94,7 @@ static t_respuesta* confirmar_pedido(t_datos_pedido* datos_para_confirmar)
 		t_datos_estado_comida* plato = en_lista;
 		for (int i=0; i<plato->cant_total;i++)
 			{t_para_nuevo_plato* nuevo_plato = malloc(sizeof(t_para_nuevo_plato));
-			nuevo_plato->nombre_plato = plato->comida;
+			nuevo_plato->nombre_plato = string_duplicate(plato->comida);
 			nuevo_plato->id_pedido = datos_para_confirmar->id_pedido;
 			agregar_interrupcion(NUEVO_PLATO, nuevo_plato);}}
 
@@ -90,13 +102,14 @@ static t_respuesta* confirmar_pedido(t_datos_pedido* datos_para_confirmar)
 	list_iterate(datos_pedido->platos, &empezar_pedido);
 
 	agendar_pedido(datos_para_confirmar->id_pedido, datos_pedido);
+	destruir_estado_pedido(datos_pedido);
 	return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) true, false);
 }
 
-static t_respuesta* consultar_pedido(t_datos_pedido* datos_para_confirmar)
+static t_respuesta* consultar_pedido(int id_pedido)
 {
 
-	t_datos_estado_pedido* datos_pedido = cliente_enviar_mensaje(cliente_sind, OBTENER_PEDIDO, crear_datos_pedido(datos_para_confirmar->id_pedido, nombre_restaurante));
+	t_datos_estado_pedido* datos_pedido = cliente_enviar_mensaje(cliente_sind, OBTENER_PEDIDO, crear_datos_pedido(id_pedido, nombre_restaurante));
 
 	return respuesta_crear(CONSULTAR_PEDIDO_RESPUESTA, crear_datos_consultar_pedido(nombre_restaurante, datos_pedido->estado, datos_pedido->platos), false);
 }
@@ -121,6 +134,7 @@ void cargar_interfaz()
 	serializacion_inicializar();
 
 	servidor_agregar_operacion(servidor, HANDSHAKE_CLIENTE, &handshake_cliente);
+	servidor_agregar_operacion(servidor, CONEXION_CLIENTE, &conexion_cliente);
 	servidor_agregar_operacion(servidor, CONSULTAR_PLATOS, &consultar_platos);
 	servidor_agregar_operacion(servidor, CREAR_PEDIDO, &crear_pedido);
 	servidor_agregar_operacion(servidor, AGREGAR_PLATO, &agregar_plato);
@@ -129,4 +143,3 @@ void cargar_interfaz()
 	servidor_agregar_operacion(servidor, FINALIZAR_PEDIDO, &finalizar_pedido);
 
 }
-

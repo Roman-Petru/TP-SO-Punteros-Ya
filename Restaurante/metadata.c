@@ -1,6 +1,8 @@
 #include "metadata.h"
 
 pthread_mutex_t mutex_pedidos;
+t_list* clientes_conectados;
+pthread_mutex_t mutex_clientes;
 
 static bool esta_en_lista_afinidad(char* afinidad)
 {
@@ -27,7 +29,9 @@ void obtener_metadata()
 {
 
 	lista_pedidos = list_create();
+	clientes_conectados = list_create();
 	pthread_mutex_init(&(mutex_pedidos), NULL);
+	pthread_mutex_init(&(mutex_clientes), NULL);
 	void* op_ok = cliente_enviar_mensaje(cliente_sind, HANDSHAKE_RESTO_SIND, NULL);
 	while (op_ok == NULL)
 		{log_info(logger_resto, "Fallo el handshake con el sindicato, se intentara reconectar en 5 segundos");
@@ -111,6 +115,71 @@ bool obtener_recetas(t_list* platos)
 	return true;
 }
 
+void agregar_cliente(t_datos_cliente* datos)
+{
+
+	t_cliente_conectado* cliente = malloc(sizeof(t_cliente_conectado));
+	cliente->pedidos = list_create();
+	size_t tam = strlen(datos->id_cliente)+1;
+	cliente->id = malloc(tam);
+	memcpy(cliente->id, datos->id_cliente, tam);
+
+	tam = strlen(datos->IP)+1;
+	char* IP = malloc(tam);
+	memcpy(IP, datos->IP, tam);
+
+	tam = strlen(datos->Puerto)+1;
+	char* Puerto = malloc(tam);
+	memcpy(Puerto, datos->Puerto, tam);
+
+	cliente->cliente = cliente_crear(IP, Puerto);
+	pthread_mutex_lock(&mutex_clientes);
+	list_add(clientes_conectados, cliente);
+	pthread_mutex_unlock(&mutex_clientes);
+}
+
+
+static int cliente_index(char* id_cliente)
+{
+	if(id_cliente == NULL)
+		return -1;
+
+	int index;
+	bool encontro = false;
+	bool es_mismo_cliente(void* cliente) { return strcmp(((t_cliente_conectado*) cliente)->id, id_cliente)== 0; }
+
+	for(index = 0; !encontro && list_get(clientes_conectados, index) != NULL; index++)
+		encontro = es_mismo_cliente(list_get(clientes_conectados, index));
+
+	return encontro ? index-1 : -1;
+}
+
+void cliente_agregar_pedido(char* id_cliente, int id_pedido)
+{
+	pthread_mutex_lock(&mutex_clientes);
+	t_cliente_conectado* cliente = list_get(clientes_conectados, cliente_index(id_cliente));
+	list_add(cliente->pedidos, (void*) id_pedido);
+	pthread_mutex_unlock(&mutex_clientes);
+}
+
+t_cliente_red* conseguir_cliente_pedido(int id_pedido)
+{
+	pthread_mutex_lock(&mutex_clientes);
+	bool encontro = false;
+	int i;
+	for (i=0; i<list_size(clientes_conectados) && !encontro;i++)
+		{t_cliente_conectado* cliente = list_get(clientes_conectados, i);
+		for (int j=0; j<list_size(cliente->pedidos);j++)
+			{
+			int id_pivot = (int) list_get(cliente->pedidos, j);
+			if (id_pivot == id_pedido)
+				encontro = true;
+			}
+		}
+	pthread_mutex_unlock(&mutex_clientes);
+	t_cliente_conectado* cliente = list_get(clientes_conectados, i-1);
+	return cliente->cliente;
+}
 
 
 void agendar_pedido(int id_pedido, t_datos_estado_pedido* estado_pedido)

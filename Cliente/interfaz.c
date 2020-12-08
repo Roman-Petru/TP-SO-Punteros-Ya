@@ -46,6 +46,12 @@ void handshake()
 		op_ok = cliente_enviar_mensaje(cliente, CONEXION_CLIENTE, datos);
 	}
 
+	if(modulo == RESTAURANTE)
+	{
+		t_datos_cliente* datos = crear_datos_cliente(config_get_string_value(config, "ID_CLIENTE"), posicion_crear(config_get_int_value(config, "POSICION_X"), config_get_int_value(config, "POSICION_Y")), config_get_string_value(config, "IP_SERVIDOR"), config_get_string_value(config, "PUERTO_ESCUCHA"));
+		op_ok = cliente_enviar_mensaje(cliente, CONEXION_CLIENTE, datos);
+	}
+
 	if(modulo == MODULO_ERROR || !op_ok)
 		{consola_log(consola, "Error al realizar el handshake, se intentara reconectar en 5 segundos");
 		sleep(5);
