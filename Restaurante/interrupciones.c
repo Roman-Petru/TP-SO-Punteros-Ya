@@ -16,11 +16,10 @@ static t_datos_interrupcion* interrupcion_crear(t_tipo_interrupcion tipo, void* 
 	return interrupcion;
 }
 
-/*static void interrupcion_destruir(t_datos_interrupcion* interrupcion)
+static void interrupcion_destruir(t_datos_interrupcion* interrupcion)
 {
-	free(interrupcion->datos);
 	free(interrupcion);
-}*/
+}
 
 static void ejecutar_interrupcion(t_datos_interrupcion* interrupcion)
 {
@@ -41,14 +40,15 @@ void ejecutar_interrupciones()
 		return;
 	list_sort(interrupciones, (void*) &ordenar_interrupciones);
 	list_iterate(interrupciones, (void*) &ejecutar_interrupcion);
-	//list_clean_and_destroy_elements(interrupciones, (void*) &interrupcion_destruir);
-	list_clean(interrupciones);
+	list_clean_and_destroy_elements(interrupciones, (void*) &interrupcion_destruir);
+	//list_clean(interrupciones);
 }
 
 //========== INTERRUPCIONES ==========//
 void interrupcion_nuevo_plato(t_para_nuevo_plato* datos)
 {
 	crear_plato(datos->nombre_plato, datos->id_pedido);
+	free(datos);
 }
 
 void interrupcion_terminar_resto(void* null) { terminar(); }

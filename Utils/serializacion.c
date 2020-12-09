@@ -446,7 +446,9 @@ static void* deserializar_estado_pedido(t_buffer* buffer)
 		list_add(platos, crear_datos_estado_comida(comida, total, lista));
 		}
 
-	return crear_datos_estado_pedido(*estado_pedido, platos);
+	t_estado_pedido aux_estado = *estado_pedido;
+	free(estado_pedido);
+	return crear_datos_estado_pedido(aux_estado, platos);
 }
 
 
@@ -467,7 +469,9 @@ static void* deserializar_consultar_pedido(t_buffer* buffer)
 		list_add(platos, crear_datos_estado_comida(comida, total, lista));
 		}
 
-	return crear_datos_consultar_pedido(restaurante, *estado_pedido, platos);
+	t_estado_pedido aux_estado = *estado_pedido;
+	free(estado_pedido);
+	return crear_datos_consultar_pedido(restaurante, aux_estado, platos);
 }
 
 static void* deserializar_handshake_restaurante_app(t_buffer* buffer)
@@ -535,9 +539,9 @@ void destruir_consultar_pedido(void* datos_void)
 {
 	t_consultar_pedido* datos = datos_void;
 
-	void destruir_platos (void* platos) { free(((t_datos_estado_comida*) platos)->comida);free(platos);}
+	//void destruir_platos (void* platos) { free(((t_datos_estado_comida*) platos)->comida);free(platos);}
 
-	list_destroy_and_destroy_elements(datos->platos, &destruir_platos);
+	list_destroy_and_destroy_elements(datos->platos, &free);
 	free(datos->restaurante);
 	free(datos);
 }
@@ -582,7 +586,7 @@ void destruir_estado_pedido(void* datos_void)
 	void destruir_platos (void* platos) { free(((t_datos_estado_comida*) platos)->comida);free(platos);}
 
 	list_destroy_and_destroy_elements(datos_estado_pedido->platos, &destruir_platos);
-	free(datos_void);
+	free(datos_estado_pedido);
 }
 
 static void sin_free() { }

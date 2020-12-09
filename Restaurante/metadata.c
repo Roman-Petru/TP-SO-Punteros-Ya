@@ -49,7 +49,7 @@ void obtener_metadata()
 	indice_id_pedido = (config_get_int_value(config_resto, "PUERTO_ESCUCHA")-5000)*1000+datos_restaurante->cantidad_pedidos+1;
 	cantidad_hornos = datos_restaurante->cantidad_hornos;
 	posicion = posicion_crear(datos_restaurante->posicion->x, datos_restaurante->posicion->y);
-
+	free(datos_restaurante->posicion);
 
 	lista_afinidades = list_create();
 
@@ -83,6 +83,7 @@ void obtener_metadata()
 			list_add(lista_platos, plato_del_resto);
 		}
 
+	list_destroy_and_destroy_elements(datos_restaurante->lista_precios, &free);
 	free(datos_restaurante);
 
 }
@@ -105,11 +106,13 @@ bool obtener_recetas(t_list* platos)
 		char* dup = string_duplicate(comida->comida);
 		t_obtener_receta* pasos_receta = cliente_enviar_mensaje(cliente_sind, OBTENER_RECETA, comida->comida);
 		if (list_is_empty(pasos_receta->pasos))
-			return false;
+			{free(dup);
+			return false;}
 
 
 		dictionary_put(diccionario_recetas, dup, pasos_receta->pasos);
-
+		free(dup);
+		free(pasos_receta);
 	}
 
 	return true;
