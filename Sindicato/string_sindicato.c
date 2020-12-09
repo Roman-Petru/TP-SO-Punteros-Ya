@@ -12,6 +12,14 @@ char* remover_corchetes (char* string)
 	return nuevo_string;
 }
 
+void destruir_pedido_sind(t_pedido_sind* pedido_sind)
+{
+	void destruir_plato (void* plato) { free(((t_datos_estado_comida*) plato)->comida);free(plato);}
+	list_destroy_and_destroy_elements(pedido_sind->platos, &destruir_plato);
+	//list_destroy(pedido_sind->platos);
+	free(pedido_sind->estado);
+	free(pedido_sind);
+}
 
 static t_datos_estado_comida* cargar_estado_plato(char* plato, char* cant_platos, char* cant_lista)
 {
@@ -40,8 +48,10 @@ t_pedido_sind* desglosar_pedido (char* pedido_en_string)
 
 
 	for (int i=0; lista_platos[i] != NULL; i++)
-		{t_datos_estado_comida* estado_comida = cargar_estado_plato(string_duplicate(lista_platos[i]), cant_platos[i], cant_lista[i]);
+		{char* comida_aux = string_duplicate(lista_platos[i]);
+		t_datos_estado_comida* estado_comida = cargar_estado_plato(comida_aux, cant_platos[i], cant_lista[i]);
 		list_add(pedido_sind->platos, estado_comida);
+		free(lista_platos[i]);
 		}
 
 	free(lista_platos);
@@ -77,6 +87,7 @@ t_obtener_receta* desglosar_receta (char* receta_en_string)
 	for (int i=0; operacion[i] != NULL; i++)
 		{t_paso* paso = cargar_pasito(string_duplicate(operacion[i]), tiempo_operacion[i]);
 		list_add(receta->pasos, paso);
+		free(operacion[i]);
 		}
 
 	free(operacion);
@@ -105,8 +116,9 @@ t_obtener_restaurante* desglosar_resto (char* resto_en_string, int cant_pedidos)
 	char** afinidad = config_string_get_array_value(string_config, "AFINIDAD_COCINEROS");
 
 	for (int i=0; afinidad[i] != NULL; i++)
-		{char* afi = afinidad[i];
-		list_add(resto->lista_afinidades, afi);	}
+		{char* afi = string_duplicate(afinidad[i]);
+		list_add(resto->lista_afinidades, afi);
+		free(afinidad[i]);}
 
 	resto->lista_precios = list_create();
 
@@ -115,7 +127,8 @@ t_obtener_restaurante* desglosar_resto (char* resto_en_string, int cant_pedidos)
 
 	for (int i=0; platos[i] != NULL; i++)
 		{t_precio* precio = cargar_precio(string_duplicate(platos[i]), precio_platos[i]);
-		list_add(resto->lista_precios, precio);	}
+		list_add(resto->lista_precios, precio);
+		free(platos[i]);}
 
 	resto->cantidad_cocineros = config_string_get_int_value(string_config, "CANTIDAD_COCINEROS");
 	resto->cantidad_hornos = config_string_get_int_value(string_config, "CANTIDAD_HORNOS");
@@ -125,10 +138,11 @@ t_obtener_restaurante* desglosar_resto (char* resto_en_string, int cant_pedidos)
 	resto->posicion = posicion_crear(strtol(posiciones[0], NULL, 10), strtol(posiciones[1], NULL, 10));
 	resto->cantidad_pedidos = cant_pedidos;
 
-
-//	free(platos); free(afinidad);
+	free(afinidad);
+	free(platos);
 	free(precio_platos);
-//	free(posiciones);free(posiciones[0]);free(posiciones[1]);
+	free(posiciones[0]);free(posiciones[1]);
+	free(posiciones);
 
 	config_string_destroy(string_config);
 	return resto;
@@ -145,10 +159,12 @@ t_list* desglosar_platos (char* resto_en_string)
 
 
 	for (int i=0; platos[i] != NULL; i++)
-		{char* plato = platos[i];
-		list_add(lista_platos, plato);	}
+		{char* plato = string_duplicate(platos[i]);
+		list_add(lista_platos, plato);
+		free(platos[i]);}
 
 	config_string_destroy(string_config);
+	free(platos);
 	return lista_platos;
 }
 
@@ -162,9 +178,13 @@ int obtener_precio(char* resto_en_string, char* comida)
 	char** precio_platos = config_string_get_array_value(string_config, "PRECIO_PLATOS");
 
 	for (int i=0; platos[i] != NULL; i++)
-		if (string_equals_ignore_case(comida, platos[i]))
+		{if (string_equals_ignore_case(comida, platos[i]))
 			precio = strtol(precio_platos[i], NULL, 10);
+		free(platos[i]);
+		free(precio_platos[i]);}
 
+	free(platos);
+	free(precio_platos);
 	config_string_destroy(string_config);
 	return precio;
 }
@@ -175,7 +195,8 @@ bool string_confirmar_pedido(t_pedido_sind* pedido_sind)
 			{log_info(logger, "No se pudo confirmar el pedido ya que no estaba en estado pendiente");
 			return false;	}
 
-	pedido_sind->estado = "Confirmado";
+	free(pedido_sind->estado);
+	pedido_sind->estado = string_duplicate("Confirmado");
 	return true;
 }
 
@@ -185,7 +206,8 @@ bool string_terminar_pedido(t_pedido_sind* pedido_sind)
 			{log_info(logger, "No se pudo terminar el pedido ya que no estaba en estado confirmado");
 			return false;	}
 
-	pedido_sind->estado = "Terminado";
+	free(pedido_sind->estado);
+	pedido_sind->estado = string_duplicate("Terminado");
 	return true;
 }
 
@@ -208,7 +230,7 @@ bool string_guardar_plato(t_pedido_sind* pedido_sind, t_guardar_plato* datos_a_g
 		list_iterate(pedido_sind->platos, &encontrar_y_agregar_plato);
 
 	if (!encontro)
-		{t_datos_estado_comida* estado_comida = crear_datos_estado_comida(datos_a_guardar->comida, datos_a_guardar->cantidad, 0);
+		{t_datos_estado_comida* estado_comida = crear_datos_estado_comida(string_duplicate(datos_a_guardar->comida), datos_a_guardar->cantidad, 0);
 		list_add(pedido_sind->platos, estado_comida);
 		}
 
@@ -217,7 +239,9 @@ bool string_guardar_plato(t_pedido_sind* pedido_sind, t_guardar_plato* datos_a_g
 	string_append(&nodo_resto, "/Info.AFIP");
 
 	t_datos_para_guardar* datos_para_guardar = leer_de_bloques(nodo_resto);
+	free(nodo_resto);
 	pedido_sind->precio += obtener_precio(datos_para_guardar->data, datos_a_guardar->comida)*datos_a_guardar->cantidad;
+	destruir_datos_para_guardar(datos_para_guardar);
 
 	return true;
 }
@@ -255,7 +279,7 @@ bool string_plato_listo(t_pedido_sind* pedido_sind, t_guardar_plato* datos_a_gua
 	return true;
 }
 
-char* armar_string_pedido(t_pedido_sind* pedido_sind)
+void armar_string_pedido(t_pedido_sind* pedido_sind, t_datos_para_guardar* data)
 {
 	char* nuevo_string = string_new();
 	string_append(&nuevo_string, "ESTADO_PEDIDO=");
@@ -290,12 +314,19 @@ char* armar_string_pedido(t_pedido_sind* pedido_sind)
 	string_append(&nuevo_string, string_cant_lista);
 	string_append(&nuevo_string, "]\nPRECIO_TOTAL=");
 
+
 	char* aux = string_itoa(pedido_sind->precio);
 	string_append(&nuevo_string, aux);
+	free(string_platos);
+	free(string_cant_total);
+	free(string_cant_lista);
 	free(aux);
 
-	//destruir estructura?
-	return nuevo_string;
+
+	free(data->data);
+	data->data = nuevo_string;
+
+	return;
 }
 
 
@@ -305,11 +336,11 @@ bool mod_string_guardar_plato(t_datos_para_guardar* datos_para_bloques, t_guarda
 
 	bool op_ok = string_guardar_plato(pedido_sind, datos_a_guardar);
 		if (!op_ok)
-			return false;
+		{destruir_pedido_sind(pedido_sind);
+			return false;}
 
-
-	datos_para_bloques->data = armar_string_pedido(pedido_sind);
-
+	armar_string_pedido(pedido_sind, datos_para_bloques);
+	destruir_pedido_sind(pedido_sind);
 
 	int bloques_extra = (strlen(datos_para_bloques->data)/(metadata->block_size-4)-list_size(datos_para_bloques->bloques_siguientes));
 
@@ -326,11 +357,12 @@ bool mod_string_confirmar_pedido(t_datos_para_guardar* datos_para_bloques)
 
 	bool op_ok = string_confirmar_pedido(pedido_sind);
 		if (!op_ok)
-			return false;
+		{destruir_pedido_sind(pedido_sind);
+			return false;}
 
 
-
-	datos_para_bloques->data = armar_string_pedido(pedido_sind);
+	armar_string_pedido(pedido_sind, datos_para_bloques);
+	destruir_pedido_sind(pedido_sind);
 
 	op_ok = (cantidad_bloques_libres()>=(strlen(datos_para_bloques->data)/(metadata->block_size-4)-list_size(datos_para_bloques->bloques_siguientes)));
 		if (!op_ok)
@@ -347,11 +379,12 @@ bool mod_string_plato_listo(t_datos_para_guardar* datos_para_bloques, t_guardar_
 
 	bool op_ok = string_plato_listo(pedido_sind, datos_a_guardar);
 		if (!op_ok)
-			return false;
+		{destruir_pedido_sind(pedido_sind);
+			return false;}
 
 
-
-	datos_para_bloques->data = armar_string_pedido(pedido_sind);
+	armar_string_pedido(pedido_sind, datos_para_bloques);
+	destruir_pedido_sind(pedido_sind);
 
 	op_ok = (cantidad_bloques_libres()>=(strlen(datos_para_bloques->data)/(metadata->block_size-4)-list_size(datos_para_bloques->bloques_siguientes)));
 		if (!op_ok)
@@ -366,12 +399,13 @@ bool mod_string_terminar_pedido(t_datos_para_guardar* datos_para_bloques)
 	t_pedido_sind* pedido_sind = desglosar_pedido (datos_para_bloques->data);
 
 	bool op_ok = string_terminar_pedido(pedido_sind);
-		if (!op_ok)		return false;
+		if (!op_ok)
+		{destruir_pedido_sind(pedido_sind);
+			return false;}
 
 
-
-	datos_para_bloques->data = armar_string_pedido(pedido_sind);
-
+	armar_string_pedido(pedido_sind, datos_para_bloques);
+	destruir_pedido_sind(pedido_sind);
 
 	op_ok = (cantidad_bloques_libres()>=(strlen(datos_para_bloques->data)/(metadata->block_size-4)-list_size(datos_para_bloques->bloques_siguientes)));
 		if (!op_ok)

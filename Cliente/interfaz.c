@@ -105,6 +105,11 @@ static void consultar_platos()
 
 	t_list* platos = cliente_enviar_mensaje(cliente, CONSULTAR_PLATOS, restaurante_seleccionado);
 
+	if (list_is_empty(platos))
+		{consola_log(consola, "No existe el restaurante seleccionado o no tiene platos");
+		list_destroy(platos);
+		return;	}
+
 	consola_log(consola, "Platos: ");
 
 	void loggear_restaurante(void* plato) { consola_log(consola, plato); }
@@ -304,8 +309,6 @@ static void obtener_receta()
 	if (modulo != SINDICATO)
 	{consola_log(consola, "El modulo no entiende este mensaje");
 	return;}
-
-	restaurante_seleccionado = consola_leer("Ingrese el nombre del restaurante: ");
 
 	char* receta = consola_leer("Ingrese el nombre de la receta a obtener: ");
 

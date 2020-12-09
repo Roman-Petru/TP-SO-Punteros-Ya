@@ -71,11 +71,13 @@ int reservar_bloque(char* path_archivo)
 
 	if (!encontro)
 		{
-		int fd = open(obtener_path_bitmap(), O_RDWR, S_IRUSR | S_IWUSR);
+		char* path_bitm = obtener_path_bitmap();
+		int fd = open(path_bitm, O_RDWR, S_IRUSR | S_IWUSR);
 		void* bit_array_aux = mmap(NULL, mapa_bits->size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 		memcpy(bit_array_aux, mapa_bits->bitarray, mapa_bits->size);
 		munmap(bit_array_aux, mapa_bits->size);
 		close(fd);
+		free(path_bitm);
 		log_info(logger, "Se asigno el bloque %d para el archivo %s", index-1, path_archivo);
 		}
 
@@ -93,12 +95,14 @@ void guardar_data_en_bloques(t_datos_para_guardar* datos_a_guardar, char* path_a
 {
 
 	modificar_tamanio_real(path_archivo, strlen(datos_a_guardar->data));
+//	char* aux_para_free = datos_a_guardar->data;
 	int bloque_extra = 0;
 	if (strlen(datos_a_guardar->data)%(metadata->block_size-4) != 0)
 		bloque_extra = 1;
 
 	int bloques_necesarios = strlen(datos_a_guardar->data)/(metadata->block_size-4)+bloque_extra;
 	int numero_bloque_sig = datos_a_guardar->bloque_inicial;
+	void* puntero_aux = datos_a_guardar->data;
 
 	for(int i=0; i<bloques_necesarios;i++)
 		{
@@ -107,11 +111,13 @@ void guardar_data_en_bloques(t_datos_para_guardar* datos_a_guardar, char* path_a
 		int arch_bloque = open(path_bloque, O_RDWR, S_IRWXU | S_IRWXG);
 		posix_fallocate(arch_bloque, 0, metadata->block_size);
 		void* archivo_en_memoria = mmap(NULL, metadata->block_size, PROT_READ | PROT_WRITE, MAP_SHARED, arch_bloque, 0);
-		memcpy(archivo_en_memoria, datos_a_guardar->data, metadata->block_size-4);
+		memcpy(archivo_en_memoria, puntero_aux, metadata->block_size-4);
 		log_info(logger, "Se escribio en el bloque %d", numero_bloque_sig);
 
+
 		if (bloques_necesarios > i+1)
-			{datos_a_guardar->data = datos_a_guardar->data + metadata->block_size-4;
+			{//munmap(datos_a_guardar->data, metadata->block_size-4);
+			puntero_aux = puntero_aux + metadata->block_size-4;
 //======================BUSCO BLOQUE SIGUIENTE O RESERVO NUEVO SI NO HAY==========================//
 			if (!list_is_empty(datos_a_guardar->bloques_siguientes))
 				{int* aux = list_remove(datos_a_guardar->bloques_siguientes, 0);
@@ -121,10 +127,9 @@ void guardar_data_en_bloques(t_datos_para_guardar* datos_a_guardar, char* path_a
 //======================GUARDO PUNTERO AL SIG BLOQUE EN EL BLOQUE==========================//
 			if (numero_bloque_sig >= 0){
 				void* puntero_a_numero = archivo_en_memoria + metadata->block_size - 4;
-				//*puntero_a_numero = numero_bloque_sig;
 				memcpy(puntero_a_numero, &numero_bloque_sig, 4);
 				munmap(puntero_a_numero, 4);} else {log_info(logger, "No hay mas bloques disponibles");
-			}	}
+			}	} //else {munmap(datos_a_guardar->data, metadata->block_size-4);}
 
 
 		munmap(archivo_en_memoria, metadata->block_size);
@@ -132,7 +137,7 @@ void guardar_data_en_bloques(t_datos_para_guardar* datos_a_guardar, char* path_a
 		close(arch_bloque);
 		}
 
-	//free(data);
+	//free(aux_para_free);
 }
 
 
@@ -164,7 +169,7 @@ t_datos_para_guardar* leer_de_bloques(char* path)
 		char* path_bloque = obtener_path_bloque(*numero_bloque_sig);
 		int arch_bloque = open(path_bloque, O_RDONLY, S_IRWXU | S_IRWXG);
 		void* archivo_en_memoria = mmap(NULL, metadata->block_size, PROT_READ, MAP_SHARED, arch_bloque, 0);
-	//	char* aux = string_new();
+		free(path_bloque);
 
 		int cantidad_a_copiar;
 
@@ -183,7 +188,8 @@ t_datos_para_guardar* leer_de_bloques(char* path)
 
 		if (add_end_string)
 			{char* end_string = string_new();
-			memcpy(datos_para_guardar->data+(numero_a_reallocar-1), end_string, 1);}
+			memcpy(datos_para_guardar->data+(numero_a_reallocar-1), end_string, 1);
+			free(end_string);}
 
 		//string_append_sin_mas_uno(&(datos_para_guardar->data), aux);
 		//log_info(logger, "%s", aux);
@@ -193,7 +199,7 @@ t_datos_para_guardar* leer_de_bloques(char* path)
 			//memcpy(&numero_bloque_sig, puntero_a_numero, 4);
 			numero_bloque_sig = malloc(sizeof(int));
 			*numero_bloque_sig = *puntero_a_numero;
-			list_add(datos_para_guardar->bloques_siguientes, numero_bloque_sig);	}
+			list_add(datos_para_guardar->bloques_siguientes, numero_bloque_sig);}
 
 		munmap(archivo_en_memoria, metadata->block_size);
 		close(arch_bloque);
@@ -203,7 +209,11 @@ t_datos_para_guardar* leer_de_bloques(char* path)
 }
 
 
-
-
+void destruir_datos_para_guardar (t_datos_para_guardar* datos)
+{
+	list_destroy_and_destroy_elements(datos->bloques_siguientes, &free);
+	free(datos->data);
+	free(datos);
+}
 
 

@@ -59,7 +59,9 @@ char* obtener_nodo_restaurantes()
 char* obtener_nodo_restaurante_especifico(char* restaurante)
 {
 	char* nodo = string_new();
-	string_append(&nodo, obtener_nodo_restaurantes());
+	char* nodo_resto = obtener_nodo_restaurantes();
+	string_append(&nodo, nodo_resto);
+	free(nodo_resto);
 	string_append(&nodo,"/");
 	string_append(&nodo,restaurante);
 

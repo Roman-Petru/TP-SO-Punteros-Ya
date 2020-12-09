@@ -49,7 +49,8 @@ void inicializar_metadata()
 		{log_info(logger, "Se detecto un MAGIC NUMBER que no es AFIP, cerrando sindicato");
 		exit(0);}
 
-	free(aux[0]); free(aux[1]); free(aux);
+	free(aux[0]); free(aux[1]); free(aux[2]); free(aux);
+
 	munmap(metadata_char, 200);
 	close(fd);
 
@@ -58,8 +59,8 @@ void inicializar_metadata()
 	pthread_mutex_init(&mutex_mapa_bit, NULL);
 	if (!existe_archivo(bitm)) crear_bitmap(bitm);
 	else {
-
-		int fd = open(obtener_path_bitmap(), O_RDONLY, S_IRUSR | S_IWUSR);
+		char* path_bitm = obtener_path_bitmap();
+		int fd = open(path_bitm, O_RDONLY, S_IRUSR | S_IWUSR);
 			char* bit_array_aux = mmap(NULL, metadata->blocks/8, PROT_READ, MAP_PRIVATE, fd, 0);
 
 			char* para_mapa = calloc(1,metadata->blocks/8);
@@ -67,11 +68,15 @@ void inicializar_metadata()
 			memcpy(para_mapa, bit_array_aux, metadata->blocks/8);
 			munmap(bit_array_aux, metadata->blocks/8);
 			close(fd);
+			free(path_bitm);
 
 			mapa_bits = bitarray_create_with_mode(para_mapa, metadata->blocks/8, LSB_FIRST);
 
 
 		}
+
+	free(bitm);
+	free(meta);
 
 }
 

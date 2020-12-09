@@ -27,7 +27,7 @@ t_config_string *config_string_create(char* buffer) {
 	string_iterate_lines(lines, (void*) free);
 
 	free(lines);
-	free(buffer);
+	//free(buffer);
 
 
 	return config;

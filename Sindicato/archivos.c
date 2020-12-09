@@ -76,9 +76,11 @@ bool receta_existe(char* receta)
 			if (string_equals_ignore_case(entry->d_name, dupli))
 				encontro = true;
 		}}
-	free(nodo); //free(dup);
+
 	closedir(dir);
 
+	free(nodo);
+	free(dupli);
 	return encontro;
 }
 int obtener_cantidad_pedidos(char* path_resto)
@@ -95,7 +97,6 @@ int obtener_cantidad_pedidos(char* path_resto)
 				if (entry->d_type == DT_REG)
 					cant_pedidos++;
 			}}
-		//free(dup);
 		closedir(dir);
 
 		return cant_pedidos-1;
@@ -144,6 +145,7 @@ char* crear_string_archivo_info(int size_arch, uint32_t bloque_inicial)
 	string_append(&datos_archivo_info, "\nINITIAL_BLOCK=");
 	char* string_bloque = string_itoa(bloque_inicial);
 	string_append(&datos_archivo_info, string_bloque);
+	free(string_bloque);
 
 	free (size);
 	return datos_archivo_info;
@@ -154,13 +156,14 @@ bool crear_archivo_pedido(char* nodo_resto, int id_pedido)
 	char* nombre_arch_pedido = string_new();
 	string_append(&nombre_arch_pedido, nodo_resto);
 	string_append(&nombre_arch_pedido, "/");
-	string_append(&nombre_arch_pedido, armar_string_arch_pedido(id_pedido));
+	char* string_arch_pedido = armar_string_arch_pedido(id_pedido);
+	string_append(&nombre_arch_pedido, string_arch_pedido);
+	free(string_arch_pedido);
 
 
 
 
-
-	char* datos_archivo_a_bloques = "ESTADO_PEDIDO=Pendiente\nLISTA_PLATOS=[]\nCANTIDAD_PLATOS=[]\nCANTIDAD_LISTA=[]\nPRECIO_TOTAL=0";
+	char* datos_archivo_a_bloques = string_duplicate("ESTADO_PEDIDO=Pendiente\nLISTA_PLATOS=[]\nCANTIDAD_PLATOS=[]\nCANTIDAD_LISTA=[]\nPRECIO_TOTAL=0");
 
 	bool op_ok = (cantidad_bloques_libres()>=(strlen(datos_archivo_a_bloques)/(metadata->block_size-4))+1);
 		if (!op_ok)
@@ -189,6 +192,7 @@ bool crear_archivo_pedido(char* nodo_resto, int id_pedido)
 
 	guardar_data_en_bloques(datos, nombre_arch_pedido);
 	free(nombre_arch_pedido);
+	destruir_datos_para_guardar(datos);
 	log_info(logger, "Se creo un nuevo archivo de pedido");
 	return true;
 }

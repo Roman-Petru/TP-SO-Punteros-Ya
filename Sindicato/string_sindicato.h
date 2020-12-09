@@ -16,6 +16,7 @@ typedef struct {
 	int precio;
 }t_pedido_sind;
 
+void destruir_pedido_sind(t_pedido_sind* pedido_sind);
 t_obtener_restaurante* desglosar_resto (char* resto_en_string, int cant_pedidos);
 t_list* desglosar_platos (char* resto_en_string);
 t_obtener_receta* desglosar_receta (char* receta_en_string);

@@ -27,11 +27,19 @@ static t_buffer* serializar_string(void* datos)
 static t_buffer* serializar_lista_string(void* datos)
 {
 	t_list* lista = datos;
+
+	if(list_is_empty(lista))
+		{t_buffer* buffer = buffer_crear(sizeof(uint32_t));
+		buffer_serializar_int(buffer, 0);
+		return buffer;}
+
 	size_t tamanio = sizeof(size_t)*list_size(lista);
 	void sumar_len_string(void* string)	{ tamanio = tamanio + strlen(string); }
 	list_iterate(lista, &sumar_len_string);
 
-	t_buffer* buffer = buffer_crear(tamanio);
+	t_buffer* buffer = buffer_crear(tamanio+sizeof(uint32_t));
+	buffer_serializar_int(buffer, list_size(lista));
+
 	void serializar_lista(void* string) { buffer_serializar_string(buffer, string); }
 	list_iterate(lista, &serializar_lista);
 
@@ -176,11 +184,10 @@ static t_buffer* serializar_estado_pedido(void* datos_void)
 	t_datos_estado_pedido* datos = datos_void;
 	uint32_t cantidad_platos = list_size(datos->platos);
 
-	char* nombre_plato(void* plato) { return ((t_datos_estado_comida*)plato)->comida;}
+	char* nombre_plato(void* plato) { return (strdup(((t_datos_estado_comida*)plato)->comida));}
 	t_list* lista_mapeada = list_map(datos->platos, (void*) &nombre_plato);
 
 	t_buffer* buffer = buffer_crear(sizeof(t_estado_pedido) + sizeof(uint32_t) + sizeof(uint32_t)*cantidad_platos*3 + tamanio_lista_string(lista_mapeada));
-	//destruir_lista_string(lista_mapeada);
 
 	buffer_serializar(buffer, &datos->estado, sizeof(t_estado_pedido));
 	buffer_serializar_int(buffer, cantidad_platos);
@@ -194,6 +201,7 @@ static t_buffer* serializar_estado_pedido(void* datos_void)
 		buffer_serializar_string(buffer, datos_estado_comida->comida);
 		}
 
+	destruir_lista_string(lista_mapeada);
 	return buffer;
 }
 
@@ -216,6 +224,7 @@ static t_buffer* serializar_obtener_receta(void* datos_void)
 		buffer_serializar_int(buffer, datos_paso->ciclos);
 		}
 
+	destruir_lista_string(lista_mapeada);
 	return buffer;
 }
 
@@ -253,6 +262,7 @@ static t_buffer* serializar_obtener_restaurante(void* datos_void)
 	buffer_serializar_int(buffer, datos->cantidad_hornos);
 	buffer_serializar_int(buffer, datos->cantidad_pedidos);
 
+	destruir_lista_string(lista_mapeada);
 	return buffer;
 }
 
@@ -292,6 +302,10 @@ static void* deserializar_string(t_buffer* buffer)
 static void* deserializar_lista_string(t_buffer* buffer)
 {
 	t_list* lista = list_create();
+	int tamanio_lista = buffer_deserializar_int(buffer);
+		if (tamanio_lista == 0)
+			return lista;
+
 	while(!buffer_leido(buffer))
 		list_add(lista, buffer_deserializar_string(buffer));
 
@@ -541,9 +555,21 @@ void destruir_obtener_receta(void* datos_void)
 {
 	t_obtener_receta* datos = datos_void;
 
-	void destruir_pasos (void* pasos) { free(((t_paso*) pasos)->operacion);free(pasos);}
+	//void destruir_pasos (void* pasos) { free(((t_paso*) pasos)->operacion);free(pasos);}
 
-	list_destroy_and_destroy_elements(datos->pasos, &destruir_pasos);
+	list_destroy_and_destroy_elements(datos->pasos, &free);
+	free(datos);
+}
+
+
+void destruir_obtener_restaurante(void* datos_void)
+{
+	t_obtener_restaurante* datos = datos_void;
+
+	free(datos->posicion);
+	//void destruir_precios (void* precio) { free(((t_precio*) precio)->nombre_plato);free(precio);}
+	list_destroy_and_destroy_elements(datos->lista_precios, &free);
+	list_destroy_and_destroy_elements(datos->lista_afinidades, &free);
 	free(datos);
 }
 
@@ -698,7 +724,7 @@ void diccionario_destrucciones_inicializar()
 	dictionary_int_put(diccionario_destrucciones, OBTENER_RECETA, &free);
 	dictionary_int_put(diccionario_destrucciones, OBTENER_RECETA_RESPUESTA, &destruir_obtener_receta);
 	dictionary_int_put(diccionario_destrucciones, OBTENER_RESTAURANTE, &free);
-	dictionary_int_put(diccionario_destrucciones, OBTENER_RESTAURANTE_RESPUESTA, &sin_free);//ver free
+	dictionary_int_put(diccionario_destrucciones, OBTENER_RESTAURANTE_RESPUESTA, &destruir_obtener_restaurante);
 	dictionary_int_put(diccionario_destrucciones, FINALIZAR_PEDIDO, &destruir_datos_pedido);
 	dictionary_int_put(diccionario_destrucciones, FINALIZAR_PEDIDO_CLIENTE, &sin_free);
 	dictionary_int_put(diccionario_destrucciones, FINALIZAR_PEDIDO_RESPUESTA, &sin_free);
@@ -725,6 +751,8 @@ void inicializar_diccionario_destruccion_respuestas()
 	dictionary_int_put(diccionario_destruccion_respuestas, CONSULTAR_PLATOS_RESPUESTA, &destruir_lista_string);
 	dictionary_int_put(diccionario_destruccion_respuestas, OBTENER_PEDIDO_RESPUESTA, &destruir_estado_pedido);
 	dictionary_int_put(diccionario_destruccion_respuestas, CONSULTAR_PEDIDO_RESPUESTA, &destruir_consultar_pedido);
+	dictionary_int_put(diccionario_destruccion_respuestas, OBTENER_RECETA_RESPUESTA, &destruir_obtener_receta);
+	dictionary_int_put(diccionario_destruccion_respuestas, OBTENER_RESTAURANTE_RESPUESTA, &destruir_obtener_restaurante);
 }
 
 void destruir_datos_respuesta(t_codigo_de_operacion codigo_de_operacion, void* datos)
