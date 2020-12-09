@@ -68,15 +68,16 @@ void escribir_marco_principal_guardar_plato(t_pagina* pagina, int cantidad_comid
 	pagina_modificada(pagina, marco_principal);
 }
 
-void escribir_marco_principal_plato_listo(t_pagina* pagina)
+bool escribir_marco_principal_plato_listo(t_pagina* pagina)
 {
 	t_marco* marco_principal = obtener_marco_principal(pagina->marco_principal);
 	if(pagina->comida_esta_lista)
 		{log_info(logger, "De esta comida ya estan listos todos los platos, no se puede pasar un plato listo");
-		return;}
+		return false;}
 	marco_principal->cantidad_lista = marco_principal->cantidad_lista + 1;
 	pagina->comida_esta_lista = marco_principal->cantidad_lista == marco_principal->cantidad_total;
 	pagina_modificada(pagina, marco_principal);
+	return true;
 }
 
 bool comida_esta_lista(t_pagina* pagina)
@@ -97,7 +98,7 @@ t_datos_estado_pedido* leer_pedido_memoria_principal(t_segmento* segmento_pedido
 
 		log_info(logger, "Se leyo el marco de memoria principal de posicion %d con nombre de plato %s, cantidad lista %d y cantidad total %d", pagina->marco_principal, marco_principal->nombre_plato, marco_principal->cantidad_lista, marco_principal->cantidad_total);
 
-		t_datos_estado_comida* estado_comida = crear_datos_estado_comida(marco_principal->nombre_plato, marco_principal->cantidad_total, marco_principal->cantidad_lista);
+		t_datos_estado_comida* estado_comida = crear_datos_estado_comida(strdup(marco_principal->nombre_plato), marco_principal->cantidad_total, marco_principal->cantidad_lista);
 
 		return 	estado_comida;}
 

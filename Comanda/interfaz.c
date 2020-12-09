@@ -24,18 +24,19 @@ static t_respuesta* guardar_plato(t_guardar_plato* datos)
 {
 	//Verificar si existe la tabla de segmentos de dicho Restaurante. En caso de no existir se deberá informar dicha situación.
 	if(!tabla_segmento_restaurante_existe(datos->restaurante))
-		return respuesta_crear(GUARDAR_PLATO_RESPUESTA, (void*) false, false);
+		{log_info(logger, "No existe la tabla de segmentos del restaurante");
+		return respuesta_crear(GUARDAR_PLATO_RESPUESTA, (void*) false, false);}
 
 	//Verificar que exista el segmento de dicho pedido dentro de la tabla de segmentos del Restaurante. En caso de no existir se deberá informar dicha situación.
 	if(!segmento_existe(datos->restaurante, datos->id_pedido))
-		return respuesta_crear(GUARDAR_PLATO_RESPUESTA, (void*) false, false);
+		{log_info(logger, "No existe el segmento del pedido dentro de la tabla de segmentos del Restaurante");
+		return respuesta_crear(GUARDAR_PLATO_RESPUESTA, (void*) false, false);}
 
 	t_segmento* segmento = obtener_segmento(datos->restaurante, datos->id_pedido);
 
 	if(segmento->estado != PENDIENTE)
 		return respuesta_crear(GUARDAR_PLATO_RESPUESTA, (void*) false, false);
 
-	//TODO tiene que leer los marcos para saber si esta el plato, no las paginas.
 	//Verificar si existe el plato dentro de la tabla de páginas del pedido. En caso contrario, se deberá asignar una nueva página al segmento.
 	pthread_mutex_lock(&(segmento->mutex_tabla_paginas));
 
@@ -72,11 +73,13 @@ static t_respuesta* obtener_pedido(t_datos_pedido* datos)
 {
 	//Verificar si existe la tabla de segmentos de dicho Restaurante. En caso de no existir se deberá informar dicha situación.
 	if(!tabla_segmento_restaurante_existe(datos->restaurante))
-		return respuesta_crear(OBTENER_PEDIDO_RESPUESTA, NULL, false);
+		{log_info(logger, "No existe la tabla de segmentos del restaurante");
+		return respuesta_crear(OBTENER_PEDIDO_RESPUESTA, NULL, false);}
 
 	//Verificar que exista el segmento de dicho pedido dentro de la tabla de segmentos del Restaurante. En caso de no existir se deberá informar dicha situación.
 	if(!segmento_existe(datos->restaurante, datos->id_pedido))
-		return respuesta_crear(OBTENER_PEDIDO_RESPUESTA, NULL, false);
+		{log_info(logger, "No existe el segmento del pedido dentro de la tabla de segmentos del Restaurante");
+		return respuesta_crear(OBTENER_PEDIDO_RESPUESTA, NULL, false);}
 
 	t_segmento* segmento = obtener_segmento(datos->restaurante, datos->id_pedido);
 
@@ -91,18 +94,20 @@ static t_respuesta* obtener_pedido(t_datos_pedido* datos)
 
 	t_datos_estado_pedido* datos_respuesta = leer_pedido_memoria_principal(segmento);
 
-	return respuesta_crear(OBTENER_PEDIDO_RESPUESTA, (void*) datos_respuesta, false);
+	return respuesta_crear(OBTENER_PEDIDO_RESPUESTA, (void*) datos_respuesta, true);
 }
 
 static t_respuesta* confirmar_pedido(t_datos_pedido* datos)
 {
 	//Verificar si existe la tabla de segmentos de dicho Restaurante. En caso de no existir se deberá informar dicha situación.
 	if(!tabla_segmento_restaurante_existe(datos->restaurante))
-		return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) false, false);
+		{log_info(logger, "No existe la tabla de segmentos del restaurante");
+		return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) false, false);}
 
 	//Verificar que exista el segmento de dicho pedido dentro de la tabla de segmentos del Restaurante. En caso de no existir se deberá informar dicha situación.
 	if(!segmento_existe(datos->restaurante, datos->id_pedido))
-		return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) false, false);
+		{log_info(logger, "No existe el segmento del pedido dentro de la tabla de segmentos del Restaurante");
+		return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) false, false);}
 
 	t_segmento* segmento = obtener_segmento(datos->restaurante, datos->id_pedido);
 	//Verificar que el pedido esté en estado “Pendiente”. En caso contrario se deberá informar dicha situación.
@@ -122,11 +127,13 @@ static t_respuesta* plato_listo(t_guardar_plato* datos)
 {
 	//Verificar si existe la tabla de segmentos de dicho Restaurante. En caso de no existir se deberá informar dicha situación.
 	if(!tabla_segmento_restaurante_existe(datos->restaurante))
-		return respuesta_crear(PLATO_LISTO_RESPUESTA, (void*) false, false);
+		{log_info(logger, "No existe la tabla de segmentos del restaurante");
+		return respuesta_crear(PLATO_LISTO_RESPUESTA, (void*) false, false);}
 
 	//Verificar que exista el segmento de dicho pedido dentro de la tabla de segmentos del Restaurante. En caso de no existir se deberá informar dicha situación.
 	if(!segmento_existe(datos->restaurante, datos->id_pedido))
-		return respuesta_crear(PLATO_LISTO_RESPUESTA, (void*) false, false);
+		{log_info(logger, "No existe el segmento del pedido dentro de la tabla de segmentos del Restaurante");
+		return respuesta_crear(PLATO_LISTO_RESPUESTA, (void*) false, false);}
 
 	t_segmento* segmento = obtener_segmento(datos->restaurante, datos->id_pedido);
 
@@ -135,7 +142,8 @@ static t_respuesta* plato_listo(t_guardar_plato* datos)
 
 	//Verificar que el pedido esté en estado “Confirmado”. En caso contrario se deberá informar dicha situación.
 	if(segmento->estado != CONFIRMADO)
-		return respuesta_crear(PLATO_LISTO_RESPUESTA, (void*) false, false);
+		{log_info(logger, "No se puede pasar a plato listo porque el pedido no esta en estado Confirmado");
+		return respuesta_crear(PLATO_LISTO_RESPUESTA, (void*) false, false);}
 
 	int numero_pagina = obtener_pagina_comida(segmento, datos->comida);
 	if(numero_pagina == -1)
@@ -149,7 +157,10 @@ static t_respuesta* plato_listo(t_guardar_plato* datos)
 
 	//Se deberá aumentar en uno la cantidad lista de ese plato. En caso de que todos los platos estén listos, se deberá cambiar el estado del pedido a “Terminado”.
 	if(op_ok)
-		escribir_marco_principal_plato_listo(pagina);
+		{bool escrito_ok = escribir_marco_principal_plato_listo(pagina);
+		if (!escrito_ok)
+			return respuesta_crear(PLATO_LISTO_RESPUESTA, (void*) false, false);
+		}
 	else
 		return respuesta_crear(PLATO_LISTO_RESPUESTA, (void*) false, false);
 
@@ -164,11 +175,13 @@ static t_respuesta* finalizar_pedido(t_datos_pedido* datos)
 {
 	//Verificar si existe la tabla de segmentos de dicho Restaurante. En caso de no existir se deberá informar dicha situación.
 	if(!tabla_segmento_restaurante_existe(datos->restaurante))
-			return respuesta_crear(FINALIZAR_PEDIDO_RESPUESTA, (void*) false, false);
+		{log_info(logger, "No existe la tabla de segmentos del restaurante");
+			return respuesta_crear(FINALIZAR_PEDIDO_RESPUESTA, (void*) false, false);}
 
 	//Verificar que exista el segmento de dicho pedido dentro de la tabla de segmentos del Restaurante. En caso de no existir se deberá informar dicha situación.
 	if(!segmento_existe(datos->restaurante, datos->id_pedido))
-		return respuesta_crear(FINALIZAR_PEDIDO_RESPUESTA, (void*) false, false);
+		{log_info(logger, "No existe el segmento del pedido dentro de la tabla de segmentos del Restaurante");
+		return respuesta_crear(FINALIZAR_PEDIDO_RESPUESTA, (void*) false, false);}
 
 	t_segmento* segmento = obtener_segmento(datos->restaurante, datos->id_pedido);
 

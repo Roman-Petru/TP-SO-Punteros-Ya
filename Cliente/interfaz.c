@@ -145,8 +145,9 @@ static void guardar_pedido()
 		return;
 
 	restaurante_seleccionado = consola_leer("Ingrese el nombre del restaurante: ");
-	char* id = consola_leer("Ingrese el id: ");
+	char* id = consola_leer("Ingrese el id del pedido: ");
 	id_pedido = strtol(id, NULL, 10);
+	free(id);
 
 	t_datos_pedido* datos = crear_datos_pedido(id_pedido, restaurante_seleccionado);
 
@@ -177,9 +178,13 @@ static void guardar_plato()
 	return;}
 
 
-	if(validar_pedido() && validar_restaurante())
+	if(validar_restaurante())
 		return;
 
+
+	char* id = consola_leer("Ingrese el id del pedido: ");
+	id_pedido = strtol(id, NULL, 10);
+	free(id);
 	char* plato = consola_leer("Ingrese el nombre de la comida: ");
 	char* cant_s = consola_leer("Ingrese la cantidad: ");
 	int cant = strtol(cant_s, NULL, 10);
@@ -197,12 +202,20 @@ static void obtener_pedido()
 	{consola_log(consola, "El modulo no entiende este mensaje");
 	return;}
 
-	if(validar_pedido() && validar_restaurante())
+	if(validar_restaurante())
 		return;
 
+
+	char* id = consola_leer("Ingrese el id del pedido: ");
+	id_pedido = strtol(id, NULL, 10);
+	free(id);
 	t_datos_pedido* datos = crear_datos_pedido(id_pedido, restaurante_seleccionado);
 
 	t_datos_estado_pedido* datos_pedido = cliente_enviar_mensaje(cliente, OBTENER_PEDIDO, datos);
+
+	if (datos_pedido == NULL)
+		{consola_log(consola, "No se pudo obtener pedido");
+		return;}
 
 	char* mensaje = malloc(200);
 	sprintf(mensaje, "El estado del pedido es: %s, y contiene: ", (char*) dictionary_int_get(diccionario_estados, (datos_pedido->estado)));
@@ -222,20 +235,33 @@ static void obtener_pedido()
 /*FINALIZAR PEDIDO*/
 static void finalizar_pedido()
 {
-	if(validar_pedido() && validar_restaurante())
+
+	if (modulo != COMANDA)
+	{consola_log(consola, "El modulo no entiende este mensaje");
+	return;}
+
+	if(validar_restaurante())
 		return;
+
+	char* id = consola_leer("Ingrese el id del pedido: ");
+			id_pedido = strtol(id, NULL, 10);
+			free(id);
+
 	t_datos_pedido* datos = crear_datos_pedido(id_pedido, restaurante_seleccionado);
-	consola_log(consola, "voy a mandar mensaje");
+
 	bool operacion_ok = cliente_enviar_mensaje(cliente, FINALIZAR_PEDIDO, datos);
-	consola_log(consola, "recibi respuesta");
-	char* mensaje = operacion_ok ? "El pedido ha finalizado correctamente" : "El pedido no ha podido finalizarse correctamente" ;
-	consola_log(consola, mensaje);
+	consola_if(consola, operacion_ok);
+
 }
 
 /*CONFIRMAR PEDIDO*/
 static void confirmar_pedido()
 {
 
+	if (modulo == COMANDA || modulo == SINDICATO)
+		{char* id = consola_leer("Ingrese el id del pedido: ");
+		id_pedido = strtol(id, NULL, 10);
+		free(id);}
 
 	if(validar_restaurante() && validar_pedido())
 		return;
@@ -258,9 +284,14 @@ static void plato_listo()
 	{consola_log(consola, "El modulo no entiende este mensaje");
 	return;}
 
-	if(validar_pedido() && validar_restaurante())
+	if(validar_restaurante())
 		return;
 
+
+	if (modulo == COMANDA || modulo == SINDICATO)
+		{char* id = consola_leer("Ingrese el id del pedido: ");
+		id_pedido = strtol(id, NULL, 10);
+		free(id);}
 
 	char* plato = consola_leer("Ingrese el nombre del plato listo: ");
 	int cant = 1;
