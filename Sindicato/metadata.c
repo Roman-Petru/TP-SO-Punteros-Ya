@@ -11,9 +11,8 @@ void inicializar_metadata()
 	char* puntoMontaje = config_get_string_value(config, "PUNTO_MONTAJE");
 	raiz = crearNodo(puntoMontaje);
 	if (!existe_directorio(puntoMontaje))
-		{if (0 != mkdir(puntoMontaje, 0700)){
-			perror("mkdir");		}
-			printf("que onda");}
+		{if (0 != mkdir(puntoMontaje, 0700))
+			perror("mkdir");}
 
 	char* meta = string_new();
 	string_append(&meta,raiz->nombre);

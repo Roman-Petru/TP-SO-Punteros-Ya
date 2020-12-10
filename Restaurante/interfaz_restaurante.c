@@ -94,7 +94,7 @@ static t_respuesta* confirmar_pedido(t_datos_pedido* datos_para_confirmar)
 		t_datos_estado_comida* plato = en_lista;
 		for (int i=0; i<plato->cant_total;i++)
 			{t_para_nuevo_plato* nuevo_plato = malloc(sizeof(t_para_nuevo_plato));
-			nuevo_plato->nombre_plato = plato->comida;//ojo
+			nuevo_plato->nombre_plato = string_duplicate(plato->comida);//ojo
 			nuevo_plato->id_pedido = datos_para_confirmar->id_pedido;
 			agregar_interrupcion(NUEVO_PLATO, nuevo_plato);}}
 

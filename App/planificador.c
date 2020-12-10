@@ -177,8 +177,7 @@ void ejecutar_ciclo()
 	void esperar_pedido(t_pedido* pedido) { sem_wait (&sem_ciclo); }
 	list_iterate(cola_EXEC, (void*) &esperar_pedido); //Espera que los pedidos en EXEC terminen de ejecutar
 
-	sleep(1);
-	//sleep(config_get_int_value(config, "CICLO"));
+	sleep(config_get_int_value(config, "RETARDO_CICLO_CPU"));
 
 	//=====PARA HRRN=====//
 	if (strcmp(config_get_string_value(config, "ALGORITMO_DE_PLANIFICACION"), "HRRN") == 0)
