@@ -84,16 +84,20 @@ static t_respuesta* consultar_platos(char* restaurante)
 /*CREAR PEDIDO*/
 static t_respuesta* crear_pedido(char* id_cliente)
 {
+	log_info(logger, "Llego el mensaje crear pedido");
 	char* restaurante = cliente_obtener_restaurante(id_cliente);
 	int id_pedido;
 
 	if(es_resto_default(restaurante))
 		id_pedido = generar_id_pedido();
 	else if(restaurante_esta_conectado(restaurante))
-		id_pedido = (int) cliente_enviar_mensaje(restaurante_obtener_cliente(restaurante), CREAR_PEDIDO, NULL);
+		{log_info(logger, "Paso restaurante esta conectado");
+		id_pedido = (int) cliente_enviar_mensaje(restaurante_obtener_cliente(restaurante), CREAR_PEDIDO, NULL);}
 	else
 		{log_info(logger, "No se selecciono un restaurante valido para crear el pedido");
 		return respuesta_crear(CREAR_PEDIDO_RESPUESTA, (void*) -1, false);}
+
+	log_info(logger, "Se obtuvo id de pedido del resto");
 
 	t_datos_pedido* datos = crear_datos_pedido(id_pedido, restaurante);
 	bool op_ok = cliente_enviar_mensaje(cliente_comanda, GUARDAR_PEDIDO, datos);
