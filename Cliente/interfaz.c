@@ -188,6 +188,7 @@ static void guardar_plato()
 	char* plato = consola_leer("Ingrese el nombre de la comida: ");
 	char* cant_s = consola_leer("Ingrese la cantidad: ");
 	int cant = strtol(cant_s, NULL, 10);
+	free(cant_s);
 
 	t_guardar_plato* datos = crear_datos_guardar_plato(id_pedido,cant ,plato , restaurante_seleccionado);
 
