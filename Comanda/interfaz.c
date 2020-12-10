@@ -3,6 +3,7 @@
 
 static t_respuesta* handshake_cliente()
 {
+	log_info(logger, "Se conecto un cliente");
 	return respuesta_crear(HANDSHAKE_CLIENTE_RESPUESTA, (void*) COMANDA, false);
 }
 

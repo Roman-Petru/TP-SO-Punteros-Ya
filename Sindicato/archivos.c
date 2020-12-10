@@ -1,5 +1,8 @@
 #include "archivos.h"
 
+pthread_mutex_t mutex_direc_rest;
+pthread_mutex_t mutex_direc_recetas;
+pthread_mutex_t mutex_direc_pedidos;
 
 void inicializar_archivos()
 {
@@ -16,6 +19,7 @@ void inicializar_archivos()
 	string_append(&restaurantes, files);
 	string_append(&restaurantes,"/Restaurantes");
 	agregarNodo(nodo_files ,crearNodo("/Restaurantes"));
+	pthread_mutex_init(&(mutex_direc_rest), NULL);
 
 	if (!existe_directorio(restaurantes))
 		mkdir(restaurantes, 0700);
@@ -25,6 +29,7 @@ void inicializar_archivos()
 	string_append(&recetas, files);
 	string_append(&recetas,"/Recetas");
 	agregarNodo(nodo_files ,crearNodo("/Recetas"));
+	pthread_mutex_init(&(mutex_direc_recetas), NULL);
 
 	if (!existe_directorio(recetas))
 		mkdir(recetas, 0700);
@@ -32,6 +37,8 @@ void inicializar_archivos()
 	free(restaurantes);
 	free(recetas);
 	free(files);
+
+	pthread_mutex_init(&(mutex_direc_pedidos), NULL);
 
 }
 
@@ -41,6 +48,7 @@ bool restaurante_existe(char* restaurante)
 
 	char* nodo = obtener_nodo_restaurantes();
 
+	pthread_mutex_lock(&mutex_direc_rest);
 	DIR* dir = opendir(nodo);
 	struct dirent* entry;
 	bool encontro = false;
@@ -55,6 +63,7 @@ bool restaurante_existe(char* restaurante)
 
 	free(nodo);
 	closedir(dir);
+	pthread_mutex_unlock(&mutex_direc_rest);
 
 	return encontro;
 }
@@ -66,6 +75,7 @@ bool receta_existe(char* receta)
 	char* dupli = string_duplicate(receta);
 	string_append(&dupli, ".AFIP");
 
+	pthread_mutex_lock(&mutex_direc_recetas);
 	DIR* dir = opendir(nodo);
 	struct dirent* entry;
 	bool encontro = false;
@@ -78,7 +88,7 @@ bool receta_existe(char* receta)
 		}}
 
 	closedir(dir);
-
+	pthread_mutex_unlock(&mutex_direc_recetas);
 	free(nodo);
 	free(dupli);
 	return encontro;
@@ -117,6 +127,7 @@ return nombre_arch_pedido;
 bool pedido_existe(char* nodo_resto, int id_pedido)
 {
 	char* nombre_arch_pedido = armar_string_arch_pedido(id_pedido);
+	pthread_mutex_lock(&mutex_direc_pedidos);
 	DIR* dir = opendir(nodo_resto);
 	struct dirent* entry;
 	bool encontro = false;
@@ -133,6 +144,7 @@ bool pedido_existe(char* nodo_resto, int id_pedido)
 
 	free(nombre_arch_pedido);
 	closedir(dir);
+	pthread_mutex_unlock(&mutex_direc_pedidos);
 	return encontro;
 }
 
@@ -228,7 +240,9 @@ void crear_receta(char* data)
 {
 	char** aux = string_n_split(data, 3, " ");
 	char* nombre_arch_recetas = string_new();
-	string_append(&nombre_arch_recetas, obtener_nodo_recetas());
+	char* nodo_recetas = obtener_nodo_recetas();
+	string_append(&nombre_arch_recetas, nodo_recetas);
+	free(nodo_recetas);
 	string_append(&nombre_arch_recetas, "/");
 	string_append(&nombre_arch_recetas, aux[0]);
 	string_append(&nombre_arch_recetas, ".AFIP");
@@ -277,6 +291,7 @@ void crear_receta(char* data)
 	log_info(logger, "Se creo un nuevo archivo de receta");
 	guardar_data_en_bloques(datos, nombre_arch_recetas);
 	free(nombre_arch_recetas);
+	destruir_datos_para_guardar(datos);
 }
 
 
@@ -285,8 +300,10 @@ void crear_restaurante (char* data)
 	char** aux = string_n_split(data, 7, " ");
 
 	char* nombre_arch_recestaurante = string_new();
-	string_append(&nombre_arch_recestaurante, obtener_nodo_restaurante_especifico(aux[0]));
+	char* resto_especifico = obtener_nodo_restaurante_especifico(aux[0]);
+	string_append(&nombre_arch_recestaurante, resto_especifico);
 	mkdir(nombre_arch_recestaurante, 0700);
+	free(resto_especifico);
 
 	//CrearRestaurante Resto 5 [4,5] [Milanesa] [Milanesa,Empanadas] [200,50] 2
 
@@ -342,4 +359,5 @@ void crear_restaurante (char* data)
 	log_info(logger, "Se creo un nuevo archivo de restaurante");
 	guardar_data_en_bloques(datos, nombre_arch_recestaurante);
 	free(nombre_arch_recestaurante);
+	destruir_datos_para_guardar(datos);
 }

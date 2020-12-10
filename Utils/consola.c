@@ -69,14 +69,15 @@ void consola_leer_comando_sindicato(t_consola* consola, char* intro)
 
 	char** aux = string_n_split(leido, 2, " ");
 	if (string_equals_ignore_case(aux[0], "CrearReceta"))
-		{free(aux[0]);
-		((t_comando) dictionary_get(consola->comandos, "CrearReceta"))(aux[1]);}
-		//crear_receta();
+		{((t_comando) dictionary_get(consola->comandos, "CrearReceta"))(aux[1]);}
 	else if (string_equals_ignore_case(aux[0], "CrearRestaurante"))
-		{free(aux[0]);
-		((t_comando) dictionary_get(consola->comandos, "CrearRestaurante"))(aux[1]);}
+		{((t_comando) dictionary_get(consola->comandos, "CrearRestaurante"))(aux[1]);}
 	else
 		log_error(consola->logger, "%s no entiende el mensaje %s.", consola->modulo, leido);
+
+	free(aux[0]);
+	free(aux[1]);
+	free(aux);
 	free(leido);
 }
 

@@ -1,6 +1,8 @@
 #include "interfaz.h"
 #include "string_sindicato.h"
 
+pthread_mutex_t mutex_sindicalizador;
+
 static t_respuesta* handshake_cliente()
 {
 	log_info(logger, "Un cliente realizo un handshake");
@@ -34,11 +36,14 @@ static t_respuesta* guardar_pedido(t_datos_pedido* datos)
 		free(nodo_resto);
 		return respuesta_crear(GUARDAR_PEDIDO_RESPUESTA, (void*) false, false);	}
 
+	pthread_mutex_lock(&mutex_sindicalizador);
 	if (crear_archivo_pedido(nodo_resto, datos->id_pedido))
-		{free(nodo_resto);
+		{pthread_mutex_unlock(&mutex_sindicalizador);
+		free(nodo_resto);
 		return respuesta_crear(GUARDAR_PEDIDO_RESPUESTA, (void*) true, false);	}
 	else
-		{free(nodo_resto);
+		{pthread_mutex_unlock(&mutex_sindicalizador);
+		free(nodo_resto);
 		return respuesta_crear(GUARDAR_PEDIDO_RESPUESTA, (void*) false, false);}
 }
 
@@ -58,14 +63,17 @@ static t_respuesta* guardar_plato(t_guardar_plato* datos)
 
 	char* path_pedido = obtener_path_pedido(nodo_resto, datos->id_pedido);
 
+	pthread_mutex_lock(&mutex_sindicalizador);
 	t_datos_para_guardar* datos_para_guardar = leer_de_bloques(path_pedido);
 
 	bool op_ok = mod_string_guardar_plato(datos_para_guardar, datos);
 		if(!op_ok)
-			return respuesta_crear(GUARDAR_PLATO_RESPUESTA, (void*) false, false);
+			{pthread_mutex_unlock(&mutex_sindicalizador);
+			return respuesta_crear(GUARDAR_PLATO_RESPUESTA, (void*) false, false);}
 
 
 	guardar_data_en_bloques(datos_para_guardar, path_pedido);
+	pthread_mutex_unlock(&mutex_sindicalizador);
 	free(nodo_resto);
 	free(path_pedido);
 	destruir_datos_para_guardar(datos_para_guardar);
@@ -90,15 +98,18 @@ static t_respuesta* confirmar_pedido(t_datos_pedido* datos)
 
 	char* path_pedido = obtener_path_pedido(nodo_resto, datos->id_pedido);
 	free(nodo_resto);
+	pthread_mutex_lock(&mutex_sindicalizador);
 	t_datos_para_guardar* datos_para_guardar = leer_de_bloques(path_pedido);
 
 	bool op_ok = mod_string_confirmar_pedido(datos_para_guardar);
 		if(!op_ok)
-			{destruir_datos_para_guardar(datos_para_guardar);
+			{pthread_mutex_unlock(&mutex_sindicalizador);
+			destruir_datos_para_guardar(datos_para_guardar);
 			free(path_pedido);
 			return respuesta_crear(CONFIRMAR_PEDIDO_RESPUESTA, (void*) false, false);}
 
 	guardar_data_en_bloques(datos_para_guardar, path_pedido);
+	pthread_mutex_unlock(&mutex_sindicalizador);
 	destruir_datos_para_guardar(datos_para_guardar);
 	free(path_pedido);
 
@@ -122,7 +133,9 @@ static t_respuesta* obtener_pedido(t_datos_pedido* datos)
 
 	char* path_pedido = obtener_path_pedido(nodo_resto, datos->id_pedido);
 
+	pthread_mutex_lock(&mutex_sindicalizador);
 	t_datos_para_guardar* datos_para_guardar = leer_de_bloques(path_pedido);
+	pthread_mutex_unlock(&mutex_sindicalizador);
 	t_pedido_sind* pedido = desglosar_pedido(datos_para_guardar->data);
 
 	t_datos_estado_pedido* datos_respuesta = modificar_estructura_pedido(pedido);
@@ -153,16 +166,19 @@ static t_respuesta* plato_listo(t_guardar_plato* datos)
 
 	char* path_pedido = obtener_path_pedido(nodo_resto, datos->id_pedido);
 	free(nodo_resto);
+
+	pthread_mutex_lock(&mutex_sindicalizador);
 	t_datos_para_guardar* datos_para_guardar = leer_de_bloques(path_pedido);
 
 	bool op_ok = mod_string_plato_listo(datos_para_guardar, datos);
 		if(!op_ok)
-			{free(path_pedido);
+			{pthread_mutex_unlock(&mutex_sindicalizador);
+			free(path_pedido);
 			destruir_datos_para_guardar(datos_para_guardar);
 			return respuesta_crear(PLATO_LISTO_RESPUESTA, (void*) false, false);}
 
 	guardar_data_en_bloques(datos_para_guardar, path_pedido);
-
+	pthread_mutex_unlock(&mutex_sindicalizador);
 	free(path_pedido);
 	destruir_datos_para_guardar(datos_para_guardar);
 
@@ -186,16 +202,19 @@ static t_respuesta* terminar_pedido(t_datos_pedido* datos)
 
 	char* path_pedido = obtener_path_pedido(nodo_resto, datos->id_pedido);
 	free(nodo_resto);
+	pthread_mutex_lock(&mutex_sindicalizador);
 	t_datos_para_guardar* datos_para_guardar = leer_de_bloques(path_pedido);
 
 	bool op_ok = mod_string_terminar_pedido(datos_para_guardar);
 		if(!op_ok)
-			{free(path_pedido);
+			{pthread_mutex_unlock(&mutex_sindicalizador);
+			free(path_pedido);
 			destruir_datos_para_guardar(datos_para_guardar);
 			return respuesta_crear(TERMINAR_PEDIDO_RESPUESTA, (void*) false, false);}
 
 
 	guardar_data_en_bloques(datos_para_guardar, path_pedido);
+	pthread_mutex_unlock(&mutex_sindicalizador);
 	free(path_pedido);
 	destruir_datos_para_guardar(datos_para_guardar);
 
@@ -219,7 +238,9 @@ static t_respuesta* obtener_receta(char* nombre_receta)
 	string_append(&path_receta, nombre_receta);
 	string_append(&path_receta, ".AFIP");
 
+	pthread_mutex_lock(&mutex_sindicalizador);
 	t_datos_para_guardar* datos_para_guardar = leer_de_bloques(path_receta);
+	pthread_mutex_unlock(&mutex_sindicalizador);
 	free(path_receta);
 
 	t_obtener_receta* receta = desglosar_receta(datos_para_guardar->data);
@@ -300,6 +321,8 @@ void cargar_interfaz()
 	servidor_agregar_operacion(servidor, TERMINAR_PEDIDO, &terminar_pedido);
 	servidor_agregar_operacion(servidor, OBTENER_RECETA, &obtener_receta);
 	servidor_agregar_operacion(servidor, OBTENER_RESTAURANTE, &obtener_restaurante);
+
+	pthread_mutex_init(&(mutex_sindicalizador), NULL);
 }
 
 
