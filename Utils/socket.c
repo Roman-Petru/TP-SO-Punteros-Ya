@@ -39,7 +39,7 @@ int socket_crear(char *ip, char* puerto)
 int socket_escucha_crear(char* ip, char* puerto)
 {
 	int socket_servidor;
-	struct addrinfo* servinfo = direccion_crear("localhost", puerto);
+	struct addrinfo* servinfo = direccion_crear(ip, puerto);
 
 	socket_servidor = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
 	if(socket_servidor == -1)
