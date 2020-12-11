@@ -46,6 +46,12 @@ int socket_escucha_crear(char* ip, char* puerto)
 		{perror("Error de socket:");
 		abort();}
 
+	int option = 1;
+
+	if (setsockopt(socket_servidor, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option)) == -1)
+		{perror("Error de setsockopt: ");
+		abort();}
+
 	if (bind(socket_servidor, servinfo->ai_addr, servinfo->ai_addrlen) == -1)
 		{perror("Error de bind:");
 		abort();}
