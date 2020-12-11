@@ -105,7 +105,6 @@ static void actualizar_estado_bloqueados()
 					cambiar_estado_a(pedido, READY, A_READY_LISTO);
 					i--;
 					pedido->instruccion_a_realizar = IR_A_CLIENTE;
-					//TODO y en el caso que quede esperando, descansa mientras esta en el restaurante?
 				}
 			}
 			else
@@ -132,6 +131,7 @@ static void actualizar_estado_ejecutados()
 		{
 			cambiar_estado_a(pedido, EXIT, A_EXIT);
 			i--;
+			repartidor_renovar(pedido->repartidor);
 			list_add(repartidores_libres, pedido->repartidor);
 			pthread_cancel(pedido->hilo);
 			sem_t* sincronizador = pedido_obtener_semaforo(pedido->id_pedido);
@@ -146,25 +146,24 @@ static void actualizar_estado_ejecutados()
 		}
 		else
 		{
-			if (posicion_es_igual(pedido->repartidor->posicion, pedido->posicion_de_restaurante))
+			if (pedido->repartidor->esta_cansado)
+						{
+							cambiar_estado_a(pedido, BLOCKED, A_BLOCKED_CANSADO);
+							pedido->repartidor->ciclos_viajando = 0;
+							i--;
+						}
+			else if (posicion_es_igual(pedido->repartidor->posicion, pedido->posicion_de_restaurante))
 			{
 				if (pedido->esta_listo)
 					pedido->instruccion_a_realizar = IR_A_CLIENTE;
 				else
 				{
-					//TODO arreglar esto, si llega al mismo tiempo que se cansa no andaria bien
 					cambiar_estado_a(pedido, BLOCKED, A_BLOCKED_ESPERA);
 					i--;
 					pedido->instruccion_a_realizar = ESPERAR_EN_RESTAURANTE;
-					pedido->repartidor->ciclos_viajando = 0;
 				}
 			}
-			if (pedido->repartidor->esta_cansado)
-			{
-				cambiar_estado_a(pedido, BLOCKED, A_BLOCKED_CANSADO);
-				pedido->repartidor->ciclos_viajando = 0;
-				i--;
-			}
+
 		}
 	}
 }

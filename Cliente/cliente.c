@@ -35,10 +35,11 @@ servidor_agregar_operacion(servidor, FINALIZAR_PEDIDO_CLIENTE, &finalizar_pedido
 
 static void inicializar()
 {
-	consola = consola_crear("cliente.log", "Cliente");
-	char* string_config = consola_leer("Ingrese el nombre del config deseado: ");
+	char* string_config = readline("Ingrese el nombre del config deseado: ");
 
 	config = config_create(string_config);
+
+	consola = consola_crear(config_get_string_value(config, "ARCHIVO_LOG"), "Cliente");
 
 	id_pedido = 0;
 	restaurante_seleccionado = NULL;

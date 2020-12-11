@@ -20,6 +20,15 @@ t_repartidor* repartidor_crear(t_posicion* posicion, int frecuencia_descanso, in
 	return repartidor;
 }
 
+void repartidor_renovar(t_repartidor* repartidor)
+{
+	repartidor->ciclos_viajando = 0;
+	repartidor->ciclos_descansados = 0;
+
+	repartidor->esta_cansado = false;
+
+}
+
 void repartidor_destruir(t_repartidor* repartidor)
 {
 	free(repartidor->posicion);

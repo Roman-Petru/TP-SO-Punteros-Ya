@@ -29,6 +29,7 @@ t_repartidor* repartidor_crear(t_posicion* posicion, int frecuencia_descanso, in
 void repartidor_destruir(t_repartidor* repartidor);
 void repartidor_mover_hacia(t_repartidor* repartidor, t_posicion* destino);
 void repartidor_descansar(t_repartidor* repartidor);
+void repartidor_renovar(t_repartidor* repartidor);
 
 void cargar_repartidores();
 t_repartidor* repartidor_obtener_mas_cercano(t_posicion* destino);
