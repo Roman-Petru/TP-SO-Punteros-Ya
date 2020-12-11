@@ -48,7 +48,7 @@ int socket_escucha_crear(char* ip, char* puerto)
 
 	int option = 1;
 
-	if (setsockopt(socket_servidor, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option)) == -1)
+	if (setsockopt(socket_servidor, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT | SO_LINGER , &option, sizeof(option)) == -1)
 		{perror("Error de setsockopt: ");
 		abort();}
 
