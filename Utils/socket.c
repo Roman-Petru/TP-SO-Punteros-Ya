@@ -40,9 +40,20 @@ int socket_escucha_crear(char* ip, char* puerto)
 {
 	int socket_servidor;
 	struct addrinfo* servinfo = direccion_crear(ip, puerto);
+
 	socket_servidor = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
-	bind(socket_servidor, servinfo->ai_addr, servinfo->ai_addrlen);
-	listen(socket_servidor, SOMAXCONN);
+	if(socket_servidor == -1)
+		{perror("Error de socket:");
+		abort();}
+
+	if (bind(socket_servidor, servinfo->ai_addr, servinfo->ai_addrlen) == -1)
+		{perror("Error de bind:");
+		abort();}
+
+	if (listen(socket_servidor, SOMAXCONN)== -1)
+		{perror("Error de listen:");
+		abort();}
+
     freeaddrinfo(servinfo);
 
     return socket_servidor;
