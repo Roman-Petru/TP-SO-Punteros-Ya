@@ -105,10 +105,15 @@ static void actualizar_estado_bloqueados()
 					cambiar_estado_a(pedido, READY, A_READY_LISTO);
 					i--;
 					pedido->instruccion_a_realizar = IR_A_CLIENTE;
+					log_info(logger, "El pedido %d fue entregado al repartidor y ahora se dirige al cliente.", pedido->pcb_id);
 				}
 			}
 			else
 			{
+				if (posicion_es_igual(pedido->repartidor->posicion, pedido->posicion_de_restaurante) && pedido->esta_listo)
+					{log_info(logger, "El pedido %d fue entregado al repartidor y ahora se dirige al cliente.", pedido->pcb_id);
+					pedido->instruccion_a_realizar = IR_A_CLIENTE;	}
+
 				repartidor_descansar(pedido->repartidor);
 				if (!pedido->repartidor->esta_cansado)
 					{cambiar_estado_a(pedido, READY, A_READY_DESCANSO);
@@ -154,7 +159,8 @@ static void actualizar_estado_ejecutados()
 			else if (posicion_es_igual(pedido->repartidor->posicion, pedido->posicion_de_restaurante))
 			{
 				if (pedido->esta_listo)
-					pedido->instruccion_a_realizar = IR_A_CLIENTE;
+					{log_info(logger, "El pedido %d fue entregado al repartidor y ahora se dirige al cliente.", pedido->pcb_id);
+					pedido->instruccion_a_realizar = IR_A_CLIENTE;}
 				else
 				{
 					cambiar_estado_a(pedido, BLOCKED, A_BLOCKED_ESPERA);
