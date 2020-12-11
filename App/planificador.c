@@ -119,7 +119,6 @@ static void actualizar_estado_bloqueados()
 
 static void actualizar_estado_ejecutados()
 {
-	//TODO: lista cambios
 
 	for (int i=0; i < list_size(cola_EXEC); i++)
 	{

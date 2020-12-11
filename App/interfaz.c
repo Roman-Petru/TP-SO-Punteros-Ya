@@ -180,7 +180,6 @@ static t_respuesta* confirmar_pedido(t_datos_pedido* datos)
 
 	t_pedido* pedido = pedido_crear(datos->id_pedido);
 
-	//TODO: Enviar mensaje Confirmar Pedido a Cliente
 	op_ok = cliente_enviar_mensaje(cliente_comanda, CONFIRMAR_PEDIDO, datos);
 
 	if (op_ok)

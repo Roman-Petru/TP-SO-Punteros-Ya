@@ -20,8 +20,8 @@ void inicializar_restaurante()
 {
 	char* config = readline("Elegir archivo de config: ");
 
-	logger_resto = log_create("resto.log", "RESTAURANTE", true, LOG_LEVEL_INFO);
 	config_resto = config_create(config);
+	logger_resto = log_create(config_get_string_value(config_resto, "ARCHIVO_LOG"), "RESTAURANTE", true, LOG_LEVEL_INFO);
 	nombre_restaurante = config_get_string_value(config_resto, "NOMBRE_RESTAURANTE");
 
 	servidor = servidor_crear(config_get_string_value(config_resto, "IP_SERVIDOR"), config_get_string_value(config_resto, "PUERTO_ESCUCHA"));

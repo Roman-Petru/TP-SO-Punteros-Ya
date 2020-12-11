@@ -129,10 +129,13 @@ static void crear_pedido()
 	else if(validar_restaurante())
 		return;
 
-
 	id_pedido = (int) cliente_enviar_mensaje(cliente, CREAR_PEDIDO, cliente_id);
 
 	consola_if(consola, id_pedido > 0);
+	char* mensaje = malloc(200);
+	sprintf(mensaje, "Se creo pedido con id: %d", id_pedido);
+	consola_log(consola, mensaje);
+	free(mensaje);
 }
 
 static void guardar_pedido()
@@ -164,6 +167,11 @@ static void agregar_plato()
 
 	if(validar_pedido())
 		return;
+
+	if (modulo == RESTAURANTE)
+		{char* id = consola_leer("Ingrese el id del pedido: ");
+		id_pedido = strtol(id, NULL, 10);
+		free(id);}
 
 	t_agregar_plato* datos = crear_datos_agregar_plato(id_pedido, consola_leer("Ingrese el nombre del plato: "));
 	bool operacion_ok = cliente_enviar_mensaje(cliente, AGREGAR_PLATO, datos);
@@ -266,6 +274,11 @@ static void confirmar_pedido()
 
 	if(validar_restaurante() && validar_pedido())
 		return;
+
+	if (modulo == RESTAURANTE)
+		{char* id = consola_leer("Ingrese el id del pedido: ");
+		id_pedido = strtol(id, NULL, 10);
+		free(id);}
 
 	bool operacion_ok = cliente_enviar_mensaje(cliente, CONFIRMAR_PEDIDO, crear_datos_pedido(id_pedido, restaurante_seleccionado));
 	consola_if(consola, operacion_ok);
